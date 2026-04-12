@@ -88,7 +88,8 @@
     <!-- FORM -->
     <div class="contact-form-wrap">
       <h3>Request a Free Quote</h3>
-      <form id="quote-form">
+      <form id="quote-form" name="quote-request" method="POST" data-netlify="true">
+        <input type="hidden" name="form-name" value="quote-request" />
         <div class="form-row">
           <div class="form-group">
             <label for="name">Your Name</label>
@@ -219,65 +220,65 @@
 <a href="https://wa.me/27650241517" class="wa-float" target="_blank">💬</a>
 
 <script>
-document.getElementById('quote-form').addEventListener('submit', function(e) {
-  e.preventDefault();
-  const btn = this.querySelector('button');
-  const name = document.getElementById('name').value.trim();
-  const phone = document.getElementById('phone').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const service = document.getElementById('service').value;
-  const budget = document.getElementById('budget').value;
-  const message = document.getElementById('message').value.trim();
-
-  if (!name || !email || !service || !budget || !message) {
-    alert('Please fill in all required fields.');
-    return;
-  }
-
-  // Create receipt format for WhatsApp
-  const receipt = `*NEW PROJECT REQUEST* 🚀\n` +
-                  `--------------------------\n` +
-                  `*Name:* ${name}\n` +
-                  `*Phone:* ${phone}\n` +
-                  `*Email:* ${email}\n` +
-                  `*Service:* ${service}\n` +
-                  `*Budget:* ${budget}\n` +
-                  `--------------------------\n` +
-                  `*Project Details:*\n${message}\n` +
-                  `--------------------------\n` +
-                  `_Sent from DemiTech Website_`;
-
-  // WhatsApp link
+ document.getElementById('quote-form').addEventListener('submit', function(e) {
+   e.preventDefault();
+   const btn = this.querySelector('button');
+   const formData = new FormData(this);
+   const name = formData.get('name');
+   const phone = formData.get('phone');
+   const email = formData.get('email');
+   const service = formData.get('service');
+   const budget = formData.get('budget');
+   const message = formData.get('message');
+ 
+   // Create receipt format for WhatsApp
+   const receipt = `*NEW PROJECT REQUEST* 🚀\n` +
+                   `--------------------------\n` +
+                   `*Name:* ${name}\n` +
+                   `*Phone:* ${phone}\n` +
+                   `*Email:* ${email}\n` +
+                   `*Service:* ${service}\n` +
+                   `*Budget:* ${budget}\n` +
+                   `--------------------------\n` +
+                   `*Project Details:*\n${message}\n` +
+                   `--------------------------\n` +
+                   `_Sent from DemiTech Website_`;
+ 
+   // WhatsApp link
    const waUrl = `https://wa.me/27650241517?text=${encodeURIComponent(receipt)}`;
    
-   // Email fallback (mailto)
-   const emailSubject = `New Project Request from ${name}`;
-   const emailBody = receipt.replace(/\*/g, ''); // Remove markdown stars for email
-   const mailtoUrl = `mailto:demitechwebservices@gmail.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
-
-   // Show feedback
-   btn.textContent = '✅ Request Sent!';
-   btn.style.background = '#2a7a2a';
+   // Show feedback state
+   btn.textContent = '⌛ Sending...';
    btn.disabled = true;
-   document.getElementById('form-feedback').style.display = 'block';
+
+   // Submit to Netlify via AJAX
+   fetch("/", {
+     method: "POST",
+     headers: { "Content-Type": "application/x-www-form-urlencoded" },
+     body: new URLSearchParams(formData).toString(),
+   })
+   .then(() => {
+     btn.textContent = '✅ Request Sent!';
+     btn.style.background = '#2a7a2a';
+     document.getElementById('form-feedback').style.display = 'block';
  
-   // Open WhatsApp
-   window.open(waUrl, '_blank');
-   
-   // Optionally open email (might be blocked as second popup, but let's try or just suggest it)
-   // window.location.href = mailtoUrl; 
-   
-   // A better way is to use a form submission service. 
-   // I'll add a comment about Formspree for the user.
-   
-   setTimeout(() => {
-    btn.textContent = '🚀 Send My Request';
-    btn.style.background = '';
-    btn.disabled = false;
-    document.getElementById('form-feedback').style.display = 'none';
-    this.reset();
-  }, 5000);
-});
-</script>
+     // Open WhatsApp
+     window.open(waUrl, '_blank');
+     
+     setTimeout(() => {
+       btn.textContent = '🚀 Send My Request';
+       btn.style.background = '';
+       btn.disabled = false;
+       document.getElementById('form-feedback').style.display = 'none';
+       this.reset();
+     }, 5000);
+   })
+   .catch((error) => {
+     alert("Error submitting form. Please try again or contact us directly via WhatsApp.");
+     btn.textContent = '🚀 Send My Request';
+     btn.disabled = false;
+   });
+ });
+ </script>
 </body>
 </html>
