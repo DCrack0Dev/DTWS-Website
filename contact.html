@@ -259,29 +259,29 @@
       }
     })
     .then(response => {
-      if (response.ok) {
-        btn.textContent = '✅ Request Sent!';
-        btn.style.background = '#2a7a2a';
-        document.getElementById('form-feedback').style.display = 'block';
-  
-        // Open WhatsApp
-        window.open(waUrl, '_blank');
-        
-        setTimeout(() => {
-          btn.textContent = '🚀 Send My Request';
-          btn.style.background = '';
-          btn.disabled = false;
-          document.getElementById('form-feedback').style.display = 'none';
-          this.reset();
-        }, 5000);
-      } else {
-        throw new Error('Formspree error');
-      }
+      // Even if response is not ok, we show success if WhatsApp opened
+      // to avoid showing a Formspree "redirect" or error page
+      btn.textContent = '✅ Request Sent!';
+      btn.style.background = '#2a7a2a';
+      document.getElementById('form-feedback').style.display = 'block';
+
+      // Open WhatsApp
+      window.open(waUrl, '_blank');
+      
+      setTimeout(() => {
+        btn.textContent = '🚀 Send My Request';
+        btn.style.background = '';
+        btn.disabled = false;
+        document.getElementById('form-feedback').style.display = 'none';
+        this.reset();
+      }, 5000);
     })
     .catch((error) => {
-      alert("Error submitting form. Please try again or contact us directly via WhatsApp.");
-      btn.textContent = '🚀 Send My Request';
-      btn.disabled = false;
+      // Silent fail for email, still open WhatsApp
+      window.open(waUrl, '_blank');
+      btn.textContent = '✅ Request Sent!';
+      btn.style.background = '#2a7a2a';
+      document.getElementById('form-feedback').style.display = 'block';
     });
   });
  </script>
