@@ -88,8 +88,7 @@
     <!-- FORM -->
     <div class="contact-form-wrap">
       <h3>Request a Free Quote</h3>
-      <form id="quote-form" name="quote-request" method="POST" data-netlify="true">
-        <input type="hidden" name="form-name" value="quote-request" />
+      <form id="quote-form" action="https://formspree.io/f/mqakvawv" method="POST">
         <div class="form-row">
           <div class="form-group">
             <label for="name">Your Name</label>
@@ -221,64 +220,70 @@
 
 <script>
  document.getElementById('quote-form').addEventListener('submit', function(e) {
-   e.preventDefault();
-   const btn = this.querySelector('button');
-   const formData = new FormData(this);
-   const name = formData.get('name');
-   const phone = formData.get('phone');
-   const email = formData.get('email');
-   const service = formData.get('service');
-   const budget = formData.get('budget');
-   const message = formData.get('message');
- 
-   // Create receipt format for WhatsApp
-   const receipt = `*NEW PROJECT REQUEST* 🚀\n` +
-                   `--------------------------\n` +
-                   `*Name:* ${name}\n` +
-                   `*Phone:* ${phone}\n` +
-                   `*Email:* ${email}\n` +
-                   `*Service:* ${service}\n` +
-                   `*Budget:* ${budget}\n` +
-                   `--------------------------\n` +
-                   `*Project Details:*\n${message}\n` +
-                   `--------------------------\n` +
-                   `_Sent from DemiTech Website_`;
- 
-   // WhatsApp link
-   const waUrl = `https://wa.me/27650241517?text=${encodeURIComponent(receipt)}`;
-   
-   // Show feedback state
-   btn.textContent = '⌛ Sending...';
-   btn.disabled = true;
-
-   // Submit to Netlify via AJAX
-   fetch("/", {
-     method: "POST",
-     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-     body: new URLSearchParams(formData).toString(),
-   })
-   .then(() => {
-     btn.textContent = '✅ Request Sent!';
-     btn.style.background = '#2a7a2a';
-     document.getElementById('form-feedback').style.display = 'block';
- 
-     // Open WhatsApp
-     window.open(waUrl, '_blank');
-     
-     setTimeout(() => {
-       btn.textContent = '🚀 Send My Request';
-       btn.style.background = '';
-       btn.disabled = false;
-       document.getElementById('form-feedback').style.display = 'none';
-       this.reset();
-     }, 5000);
-   })
-   .catch((error) => {
-     alert("Error submitting form. Please try again or contact us directly via WhatsApp.");
-     btn.textContent = '🚀 Send My Request';
-     btn.disabled = false;
-   });
- });
+    e.preventDefault();
+    const btn = this.querySelector('button');
+    const formData = new FormData(this);
+    const name = formData.get('name');
+    const phone = formData.get('phone');
+    const email = formData.get('email');
+    const service = formData.get('service');
+    const budget = formData.get('budget');
+    const message = formData.get('message');
+  
+    // Create receipt format for WhatsApp
+    const receipt = `*NEW PROJECT REQUEST* 🚀\n` +
+                    `--------------------------\n` +
+                    `*Name:* ${name}\n` +
+                    `*Phone:* ${phone}\n` +
+                    `*Email:* ${email}\n` +
+                    `*Service:* ${service}\n` +
+                    `*Budget:* ${budget}\n` +
+                    `--------------------------\n` +
+                    `*Project Details:*\n${message}\n` +
+                    `--------------------------\n` +
+                    `_Sent from DemiTech Website_`;
+  
+    // WhatsApp link
+    const waUrl = `https://wa.me/27650241517?text=${encodeURIComponent(receipt)}`;
+    
+    // Show feedback state
+    btn.textContent = '⌛ Sending...';
+    btn.disabled = true;
+  
+    // Submit to Formspree via AJAX (Works on Vercel)
+    fetch(this.action, {
+      method: "POST",
+      body: formData,
+      headers: {
+        'Accept': 'application/json'
+      }
+    })
+    .then(response => {
+      if (response.ok) {
+        btn.textContent = '✅ Request Sent!';
+        btn.style.background = '#2a7a2a';
+        document.getElementById('form-feedback').style.display = 'block';
+  
+        // Open WhatsApp
+        window.open(waUrl, '_blank');
+        
+        setTimeout(() => {
+          btn.textContent = '🚀 Send My Request';
+          btn.style.background = '';
+          btn.disabled = false;
+          document.getElementById('form-feedback').style.display = 'none';
+          this.reset();
+        }, 5000);
+      } else {
+        throw new Error('Formspree error');
+      }
+    })
+    .catch((error) => {
+      alert("Error submitting form. Please try again or contact us directly via WhatsApp.");
+      btn.textContent = '🚀 Send My Request';
+      btn.disabled = false;
+    });
+  });
  </script>
 </body>
 </html>
