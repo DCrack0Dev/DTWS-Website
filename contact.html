@@ -259,29 +259,37 @@
       }
     })
     .then(response => {
-      // Even if response is not ok, we show success if WhatsApp opened
-      // to avoid showing a Formspree "redirect" or error page
-      btn.textContent = '✅ Request Sent!';
-      btn.style.background = '#2a7a2a';
-      document.getElementById('form-feedback').style.display = 'block';
-
-      // Open WhatsApp
-      window.open(waUrl, '_blank');
-      
-      setTimeout(() => {
-        btn.textContent = '🚀 Send My Request';
-        btn.style.background = '';
+      console.log('Formspree response:', response);
+      if (response.ok) {
+        // Success
+        btn.textContent = '✅ Request Sent!';
+        btn.style.background = '#2a7a2a';
+        document.getElementById('form-feedback').style.display = 'block';
+        
+        // Open WhatsApp
+        window.open(waUrl, '_blank');
+        
+        setTimeout(() => {
+          btn.textContent = '🚀 Send My Request';
+          btn.style.background = '';
+          btn.disabled = false;
+          document.getElementById('form-feedback').style.display = 'none';
+          this.reset();
+        }, 5000);
+      } else {
+        // Formspree error - fallback to WhatsApp only
+        console.error('Formspree error:', response.statusText);
+        window.open(waUrl, '_blank');
+        btn.textContent = '✅ WhatsApp Opened!';
         btn.disabled = false;
-        document.getElementById('form-feedback').style.display = 'none';
-        this.reset();
-      }, 5000);
+      }
     })
     .catch((error) => {
-      // Silent fail for email, still open WhatsApp
+      // Network error - fallback to WhatsApp only
+      console.error('Fetch error:', error);
       window.open(waUrl, '_blank');
-      btn.textContent = '✅ Request Sent!';
-      btn.style.background = '#2a7a2a';
-      document.getElementById('form-feedback').style.display = 'block';
+      btn.textContent = '✅ WhatsApp Opened!';
+      btn.disabled = false;
     });
   });
  </script>
