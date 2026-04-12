@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Contact – DemiTech Web Services</title>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">
+      <img src="demitech-logo.svg" alt="DemiTech Web Services Logo"/>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="pricing.html">Pricing</a></li>
+      <li><a href="portfolio.html">Portfolio</a></li>
+      <li><a href="contact.html" class="active">Contact</a></li>
+      <li><a href="contact.html" class="nav-cta">Get a Quote</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="grid-bg"></div>
+  <div class="page-hero-inner fade-up d1">
+    <span class="section-tag">// Get In Touch</span>
+    <h1 class="section-title">Have a project in mind? Let's build something <span class="gold">powerful together.</span></h1>
+    <div class="divider divider-center"></div>
+    <p class="section-desc" style="margin:0 auto;">Tell us about your project and we'll get back to you within 24 hours with a free, detailed quote. No obligation, no pressure.</p>
+  </div>
+</section>
+
+<!-- CONTACT SECTION -->
+<section class="contact-section">
+  <div class="contact-inner">
+
+    <!-- INFO -->
+    <div class="contact-info">
+      <span class="section-tag">// Reach Us Directly</span>
+      <h2 class="section-title">We're here to <span class="gold">help</span></h2>
+      <div class="divider"></div>
+      <p>Whether you have a fully formed idea or just a rough concept — we'll help you figure out the best solution and give you an honest, transparent quote. Based in Durban, serving clients across South Africa.</p>
+
+      <div class="contact-channels">
+        <a href="tel:+27650241517" class="contact-channel">
+          <div class="ch-icon">📞</div>
+          <div>
+            <div class="ch-label">Call Us</div>
+            <div class="ch-val">065 024 1517</div>
+          </div>
+        </a>
+        <a href="https://wa.me/27650241517" class="contact-channel" target="_blank">
+          <div class="ch-icon">💬</div>
+          <div>
+            <div class="ch-label">WhatsApp</div>
+            <div class="ch-val">065 024 1517</div>
+          </div>
+        </a>
+        <a href="mailto:demitechwebservices@gmail.com" class="contact-channel">
+          <div class="ch-icon">✉️</div>
+          <div>
+            <div class="ch-label">Email</div>
+            <div class="ch-val">demitechwebservices@gmail.com</div>
+          </div>
+        </a>
+        <div class="contact-channel" style="cursor:default;">
+          <div class="ch-icon">📍</div>
+          <div>
+            <div class="ch-label">Location</div>
+            <div class="ch-val">Durban, KZN — Serving SA wide</div>
+          </div>
+        </div>
+        <div class="contact-channel" style="cursor:default;">
+          <div class="ch-icon">🕒</div>
+          <div>
+            <div class="ch-label">Business Hours</div>
+            <div class="ch-val">Mon – Sat: 8:00am – 6:00pm</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <div class="contact-form-wrap">
+      <h3>Request a Free Quote</h3>
+      <form id="quote-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Your Name</label>
+            <input type="text" id="name" name="name" placeholder="e.g. Thabo Nkosi" required/>
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone / WhatsApp</label>
+            <input type="tel" id="phone" name="phone" placeholder="+27 82 000 0000" required/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" placeholder="you@yourbusiness.co.za" required/>
+        </div>
+        <div class="form-group">
+          <label for="service">Service Needed</label>
+          <select id="service" name="service" required>
+            <option value="">Select a service...</option>
+            <option>Landing Page (R1,500 – R5,000)</option>
+            <option>Business Website (R5,000 – R15,000)</option>
+            <option>E-commerce Store (R10,000 – R40,000)</option>
+            <option>Web App (R10,000 – R100,000)</option>
+            <option>Mobile App (R25,000+)</option>
+            <option>SEO Services</option>
+            <option>Logo & Branding / UI Design</option>
+            <option>Digital Marketing / Social Media</option>
+            <option>Maintenance & Support</option>
+            <option>Not Sure — I Need Advice</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="budget">Approximate Budget</label>
+          <select id="budget" name="budget" required>
+            <option value="">Select a budget range...</option>
+            <option>Under R5,000</option>
+            <option>R5,000 – R15,000</option>
+            <option>R15,000 – R40,000</option>
+            <option>R40,000 – R100,000</option>
+            <option>R100,000+</option>
+            <option>Not Sure Yet</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="message">Tell Us About Your Project</label>
+          <textarea id="message" name="message" placeholder="What does your business do? What do you want your website or app to achieve? Any features or ideas you have in mind?" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-gold form-submit">🚀 Send My Request</button>
+      </form>
+      <p id="form-feedback" style="display:none;margin-top:1rem;font-size:.85rem;color:var(--gold);text-align:center;">✅ Request sent! We'll be in touch within 24 hours.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- FAQ STRIP -->
+<section style="padding:5rem 5%;background:var(--bg2);border-top:1px solid var(--border);">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="text-center" style="margin-bottom:3rem;">
+      <span class="section-tag">// Common Questions</span>
+      <h2 class="section-title">Before you reach out, <span class="gold">quick answers</span></h2>
+      <div class="divider divider-center"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem;">
+      <div style="background:var(--card);border:1px solid var(--border);padding:1.5rem;border-radius:4px;">
+        <h4 style="font-size:.95rem;margin-bottom:.5rem;color:var(--gold);">How long does a website take?</h4>
+        <p style="font-size:.85rem;color:var(--muted);line-height:1.7;">A landing page typically takes 5–10 business days. A full business website takes 14–21 days. Web apps and mobile apps take 3–16 weeks depending on complexity.</p>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);padding:1.5rem;border-radius:4px;">
+        <h4 style="font-size:.95rem;margin-bottom:.5rem;color:var(--gold);">How do payments work?</h4>
+        <p style="font-size:.85rem;color:var(--muted);line-height:1.7;">50% deposit to start, and 50% on completion. You only pay the balance once you're satisfied with the finished product. No risk.</p>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);padding:1.5rem;border-radius:4px;">
+        <h4 style="font-size:.95rem;margin-bottom:.5rem;color:var(--gold);">Do I own the website after it's built?</h4>
+        <p style="font-size:.85rem;color:var(--muted);line-height:1.7;">Yes — 100%. We hand over all code, login credentials, domain access, and hosting files. Everything belongs to you at completion.</p>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);padding:1.5rem;border-radius:4px;">
+        <h4 style="font-size:.95rem;margin-bottom:.5rem;color:var(--gold);">Can you work with clients outside Durban?</h4>
+        <p style="font-size:.85rem;color:var(--muted);line-height:1.7;">Absolutely. We serve clients across South Africa — Johannesburg, Cape Town, Pretoria, and everywhere in between. All communication can be done remotely.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img src="demitech-logo.svg" alt="DemiTech Logo"/>
+        <p>Professional digital solutions for South African businesses. Based in Durban, serving clients nationwide.</p>
+        <div class="footer-tagline">Built Local. Built to Grow.</div>
+      </div>
+      <div class="footer-col">
+        <h5>Services</h5>
+        <ul>
+          <li><a href="pricing.html">Website Development</a></li>
+          <li><a href="pricing.html">Web App Development</a></li>
+          <li><a href="pricing.html">Mobile Apps</a></li>
+          <li><a href="pricing.html">SEO & Marketing</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Pages</h5>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="pricing.html">Pricing</a></li>
+          <li><a href="portfolio.html">Portfolio</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Contact</h5>
+        <ul>
+          <li><a href="tel:+27650241517">065 024 1517</a></li>
+          <li><a href="mailto:demitechwebservices@gmail.com">demitechwebservices@gmail.com</a></li>
+          <li><a href="#">Durban, KwaZulu-Natal</a></li>
+          <li><a href="#">Mon–Sat: 8am–6pm</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2024 DemiTech Web Services. All rights reserved.</p>
+      <span class="gold-text">Built Local. Built to Grow.</span>
+    </div>
+  </div>
+</footer>
+
+<a href="https://wa.me/27650241517" class="wa-float" target="_blank">💬</a>
+
+<script>
+document.getElementById('quote-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const btn = this.querySelector('button');
+  const name = document.getElementById('name').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const service = document.getElementById('service').value;
+  const budget = document.getElementById('budget').value;
+  const message = document.getElementById('message').value.trim();
+
+  if (!name || !email || !service || !budget || !message) {
+    alert('Please fill in all required fields.');
+    return;
+  }
+
+  // Create receipt format for WhatsApp
+  const receipt = `*NEW PROJECT REQUEST* 🚀\n` +
+                  `--------------------------\n` +
+                  `*Name:* ${name}\n` +
+                  `*Phone:* ${phone}\n` +
+                  `*Email:* ${email}\n` +
+                  `*Service:* ${service}\n` +
+                  `*Budget:* ${budget}\n` +
+                  `--------------------------\n` +
+                  `*Project Details:*\n${message}\n` +
+                  `--------------------------\n` +
+                  `_Sent from DemiTech Website_`;
+
+  // WhatsApp link
+   const waUrl = `https://wa.me/27650241517?text=${encodeURIComponent(receipt)}`;
+   
+   // Email fallback (mailto)
+   const emailSubject = `New Project Request from ${name}`;
+   const emailBody = receipt.replace(/\*/g, ''); // Remove markdown stars for email
+   const mailtoUrl = `mailto:demitechwebservices@gmail.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+
+   // Show feedback
+   btn.textContent = '✅ Request Sent!';
+   btn.style.background = '#2a7a2a';
+   btn.disabled = true;
+   document.getElementById('form-feedback').style.display = 'block';
+ 
+   // Open WhatsApp
+   window.open(waUrl, '_blank');
+   
+   // Optionally open email (might be blocked as second popup, but let's try or just suggest it)
+   // window.location.href = mailtoUrl; 
+   
+   // A better way is to use a form submission service. 
+   // I'll add a comment about Formspree for the user.
+   
+   setTimeout(() => {
+    btn.textContent = '🚀 Send My Request';
+    btn.style.background = '';
+    btn.disabled = false;
+    document.getElementById('form-feedback').style.display = 'none';
+    this.reset();
+  }, 5000);
+});
+</script>
+</body>
+</html>
