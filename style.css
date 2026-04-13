@@ -11,7 +11,9 @@
   --bg2:        #0f0f0f;
   --bg3:        #141414;
   --card:       #111111;
+  --card-hover: #181818;
   --border:     #222222;
+  --nav-bg:     rgba(8,8,8,0.96);
   --gold:       #D4A017;
   --gold2:      #FFD700;
   --gold3:      #B8860B;
@@ -21,6 +23,18 @@
   --white:      #ffffff;
   --font-head:  'Cinzel', serif;
   --font-body:  'Raleway', sans-serif;
+}
+
+html[data-theme="light"] {
+  --bg:         #f6f6f6;
+  --bg2:        #ffffff;
+  --bg3:        #efefef;
+  --card:       #ffffff;
+  --card-hover: #f2f2f2;
+  --border:     #dddddd;
+  --nav-bg:     rgba(255,255,255,0.92);
+  --text:       #121212;
+  --muted:      #5a5a5a;
 }
 
 /* ── Reset ── */
@@ -47,7 +61,7 @@ a { color: inherit; text-decoration: none; }
   position: sticky;
   top: 0;
   z-index: 200;
-  background: rgba(8,8,8,0.96);
+  background: var(--nav-bg);
   backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border);
   padding: 0 5%;
@@ -112,6 +126,56 @@ a { color: inherit; text-decoration: none; }
 }
 .nav-cta:hover { background: var(--gold) !important; color: #000 !important; }
 .nav-cta::after { display: none !important; }
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  color: var(--text);
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.2s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.theme-toggle:hover { border-color: var(--gold3); transform: translateY(-1px); }
+.theme-toggle:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+.theme-toggle-track {
+  width: 34px;
+  height: 18px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  position: relative;
+  flex: 0 0 auto;
+}
+.theme-toggle-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--text);
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  transform: translateY(-50%);
+  transition: transform 0.2s;
+}
+html[data-theme="light"] .theme-toggle-thumb { transform: translate(16px, -50%); }
 
 /* ── BUTTONS ── */
 .btn {
@@ -375,7 +439,7 @@ section { position: relative; }
   overflow: hidden;
   transition: background 0.2s;
 }
-.service-card:hover { background: #181818; }
+.service-card:hover { background: var(--card-hover); }
 .service-card::before {
   content: '';
   position: absolute;
