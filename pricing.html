@@ -14,13 +14,19 @@
     <a href="index.html" class="nav-brand">
       <img src="demitech-logo.svg" alt="DemiTech Web Services Logo"/>
     </a>
-    <ul class="nav-links">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="pricing.html" class="active">Pricing</a></li>
-      <li><a href="portfolio.html">Portfolio</a></li>
-      <li><a href="contact.html">Contact</a></li>
-      <li><a href="contact.html" class="nav-cta">Get a Quote</a></li>
-    </ul>
+    <div class="nav-right">
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="pricing.html" class="active">Pricing</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="contact.html" class="nav-cta">Get a Quote</a></li>
+      </ul>
+      <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle theme" aria-pressed="false">
+        <span class="theme-toggle-track" aria-hidden="true"><span class="theme-toggle-thumb"></span></span>
+        <span class="theme-toggle-label" data-theme-toggle-label>Light</span>
+      </button>
+    </div>
   </div>
 </nav>
 
@@ -286,5 +292,37 @@
 </footer>
 
 <a href="https://wa.me/27650241517" class="wa-float" target="_blank">💬</a>
+
+<script>
+(() => {
+  const storageKey = 'dtws-theme';
+  const root = document.documentElement;
+  const toggle = document.getElementById('themeToggle');
+  const label = toggle ? toggle.querySelector('[data-theme-toggle-label]') : null;
+
+  const applyTheme = (theme) => {
+    if (theme === 'light') {
+      root.dataset.theme = 'light';
+      if (toggle) toggle.setAttribute('aria-pressed', 'true');
+      if (label) label.textContent = 'Dark';
+      return;
+    }
+
+    delete root.dataset.theme;
+    if (toggle) toggle.setAttribute('aria-pressed', 'false');
+    if (label) label.textContent = 'Light';
+  };
+
+  const stored = localStorage.getItem(storageKey);
+  applyTheme(stored === 'light' ? 'light' : 'dark');
+
+  if (!toggle) return;
+  toggle.addEventListener('click', () => {
+    const next = root.dataset.theme === 'light' ? 'dark' : 'light';
+    localStorage.setItem(storageKey, next);
+    applyTheme(next);
+  });
+})();
+</script>
 </body>
 </html>
