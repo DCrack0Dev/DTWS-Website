@@ -26,16 +26,28 @@
 }
 
 html[data-theme="light"] {
-  --bg:         #f6f6f6;
-  --bg2:        #ffffff;
-  --bg3:        #efefef;
-  --card:       #ffffff;
-  --card-hover: #f2f2f2;
-  --border:     #dddddd;
-  --nav-bg:     rgba(255,255,255,0.92);
-  --text:       #121212;
-  --muted:      #5a5a5a;
+  --bg:         #f0eeea;
+  --bg2:        #f6f3ee;
+  --bg3:        #ece7df;
+  --card:       #f9f6f1;
+  --card-hover: #f1ece3;
+  --border:     #d7d0c6;
+  --nav-bg:     rgba(249,246,241,0.92);
+  --gold-glow:  rgba(212,160,23,0.10);
+  --text:       #141414;
+  --muted:      #545454;
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(900px 540px at 12% 10%, rgba(212,160,23,0.10), transparent 60%),
+    radial-gradient(820px 520px at 88% 18%, rgba(212,160,23,0.07), transparent 62%),
+    radial-gradient(900px 620px at 52% 92%, rgba(0,0,0,0.06), transparent 65%),
+    linear-gradient(180deg, rgba(255,255,255,0.65), rgba(240,238,234,0.65));
+  background-size: 120% 120%, 120% 120%, 130% 130%, 100% 100%;
+  background-repeat: no-repeat;
+  animation: lightBgFloat 18s ease-in-out infinite;
 }
+html[data-theme="light"] body { background: transparent; }
+html[data-theme="light"] .grid-bg { opacity: 0.18; }
 
 /* ── Reset ── */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -770,6 +782,11 @@ footer {
 .wa-float:hover { transform: scale(1.1); }
 
 /* ── FADE IN ANIMATION ── */
+@keyframes lightBgFloat {
+  0% { background-position: 0% 0%, 100% 0%, 50% 100%, 0% 0%; }
+  50% { background-position: 12% 10%, 88% 14%, 48% 92%, 0% 0%; }
+  100% { background-position: 0% 0%, 100% 0%, 50% 100%, 0% 0%; }
+}
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(24px); }
   to   { opacity: 1; transform: translateY(0); }
