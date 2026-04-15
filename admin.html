@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Dashboard – DemiTech Web Services</title>
+<link rel="stylesheet" href="style.css"/>
+<script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
+<script src="appwrite-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dashboard-page admin-dashboard">
+
+<div class="dash-layout">
+  <aside class="dash-sidebar">
+    <div class="sidebar-header">
+      <img src="demitech-logo.svg" alt="DemiTech Logo" style="height:40px; margin-bottom:2rem;"/>
+    </div>
+    <nav class="sidebar-nav">
+      <ul style="list-style:none;">
+        <li style="margin-bottom:1rem;"><a href="#" class="active" style="color:var(--gold);">📈 Admin Stats</a></li>
+        <li style="margin-bottom:1rem;"><a href="#" style="color:var(--muted);">📁 All Orders</a></li>
+        <li style="margin-bottom:1rem;"><a href="#" style="color:var(--muted);">👤 Customers</a></li>
+        <li style="margin-top:4rem;"><a href="#" onclick="Auth.logout()" style="color:#ff6b6b;">🚪 Logout</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main class="dash-main">
+    <header class="dash-header">
+      <h2>Admin Control Panel</h2>
+      <p style="color:var(--muted);">Manage your business performance and client projects.</p>
+    </header>
+
+    <div class="dash-stat-grid" style="margin-top:2rem;">
+      <div class="stat-card">
+        <h5>Total Revenue</h5>
+        <div class="val" id="total-revenue">R0</div>
+      </div>
+      <div class="stat-card">
+        <h5>Pending Orders</h5>
+        <div class="val" id="pending-orders">0</div>
+      </div>
+      <div class="stat-card">
+        <h5>Conversion Rate</h5>
+        <div class="val" id="conv-rate">0%</div>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="dash-card">
+        <h4 style="font-family:var(--font-head); margin-bottom:1.5rem;">Revenue Overview</h4>
+        <canvas id="revenueChart" height="150"></canvas>
+      </div>
+      <div class="dash-card">
+        <h4 style="font-family:var(--font-head); margin-bottom:1.5rem;">Recent Orders</h4>
+        <div id="admin-order-list" class="order-list">
+          <!-- Orders loaded via JS -->
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    const user = await Auth.getUser();
+    if (!user || user.role !== 'admin') {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Load Admin Stats & Chart
+    loadAdminData();
+});
+
+async function loadAdminData() {
+    try {
+        const response = await databases.listDocuments(
+            APPWRITE_CONFIG.databaseId,
+            APPWRITE_CONFIG.collections.orders,
+            [ Appwrite.Query.limit(10), Appwrite.Query.orderDesc('$createdAt') ]
+        );
+
+        const list = document.getElementById('admin-order-list');
+        list.innerHTML = '';
+        
+        let revenue = 0;
+        let pendingCount = 0;
+
+        response.documents.forEach(doc => {
+            if (doc.orderStatus === 'pending') pendingCount++;
+            revenue += doc.paidAmount || 0;
+
+            const card = document.createElement('div');
+            card.className = 'order-card';
+            card.innerHTML = `
+                <div class="order-info">
+                    <h4>${doc.service}</h4>
+                    <p>${doc.customer_name} · ${new Date(doc.orderDate || doc.$createdAt).toLocaleDateString()}</p>
+                </div>
+                <div style="text-align:right;">
+                    <span class="order-status status-pending">${doc.orderStatus}</span>
+                    <button onclick="updateOrderStatus('${doc.$id}', 'active')" class="btn btn-gold" style="padding:0.2rem 0.6rem; font-size:0.6rem; margin-top:0.4rem; display:block;">Activate</button>
+                </div>
+            `;
+            list.appendChild(card);
+        });
+
+        document.getElementById('total-revenue').textContent = `R${revenue.toLocaleString()}`;
+        document.getElementById('pending-orders').textContent = pendingCount;
+
+        // Simple Chart.js implementation
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Monthly Revenue',
+                    data: [12000, 19000, 3000, 5000, 20000, 30000],
+                    borderColor: '#D4A017',
+                    tension: 0.4,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
+                    x: { grid: { display: false } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+    } catch (error) {
+        console.error('Admin data failed:', error);
+    }
+}
+</script>
+
+</body>
+</html>

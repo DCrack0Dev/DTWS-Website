@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Client Dashboard – DemiTech Web Services</title>
+<link rel="stylesheet" href="style.css"/>
+<script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
+<script src="appwrite-config.js"></script>
+</head>
+<body class="dashboard-page">
+
+<div class="dash-layout">
+  <aside class="dash-sidebar">
+    <div class="sidebar-header">
+      <img src="demitech-logo.svg" alt="DemiTech Logo" style="height:40px; margin-bottom:2rem;"/>
+    </div>
+    <nav class="sidebar-nav">
+      <ul style="list-style:none;">
+        <li style="margin-bottom:1rem;"><a href="#" class="active" style="color:var(--gold);">📊 Overview</a></li>
+        <li style="margin-bottom:1rem;"><a href="pricing.html" style="color:var(--muted);">🛍️ New Order</a></li>
+        <li style="margin-bottom:1rem;"><a href="contact.html" style="color:var(--muted);">💬 Support</a></li>
+        <li style="margin-top:4rem;"><a href="#" onclick="Auth.logout()" style="color:#ff6b6b;">🚪 Logout</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main class="dash-main">
+    <header class="dash-header">
+      <h2 id="welcome-user">Welcome back!</h2>
+      <p style="color:var(--muted);">Track your project milestones and payments below.</p>
+    </header>
+
+    <div class="dash-stat-grid" style="margin-top:2rem;">
+      <div class="stat-card">
+        <h5>Active Projects</h5>
+        <div class="val" id="active-projects-count">0</div>
+      </div>
+      <div class="stat-card">
+        <h5>Total Invested</h5>
+        <div class="val" id="total-invested">R0</div>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="dash-card">
+        <h4 style="font-family:var(--font-head); margin-bottom:1.5rem;">My Projects</h4>
+        <div id="project-list" class="order-list">
+          <p style="color:var(--muted); text-align:center; padding:2rem;">No active projects yet. <a href="pricing.html" class="gold">Start one here!</a></p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    const user = await Auth.getUser();
+    if (!user) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    document.getElementById('welcome-user').textContent = `Welcome back, ${user.nickname || user.name}!`;
+
+    // Load projects
+    try {
+        const response = await databases.listDocuments(
+            APPWRITE_CONFIG.databaseId,
+            APPWRITE_CONFIG.collections.orders,
+            [ Appwrite.Query.equal('userId', user.$id) ]
+        );
+
+        if (response.documents.length > 0) {
+            const list = document.getElementById('project-list');
+            list.innerHTML = '';
+            
+            let activeCount = 0;
+            let totalInvested = 0;
+
+            response.documents.forEach(doc => {
+                if (doc.orderStatus !== 'archived') activeCount++;
+                totalInvested += doc.paidAmount || 0;
+
+                const card = document.createElement('div');
+                card.className = 'order-card';
+                
+                const milestoneProgress = doc.milestone === 1 ? '50% Initial Paid' : '100% Completed';
+                const statusClass = doc.orderStatus === 'completed' ? 'status-completed' : 'status-active';
+
+                card.innerHTML = `
+                    <div class="order-info">
+                        <h4>${doc.service}</h4>
+                        <p>${milestoneProgress} · Ref: ${doc.$id.slice(0,8)}</p>
+                    </div>
+                    <div style="text-align:right;">
+                        <span class="order-status ${statusClass}">${doc.orderStatus}</span>
+                        ${doc.milestone === 1 ? `<button class="btn btn-gold" style="padding:0.3rem 0.8rem; font-size:0.7rem; margin-top:0.5rem; display:block;">Pay Final 50%</button>` : ''}
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+
+            document.getElementById('active-projects-count').textContent = activeCount;
+            document.getElementById('total-invested').textContent = `R${totalInvested.toLocaleString()}`;
+        }
+    } catch (error) {
+        console.error('Error loading projects:', error);
+    }
+});
+</script>
+
+</body>
+</html>

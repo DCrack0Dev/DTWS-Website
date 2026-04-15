@@ -20,15 +20,39 @@
         <li><a href="pricing.html">Pricing</a></li>
         <li><a href="portfolio.html" class="active">Portfolio</a></li>
         <li><a href="contact.html">Contact</a></li>
-        <li><a href="contact.html" class="nav-cta">Get a Quote</a></li>
+        <li id="nav-auth-link"><a href="login.html" class="nav-cta">Login</a></li>
       </ul>
+      <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
+      <script src="appwrite-config.js"></script>
+      <script src="nav-auth.js" defer></script>
+      <script src="currency.js" defer></script>
       <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle theme" aria-pressed="false">
         <span class="theme-toggle-track" aria-hidden="true"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-label" data-theme-toggle-label>Light</span>
       </button>
+      <button id="navToggle" class="nav-toggle" type="button" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span class="nav-toggle-icon"></span>
+      </button>
     </div>
   </div>
 </nav>
+
+<!-- MOBILE NAV OVERLAY -->
+<div id="mobileNav" class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <div class="mobile-nav-header">
+      <img src="demitech-logo.svg" alt="DemiTech Logo"/>
+      <button id="closeNav" class="close-nav" type="button" aria-label="Close navigation menu">×</button>
+    </div>
+    <ul class="mobile-nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="pricing.html">Pricing</a></li>
+      <li><a href="portfolio.html" class="active">Portfolio</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="contact.html" class="mobile-cta">Get a Quote</a></li>
+    </ul>
+  </div>
+</div>
 
 <!-- PAGE HERO -->
 <section class="page-hero">
@@ -180,7 +204,7 @@
     <div class="footer-top">
       <div class="footer-brand">
         <img src="demitech-logo.svg" alt="DemiTech Logo"/>
-        <p>Professional digital solutions for South African businesses. Based in Durban, serving clients nationwide.</p>
+        <p class="sa-only-text">Professional digital solutions for South African businesses. Based in Durban, serving clients nationwide.</p>
         <div class="footer-tagline">Built Local. Built to Grow.</div>
       </div>
       <div class="footer-col">
@@ -248,6 +272,36 @@
     const next = root.dataset.theme === 'light' ? 'dark' : 'light';
     localStorage.setItem(storageKey, next);
     applyTheme(next);
+  });
+
+  // Mobile Nav Logic
+  const navToggle = document.getElementById('navToggle');
+  const closeNav = document.getElementById('closeNav');
+  const mobileNav = document.getElementById('mobileNav');
+  const body = document.body;
+
+  const toggleNav = (show) => {
+    mobileNav.classList.toggle('active', show);
+    navToggle.setAttribute('aria-expanded', show);
+    body.style.overflow = show ? 'hidden' : '';
+  };
+
+  if (navToggle) {
+    navToggle.addEventListener('click', () => toggleNav(true));
+  }
+  if (closeNav) {
+    closeNav.addEventListener('click', () => toggleNav(false));
+  }
+  if (mobileNav) {
+    mobileNav.addEventListener('click', (e) => {
+      if (e.target === mobileNav) toggleNav(false);
+    });
+  }
+
+  // Close nav on link click
+  const navLinks = document.querySelectorAll('.mobile-nav-links a');
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => toggleNav(false));
   });
 })();
 </script>
