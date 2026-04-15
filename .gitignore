@@ -3,3 +3,5 @@ Thumbs.db
 *.log
 .vscode/
 .trae/
+.vercel
+.env*.local

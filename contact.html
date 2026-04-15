@@ -20,15 +20,39 @@
         <li><a href="pricing.html">Pricing</a></li>
         <li><a href="portfolio.html">Portfolio</a></li>
         <li><a href="contact.html" class="active">Contact</a></li>
-        <li><a href="contact.html" class="nav-cta">Get a Quote</a></li>
+        <li id="nav-auth-link"><a href="login.html" class="nav-cta">Login</a></li>
       </ul>
+      <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
+      <script src="appwrite-config.js"></script>
+      <script src="nav-auth.js" defer></script>
+      <script src="currency.js" defer></script>
       <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle theme" aria-pressed="false">
         <span class="theme-toggle-track" aria-hidden="true"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-label" data-theme-toggle-label>Light</span>
       </button>
+      <button id="navToggle" class="nav-toggle" type="button" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span class="nav-toggle-icon"></span>
+      </button>
     </div>
   </div>
 </nav>
+
+<!-- MOBILE NAV OVERLAY -->
+<div id="mobileNav" class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <div class="mobile-nav-header">
+      <img src="demitech-logo.svg" alt="DemiTech Logo"/>
+      <button id="closeNav" class="close-nav" type="button" aria-label="Close navigation menu">×</button>
+    </div>
+    <ul class="mobile-nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="pricing.html">Pricing</a></li>
+      <li><a href="portfolio.html">Portfolio</a></li>
+      <li><a href="contact.html" class="active">Contact</a></li>
+      <li><a href="contact.html" class="mobile-cta">Get a Quote</a></li>
+    </ul>
+  </div>
+</div>
 
 <!-- PAGE HERO -->
 <section class="page-hero">
@@ -50,7 +74,7 @@
       <span class="section-tag">// Reach Us Directly</span>
       <h2 class="section-title">We're here to <span class="gold">help</span></h2>
       <div class="divider"></div>
-      <p>Whether you have a fully formed idea or just a rough concept — we'll help you figure out the best solution and give you an honest, transparent quote. Based in Durban, serving clients across South Africa.</p>
+      <p class="sa-only-text">Whether you have a fully formed idea or just a rough concept — we'll help you figure out the best solution and give you an honest, transparent quote. Based in Durban, serving clients across South Africa.</p>
 
       <div class="contact-channels">
         <a href="tel:+27650241517" class="contact-channel">
@@ -78,7 +102,7 @@
           <div class="ch-icon">📍</div>
           <div>
             <div class="ch-label">Location</div>
-            <div class="ch-val">Durban, KZN — Serving SA wide</div>
+            <div class="ch-val sa-only-text">Durban, KZN — Serving SA wide</div>
           </div>
         </div>
         <div class="contact-channel" style="cursor:default;">
@@ -113,11 +137,11 @@
           <label for="service">Service Needed</label>
           <select id="service" name="service" required>
             <option value="">Select a service...</option>
-            <option>Landing Page (R1,500 – R5,000)</option>
-            <option>Business Website (R5,000 – R15,000)</option>
-            <option>E-commerce Store (R10,000 – R40,000)</option>
-            <option>Web App (R10,000 – R100,000)</option>
-            <option>Mobile App (R25,000+)</option>
+            <option data-price-min="1500" data-price-max="5000">Landing Page (R1,500 – R5,000)</option>
+            <option data-price-min="5000" data-price-max="15000">Business Website (R5,000 – R15,000)</option>
+            <option data-price-min="10000" data-price-max="40000">E-commerce Store (R10,000 – R40,000)</option>
+            <option data-price-min="10000" data-price-max="100000">Web App (R10,000 – R100,000)</option>
+            <option data-price-min="25000" data-price-max="250000">Mobile App (R25,000+)</option>
             <option>SEO Services</option>
             <option>Logo & Branding / UI Design</option>
             <option>Digital Marketing / Social Media</option>
@@ -129,12 +153,12 @@
           <label for="budget">Approximate Budget</label>
           <select id="budget" name="budget" required>
             <option value="">Select a budget range...</option>
-            <option>Under R5,000</option>
-            <option>R5,000 – R15,000</option>
-            <option>R15,000 – R40,000</option>
-            <option>R40,000 – R100,000</option>
-            <option>R100,000+</option>
-            <option>Not Sure Yet</option>
+            <option data-budget-min="5000">Under R5,000</option>
+            <option data-budget-min="5000" data-budget-max="15000">R5,000 – R15,000</option>
+            <option data-budget-min="15000" data-budget-max="40000">R15,000 – R40,000</option>
+            <option data-budget-min="40000" data-budget-max="100000">R40,000 – R100,000</option>
+            <option data-budget-max="100000">R100,000+</option>
+            <option value="">Not Sure Yet</option>
           </select>
         </div>
         <div class="form-group">
@@ -252,6 +276,36 @@
     const next = root.dataset.theme === 'light' ? 'dark' : 'light';
     localStorage.setItem(storageKey, next);
     applyTheme(next);
+  });
+
+  // Mobile Nav Logic
+  const navToggle = document.getElementById('navToggle');
+  const closeNav = document.getElementById('closeNav');
+  const mobileNav = document.getElementById('mobileNav');
+  const body = document.body;
+
+  const toggleNav = (show) => {
+    mobileNav.classList.toggle('active', show);
+    navToggle.setAttribute('aria-expanded', show);
+    body.style.overflow = show ? 'hidden' : '';
+  };
+
+  if (navToggle) {
+    navToggle.addEventListener('click', () => toggleNav(true));
+  }
+  if (closeNav) {
+    closeNav.addEventListener('click', () => toggleNav(false));
+  }
+  if (mobileNav) {
+    mobileNav.addEventListener('click', (e) => {
+      if (e.target === mobileNav) toggleNav(false);
+    });
+  }
+
+  // Close nav on link click
+  const navLinks = document.querySelectorAll('.mobile-nav-links a');
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => toggleNav(false));
   });
 })();
 </script>

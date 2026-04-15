@@ -20,15 +20,40 @@
         <li><a href="pricing.html" class="active">Pricing</a></li>
         <li><a href="portfolio.html">Portfolio</a></li>
         <li><a href="contact.html">Contact</a></li>
-        <li><a href="contact.html" class="nav-cta">Get a Quote</a></li>
+        <li id="nav-auth-link"><a href="login.html" class="nav-cta">Login</a></li>
       </ul>
+      <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
+      <script src="appwrite-config.js"></script>
+      <script src="nav-auth.js" defer></script>
+      <script src="currency.js" defer></script>
+      <script src="payfast.js" defer></script>
       <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle theme" aria-pressed="false">
         <span class="theme-toggle-track" aria-hidden="true"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-label" data-theme-toggle-label>Light</span>
       </button>
+      <button id="navToggle" class="nav-toggle" type="button" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span class="nav-toggle-icon"></span>
+      </button>
     </div>
   </div>
 </nav>
+
+<!-- MOBILE NAV OVERLAY -->
+<div id="mobileNav" class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <div class="mobile-nav-header">
+      <img src="demitech-logo.svg" alt="DemiTech Logo"/>
+      <button id="closeNav" class="close-nav" type="button" aria-label="Close navigation menu">×</button>
+    </div>
+    <ul class="mobile-nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="pricing.html" class="active">Pricing</a></li>
+      <li><a href="portfolio.html">Portfolio</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="contact.html" class="mobile-cta">Get a Quote</a></li>
+    </ul>
+  </div>
+</div>
 
 <!-- PAGE HERO -->
 <section class="page-hero">
@@ -37,7 +62,7 @@
     <span class="section-tag">// Transparent Pricing</span>
     <h1 class="section-title">Affordable for <span class="gold">Growing Businesses</span></h1>
     <div class="divider divider-center"></div>
-    <p class="section-desc" style="margin:0 auto;">Every service is priced to give South African businesses real value — professional quality without the agency price tag.</p>
+    <p class="section-desc sa-only-text" style="margin:0 auto;">Every service is priced to give South African businesses real value — professional quality without the agency price tag.</p>
   </div>
 </section>
 
@@ -57,27 +82,32 @@
         <div class="price-item">
           <h4>Landing Page (1 Page)</h4>
           <p>A single, focused page built to convert visitors into leads. Perfect for launches, promos, or a simple business presence.</p>
-          <div class="price-tag">R1,500 – R5,000</div>
+          <div class="price-tag" data-price-min="1500" data-price-max="5000">R1,500 – R5,000</div>
+          <button class="btn-order" data-order="Landing Page (1 Page)" data-amount="1500" data-category="website">Order Now</button>
         </div>
         <div class="price-item">
           <h4>Basic Website (3–5 Pages)</h4>
           <p>Multi-page site covering Home, About, Services, Gallery, and Contact. Clean, professional, and mobile-ready.</p>
-          <div class="price-tag">R3,000 – R10,000</div>
+          <div class="price-tag" data-price-min="3000" data-price-max="10000">R3,000 – R10,000</div>
+          <button class="btn-order" data-order="Basic Website (3–5 Pages)" data-amount="3000" data-category="website">Order Now</button>
         </div>
         <div class="price-item">
           <h4>Business Website (5–10 Pages)</h4>
           <p>A comprehensive site with custom layout, blog section, team profiles, testimonials, and full SEO optimisation.</p>
-          <div class="price-tag">R5,000 – R15,000</div>
+          <div class="price-tag" data-price-min="5000" data-price-max="15000">R5,000 – R15,000</div>
+          <button class="btn-order" data-order="Business Website (5–10 Pages)" data-amount="5000" data-category="website">Order Now</button>
         </div>
         <div class="price-item">
           <h4>Professional Website (Custom Design)</h4>
           <p>Fully bespoke design from scratch — no templates. Includes UX planning, wireframes, custom animations, and pixel-perfect execution.</p>
-          <div class="price-tag">R10,000 – R30,000</div>
+          <div class="price-tag" data-price-min="10000" data-price-max="30000">R10,000 – R30,000</div>
+          <button class="btn-order" data-order="Professional Website" data-amount="10000" data-category="website">Order Now</button>
         </div>
         <div class="price-item">
           <h4>E-commerce Website (Online Store)</h4>
           <p>Full online store with product listings, shopping cart, PayFast/Stripe payments, inventory, discount codes, and order tracking.</p>
-          <div class="price-tag">R10,000 – R40,000</div>
+          <div class="price-tag" data-price-min="10000" data-price-max="40000">R10,000 – R40,000</div>
+          <button class="btn-order" data-order="E-commerce Store" data-amount="10000" data-category="ecommerce">Order Now</button>
         </div>
       </div>
     </div>
@@ -89,12 +119,14 @@
         <div class="price-item">
           <h4>Basic Web App</h4>
           <p>Custom web applications with user authentication, dashboards, and core features — booking systems, client portals, internal tools.</p>
-          <div class="price-tag">R10,000 – R30,000</div>
+          <div class="price-tag" data-price-min="10000" data-price-max="30000">R10,000 – R30,000</div>
+          <button class="btn-order" data-order="Basic Web App" data-amount="10000" data-category="webapp">Order Now</button>
         </div>
         <div class="price-item">
           <h4>Advanced Web App</h4>
           <p>Complex, scalable platforms — multi-tenant SaaS, advanced integrations, real-time features, payment processing, multi-role systems.</p>
-          <div class="price-tag">R30,000 – R100,000</div>
+          <div class="price-tag" data-price-min="30000" data-price-max="100000">R30,000 – R100,000</div>
+          <button class="btn-order" data-order="Advanced Web App" data-amount="30000" data-category="webapp">Order Now</button>
         </div>
       </div>
     </div>
@@ -106,12 +138,14 @@
         <div class="price-item">
           <h4>Basic App (Simple Features)</h4>
           <p>iOS and Android apps with user auth, push notifications, and core functionality. Suitable for service tools, portfolios, and utilities.</p>
-          <div class="price-tag">R25,000 – R80,000</div>
+          <div class="price-tag" data-price-min="25000" data-price-max="80000">R25,000 – R80,000</div>
+          <button class="btn-order" data-order="Basic Mobile App" data-amount="25000" data-category="mobileapp">Order Now</button>
         </div>
         <div class="price-item">
           <h4>Advanced App (Payments, APIs, Real-time)</h4>
           <p>Feature-rich apps with payment processing, real-time data, GPS, chat, and complex backend logic. Marketplace and enterprise-level.</p>
-          <div class="price-tag">R80,000 – R250,000</div>
+          <div class="price-tag" data-price-min="80000" data-price-max="250000">R80,000 – R250,000</div>
+          <button class="btn-order" data-order="Advanced Mobile App" data-amount="80000" data-category="mobileapp">Order Now</button>
         </div>
       </div>
     </div>
@@ -123,12 +157,14 @@
         <div class="price-item">
           <h4>Basic UI Design</h4>
           <p>Professional visual design for websites or apps — layout, typography, colour palette, and iconography. Includes Figma file and mobile views.</p>
-          <div class="price-tag">R1,500 – R6,000</div>
+          <div class="price-tag" data-price-min="1500" data-price-max="6000">R1,500 – R6,000</div>
+          <button class="btn-order" data-order="Basic UI Design" data-amount="1500">Order Now</button>
         </div>
         <div class="price-item">
           <h4>Advanced UX + Wireframing</h4>
           <p>Full UX process — user journey mapping, wireframes, interactive prototypes, and tested UI. Ideal before building a web app or SaaS.</p>
-          <div class="price-tag">R6,000 – R20,000</div>
+          <div class="price-tag" data-price-min="6000" data-price-max="20000">R6,000 – R20,000</div>
+          <button class="btn-order" data-order="Advanced UX Design" data-amount="6000">Order Now</button>
         </div>
       </div>
     </div>
@@ -140,17 +176,20 @@
         <div class="price-item">
           <h4>Basic SEO Setup</h4>
           <p>One-time website optimisation — technical audit, meta tags, Google Search Console setup, image optimisation, and sitemap submission.</p>
-          <div class="price-tag">R1,000 – R3,500</div>
+          <div class="price-tag" data-price-min="1000" data-price-max="3500">R1,000 – R3,500</div>
+          <button class="btn-order" data-order="Basic SEO Setup" data-amount="1000">Order Now</button>
         </div>
         <div class="price-item">
           <h4>Monthly SEO Management</h4>
           <p>Ongoing growth — content updates, backlink building, performance reporting, and keyword tracking month over month.</p>
-          <div class="price-tag">R1,500 – R8,000/month</div>
+          <div class="price-tag" data-price-min="1500" data-price-max="8000" data-suffix="/month">R1,500 – R8,000/month</div>
+          <button class="btn-order" data-order="Monthly SEO Management" data-amount="1500">Order Now</button>
         </div>
         <div class="price-item">
           <h4>Advanced SEO Strategy</h4>
           <p>Comprehensive SEO overhaul — competitor analysis, long-form content strategy, local SEO dominance, and full technical deep-dive.</p>
-          <div class="price-tag">R5,000 – R15,000</div>
+          <div class="price-tag" data-price-min="5000" data-price-max="15000">R5,000 – R15,000</div>
+          <button class="btn-order" data-order="Advanced SEO Strategy" data-amount="5000">Order Now</button>
         </div>
       </div>
     </div>
@@ -162,17 +201,20 @@
         <div class="price-item">
           <h4>Social Media Setup & Branding</h4>
           <p>We set up and brand your Facebook, Instagram, and LinkedIn profiles — cover graphics, bios, and a consistent visual identity.</p>
-          <div class="price-tag">R800 – R3,000</div>
+          <div class="price-tag" data-price-min="800" data-price-max="3000">R800 – R3,000</div>
+          <button class="btn-order" data-order="Social Media Setup" data-amount="800">Order Now</button>
         </div>
         <div class="price-item">
           <h4>Social Media Management</h4>
           <p>We manage your pages — content creation, scheduling, posting, and engagement. You focus on the business, we handle the feed.</p>
-          <div class="price-tag">R1,500 – R6,000/month</div>
+          <div class="price-tag" data-price-min="1500" data-price-max="6000" data-suffix="/month">R1,500 – R6,000/month</div>
+          <button class="btn-order" data-order="Social Media Management" data-amount="1500">Order Now</button>
         </div>
         <div class="price-item">
           <h4>Paid Ads Management (Meta / Google)</h4>
           <p>Facebook, Instagram, or Google Ads campaigns — ad copy, creative, audience targeting, A/B testing, and weekly reports.</p>
-          <div class="price-tag">R2,000 – R8,000/month</div>
+          <div class="price-tag" data-price-min="2000" data-price-max="8000" data-suffix="/month">R2,000 – R8,000/month</div>
+          <button class="btn-order" data-order="Paid Ads Management" data-amount="2000">Order Now</button>
         </div>
       </div>
     </div>
@@ -184,12 +226,14 @@
         <div class="price-item">
           <h4>Basic Maintenance</h4>
           <p>Monthly check-ins, software updates, security monitoring, uptime checks, and up to 2 hours of content edits per month.</p>
-          <div class="price-tag">R500 – R2,000/month</div>
+          <div class="price-tag" data-price-min="500" data-price-max="2000" data-suffix="/month">R500 – R2,000/month</div>
+          <button class="btn-order" data-order="Basic Maintenance" data-amount="500">Order Now</button>
         </div>
         <div class="price-item">
           <h4>Advanced Maintenance</h4>
           <p>Priority support, up to 8 hours of updates per month, backup management, performance reports, and emergency SLA coverage.</p>
-          <div class="price-tag">R2,000 – R5,000/month</div>
+          <div class="price-tag" data-price-min="2000" data-price-max="5000" data-suffix="/month">R2,000 – R5,000/month</div>
+          <button class="btn-order" data-order="Advanced Maintenance" data-amount="2000">Order Now</button>
         </div>
       </div>
     </div>
@@ -201,32 +245,38 @@
         <div class="price-item">
           <h4>Payment Gateway Integration</h4>
           <p>Add PayFast, Stripe, or Ozow to an existing site — secure, tested, and SA compliant.</p>
-          <div class="price-tag">R1,500 – R6,000</div>
+          <div class="price-tag" data-price-min="1500" data-price-max="6000">R1,500 – R6,000</div>
+          <button class="btn-order" data-order="Payment Integration" data-amount="1500">Order Now</button>
         </div>
         <div class="price-item">
           <h4>Speed Optimisation</h4>
           <p>Audit and optimise your site — image compression, caching, CDN, and Core Web Vitals improvements.</p>
-          <div class="price-tag">R800 – R3,000</div>
+          <div class="price-tag" data-price-min="800" data-price-max="3000">R800 – R3,000</div>
+          <button class="btn-order" data-order="Speed Optimisation" data-amount="800">Order Now</button>
         </div>
         <div class="price-item">
           <h4>Website Redesign</h4>
           <p>Transform an outdated site with a modern redesign — new layout, fresh visuals, improved UX, and better performance.</p>
-          <div class="price-tag">R2,000 – R12,000</div>
+          <div class="price-tag" data-price-min="2000" data-price-max="12000">R2,000 – R12,000</div>
+          <button class="btn-order" data-order="Website Redesign" data-amount="2000">Order Now</button>
         </div>
         <div class="price-item">
           <h4>API Integration</h4>
           <p>Connect your site to third-party services — CRMs, booking platforms, delivery APIs, WhatsApp Business, and more.</p>
-          <div class="price-tag">R3,000 – R15,000</div>
+          <div class="price-tag" data-price-min="3000" data-price-max="15000">R3,000 – R15,000</div>
+          <button class="btn-order" data-order="API Integration" data-amount="3000">Order Now</button>
         </div>
         <div class="price-item">
           <h4>Personal Chat Bot</h4>
           <p>A simple AI chat bot for personal brands and solo businesses — FAQs, lead capture, and basic website embed.</p>
-          <div class="price-tag">Starting from R499</div>
+          <div class="price-tag" data-price="499">Starting from R499</div>
+          <button class="btn-order" data-order="Personal Chat Bot" data-amount="499">Order Now</button>
         </div>
         <div class="price-item">
           <h4>Business Chat Bot</h4>
           <p>A smarter bot built for teams — branded flows, knowledge base training, lead routing, and optional WhatsApp/CRM integration.</p>
-          <div class="price-tag">Starting from R1,499</div>
+          <div class="price-tag" data-price="1499">Starting from R1,499</div>
+          <button class="btn-order" data-order="Business Chat Bot" data-amount="1499">Order Now</button>
         </div>
       </div>
     </div>
@@ -253,7 +303,7 @@
     <div class="footer-top">
       <div class="footer-brand">
         <img src="demitech-logo.svg" alt="DemiTech Logo"/>
-        <p>Professional digital solutions for South African businesses. Based in Durban, serving clients nationwide.</p>
+        <p class="sa-only-text">Professional digital solutions for South African businesses. Based in Durban, serving clients nationwide.</p>
         <div class="footer-tagline">Built Local. Built to Grow.</div>
       </div>
       <div class="footer-col">
@@ -293,6 +343,67 @@
 
 <a href="https://wa.me/27650241517" class="wa-float" target="_blank">💬</a>
 
+<!-- ORDER MODAL -->
+<div id="orderModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Configure Your Project</h3>
+      <button class="close-modal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="interactiveOrderForm">
+        <div class="order-summary-box">
+          <div class="summary-item">
+            <span class="summary-label">Selected Service:</span>
+            <span id="summary-service" class="summary-value">-</span>
+          </div>
+          <div class="summary-item total-row">
+            <span class="summary-label">Estimated Total:</span>
+            <span id="summary-total" class="summary-value" data-price="0">R0</span>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h4>Business Details</h4>
+          <div class="form-group">
+            <label for="order-business-name">Business Name</label>
+            <input type="text" id="order-business-name" name="business_name" placeholder="e.g. Acme Corp" required/>
+          </div>
+          <div class="form-group">
+            <label for="order-business-desc">What does your business do?</label>
+            <textarea id="order-business-desc" name="business_desc" placeholder="Briefly describe your services/products" required></textarea>
+          </div>
+        </div>
+
+        <div class="form-section" id="options-section">
+          <h4>Project Options</h4>
+          <div id="dynamic-options" class="options-grid">
+            <!-- Options will be injected here via JS -->
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h4>Contact Information</h4>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="order-name">Your Name</label>
+              <input type="text" id="order-name" name="name" required/>
+            </div>
+            <div class="form-group">
+              <label for="order-email">Email Address</label>
+              <input type="email" id="order-email" name="email" required/>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-order-final">🚀 Proceed to Secure Checkout</button>
+        <p class="checkout-note sa-only-text">Checkout is handled securely via PayFast. Prices are in ZAR.</p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="order-modal.js" defer></script>
 <script>
 (() => {
   const storageKey = 'dtws-theme';
@@ -321,6 +432,36 @@
     const next = root.dataset.theme === 'light' ? 'dark' : 'light';
     localStorage.setItem(storageKey, next);
     applyTheme(next);
+  });
+
+  // Mobile Nav Logic
+  const navToggle = document.getElementById('navToggle');
+  const closeNav = document.getElementById('closeNav');
+  const mobileNav = document.getElementById('mobileNav');
+  const body = document.body;
+
+  const toggleNav = (show) => {
+    mobileNav.classList.toggle('active', show);
+    navToggle.setAttribute('aria-expanded', show);
+    body.style.overflow = show ? 'hidden' : '';
+  };
+
+  if (navToggle) {
+    navToggle.addEventListener('click', () => toggleNav(true));
+  }
+  if (closeNav) {
+    closeNav.addEventListener('click', () => toggleNav(false));
+  }
+  if (mobileNav) {
+    mobileNav.addEventListener('click', (e) => {
+      if (e.target === mobileNav) toggleNav(false);
+    });
+  }
+
+  // Close nav on link click
+  const navLinks = document.querySelectorAll('.mobile-nav-links a');
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => toggleNav(false));
   });
 })();
 </script>

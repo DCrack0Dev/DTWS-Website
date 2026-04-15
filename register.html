@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Register – DemiTech Web Services</title>
+<link rel="stylesheet" href="style.css"/>
+<script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
+<script src="appwrite-config.js" defer></script>
+</head>
+<body class="auth-page">
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-brand">
+      <img src="demitech-logo.svg" alt="DemiTech Web Services Logo"/>
+    </a>
+    <div class="nav-right">
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="pricing.html">Pricing</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="login.html" class="active">Login</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- REGISTER FORM -->
+<section class="auth-section">
+  <div class="auth-container fade-up d1">
+    <span class="section-tag">// Join Us</span>
+    <h1 class="section-title">Create <span class="gold">Account</span></h1>
+    <div class="divider"></div>
+    
+    <form id="registerForm" class="auth-form">
+      <div class="form-group">
+        <label for="reg-name">Full Name</label>
+        <input type="text" id="reg-name" name="name" placeholder="e.g. Thabo Nkosi" required/>
+      </div>
+      <div class="form-group">
+        <label for="reg-email">Email Address</label>
+        <input type="email" id="reg-email" name="email" placeholder="you@example.com" required/>
+      </div>
+      <div class="form-group">
+        <label for="reg-password">Password</label>
+        <input type="password" id="reg-password" name="password" placeholder="••••••••" required minlength="8"/>
+      </div>
+      <button type="submit" class="btn btn-gold btn-full">🚀 Join DemiTech</button>
+      <p class="auth-toggle">Already have an account? <a href="login.html">Login here</a></p>
+    </form>
+    
+    <div id="reg-error" class="auth-error" style="display:none;">Registration failed. Please try again.</div>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const registerForm = document.getElementById('registerForm');
+    const errorMsg = document.getElementById('reg-error');
+
+    registerForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const name = registerForm.name.value;
+        const email = registerForm.email.value;
+        const password = registerForm.password.value;
+        
+        try {
+            await Auth.register(email, password, name);
+            window.location.href = 'dashboard.html';
+        } catch (error) {
+            errorMsg.style.display = 'block';
+            errorMsg.textContent = error.message;
+            console.error('Registration error:', error);
+        }
+    };
+});
+</script>
+
+</body>
+</html>
