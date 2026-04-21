@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Spice Route Kitchen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;700;900&family=Raleway:wght@200;300;400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #C9A84C;
+      --gold-light: #E8C97A;
+      --gold-dark: #8B6914;
+      --cream: #F5EDD6;
+      --dark: #0A0705;
+      --dark2: #120E09;
+      --dark3: #1C1510;
+      --red-spice: #8B1A0A;
+      --text-muted: rgba(245,237,214,0.55);
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--dark);
+      color: var(--cream);
+      font-family: 'Raleway', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      width: 8px; height: 8px;
+      background: var(--gold);
+      border-radius: 50%;
+      position: fixed; top:0; left:0;
+      pointer-events: none;
+      z-index: 10000;
+      transform: translate(-50%,-50%);
+      transition: width 0.3s, height 0.3s, background 0.3s;
+    }
+    .cursor-ring {
+      width: 40px; height: 40px;
+      border: 1px solid var(--gold);
+      border-radius: 50%;
+      position: fixed; top:0; left:0;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%,-50%);
+      transition: width 0.3s, height 0.3s, border-color 0.3s;
+    }
+    .cursor.hover { width: 40px; height: 40px; background: rgba(201,168,76,0.1); border: 1px solid var(--gold); }
+    .cursor-ring.hover { width: 60px; height: 60px; border-color: transparent; }
+
+    /* Reveal on scroll */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Mobile Compatibility */
+    @media (max-width: 768px) {
+      .nav-links { gap: 15px; font-size: 0.8rem; }
+      .btn-reserve { padding: 8px 16px; font-size: 0.7rem; }
+      .hero-content h1 { font-size: 4rem; }
+      .hero-tagline { font-size: 0.9rem; }
+      
+      .dishes-grid { grid-template-columns: 1fr; gap: 20px; }
+      .menu-items { grid-template-columns: 1fr; gap: 20px; }
+      .menu-item { height: auto; flex-direction: column; }
+      .item-img { width: 100%; height: 200px; }
+      .item-info { padding: 20px; }
+      
+      .story { flex-direction: column; padding: 60px 20px; }
+      .story-image, .story-text { width: 100%; }
+      .story-stats { grid-template-columns: 1fr; gap: 20px; }
+      
+      .footer-grid { grid-template-columns: 1fr; gap: 40px; text-align: center; }
+      .footer-brand, .footer-col { align-items: center; }
+      
+      .book-layout { grid-template-columns: 1fr; }
+      .book-left { height: 300px; }
+      .book-right { padding: 40px 20px; }
+      
+      .menu-tabs { overflow-x: auto; padding-bottom: 10px; justify-content: flex-start; }
+      .menu-tab { white-space: nowrap; padding: 10px 20px; }
+      
+      .reviews-grid { grid-template-columns: 1fr; }
+      
+      /* Custom cursor hide on mobile */
+      .cursor, .cursor-ring { display: none; }
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top:0; left:0; right:0;
+      z-index: 1000;
+      padding: 24px 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: linear-gradient(to bottom, rgba(10,7,5,0.85), transparent);
+      transition: background 0.4s;
+    }
+    nav.scrolled {
+      background: rgba(10,7,5,0.97);
+      padding: 16px 60px;
+      border-bottom: 1px solid rgba(201,168,76,0.15);
+    }
+    .nav-logo {
+      font-family: 'Cinzel', serif;
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--gold);
+      letter-spacing: 0.2em;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+    }
+    .nav-logo::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 2px;
+      bottom: 0;
+      left: -100%;
+      background: var(--gold);
+      transition: left 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .nav-logo:hover::before {
+      left: 100%;
+    }
+    .nav-logo span { color: var(--cream); }
+
+    /* Logo Animation */
+    @keyframes logoPulse {
+      0% { text-shadow: 0 0 10px rgba(201,168,76,0); }
+      50% { text-shadow: 0 0 25px rgba(201,168,76,0.6); }
+      100% { text-shadow: 0 0 10px rgba(201,168,76,0); }
+    }
+    .hero-logo {
+      animation: fadeUp 1.2s 0.5s ease both, logoPulse 4s ease-in-out infinite;
+    }
+    .nav-links { display: flex; gap: 42px; list-style: none; }
+    .nav-links a {
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 400;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--cream);
+      text-decoration: none;
+      position: relative;
+      opacity: 0.8;
+      transition: opacity 0.3s;
+    }
+    .nav-links a::after {
+      content:''; position:absolute; bottom:-4px; left:0; right:0;
+      height:1px; background: var(--gold);
+      transform: scaleX(0); transition: transform 0.3s;
+    }
+    .nav-links a:hover { opacity:1; }
+    .nav-links a:hover::after { transform: scaleX(1); }
+    .nav-reserve {
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      padding: 10px 24px;
+      text-decoration: none;
+      transition: background 0.3s, color 0.3s;
+    }
+    .nav-reserve:hover { background: var(--gold); color: var(--dark); }
+
+    /* ===== PAGES ===== */
+    .page { display: none; min-height: 100vh; }
+    .page.active { display: block; }
+
+    /* ===== HOME PAGE ===== */
+    #home { position: relative; }
+
+    .hero {
+      position: relative;
+      height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset:0;
+      background: url('https://images.unsplash.com/photo-1516714435131-44d6b64dc6a2?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+      transform: scale(1.05);
+      animation: heroZoom 20s ease-in-out infinite alternate;
+    }
+    @keyframes heroZoom {
+      from { transform: scale(1.05); }
+      to   { transform: scale(1.12); }
+    }
+    .hero-overlay {
+      position: absolute; inset:0;
+      background: linear-gradient(
+        to bottom,
+        rgba(10,7,5,0.35) 0%,
+        rgba(10,7,5,0.2) 40%,
+        rgba(10,7,5,0.7) 100%
+      );
+    }
+    .hero-content {
+      position: relative; z-index:2;
+      text-align: center;
+      animation: fadeUp 1.4s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(40px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+    .hero-eyebrow {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.1rem;
+      color: var(--gold-light);
+      letter-spacing: 0.35em;
+      margin-bottom: 12px;
+      opacity: 0;
+      animation: fadeUp 1s 0.3s ease both;
+    }
+    .hero-logo {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(7rem, 16vw, 14rem);
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 0.08em;
+      line-height: 0.9;
+      text-shadow: 0 0 80px rgba(0,0,0,0.6);
+      opacity: 0;
+      animation: fadeUp 1.2s 0.5s ease both;
+    }
+    .hero-tagline {
+      font-size: 0.72rem;
+      letter-spacing: 0.45em;
+      text-transform: uppercase;
+      color: var(--cream);
+      opacity: 0;
+      margin-top: 18px;
+      animation: fadeUp 1s 0.9s ease both;
+    }
+    .hero-divider {
+      width: 80px; height: 1px;
+      background: var(--gold);
+      margin: 24px auto;
+      opacity: 0;
+      animation: fadeUp 1s 1.1s ease both;
+    }
+    .hero-cta {
+      display: inline-block;
+      font-size: 0.65rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      padding: 14px 40px;
+      text-decoration: none;
+      margin-top: 8px;
+      opacity: 0;
+      animation: fadeUp 1s 1.3s ease both;
+      transition: background 0.3s, color 0.3s;
+    }
+    .hero-cta:hover { background: var(--gold); color: var(--dark); }
+
+    /* Scroll indicator */
+    .scroll-hint {
+      position: absolute; bottom: 40px; left:50%;
+      transform: translateX(-50%);
+      z-index:3; text-align: center;
+      opacity: 0; animation: fadeUp 1s 1.8s ease both;
+    }
+    .scroll-hint span {
+      display: block; font-size: 0.58rem;
+      letter-spacing: 0.4em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 10px;
+    }
+    .scroll-line {
+      width: 1px; height: 50px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      margin: 0 auto;
+      animation: scrollPulse 2s ease infinite;
+    }
+    @keyframes scrollPulse {
+      0%,100% { opacity:1; } 50% { opacity:0.3; }
+    }
+
+    /* Story Section */
+    .story {
+      display: grid; grid-template-columns: 1fr 1fr;
+      min-height: 80vh;
+    }
+    .story-image {
+      position: relative; overflow: hidden;
+    }
+    .story-image img {
+      width:100%; height:100%; object-fit: cover;
+      filter: brightness(0.85) saturate(0.9);
+      transition: transform 0.8s ease;
+    }
+    .story-image:hover img { transform: scale(1.04); }
+    .story-image::after {
+      content:''; position:absolute; inset:0;
+      background: linear-gradient(to right, transparent 60%, var(--dark));
+    }
+    .story-text {
+      background: var(--dark2);
+      padding: 100px 80px;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .section-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+    }
+    .story-text h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.4rem, 4vw, 3.4rem);
+      font-weight: 300;
+      line-height: 1.2;
+      margin-bottom: 30px;
+      color: var(--cream);
+    }
+    .story-text h2 em { color: var(--gold); font-style: italic; }
+    .story-text p {
+      font-size: 0.9rem;
+      line-height: 1.9;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+    .story-stats {
+      display: flex; gap: 48px; margin-top: 40px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(201,168,76,0.2);
+    }
+    .stat-num {
+      font-family: 'Cinzel', serif;
+      font-size: 2.2rem;
+      color: var(--gold);
+    }
+    .stat-label {
+      font-size: 0.65rem; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Featured dishes */
+    .featured {
+      padding: 120px 60px;
+      background: var(--dark3);
+      text-align: center;
+    }
+    .featured h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.5rem, 4vw, 3.5rem);
+      font-weight: 300;
+      margin-bottom: 12px;
+    }
+    .featured h2 em { color: var(--gold); font-style: italic; }
+    .featured-sub {
+      font-size: 0.75rem; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--text-muted);
+      margin-bottom: 70px;
+    }
+    .dishes-grid {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 2px;
+    }
+    .dish-card {
+      position: relative; overflow: hidden;
+      aspect-ratio: 3/4;
+    }
+    .dish-card img {
+      width:100%; height:100%; object-fit:cover;
+      transition: transform 0.8s ease, filter 0.5s;
+      filter: brightness(0.7) saturate(0.8);
+      background: var(--dark3);
+    }
+    .dish-card:hover img { transform: scale(1.08); filter: brightness(0.5) saturate(0.7); }
+    .dish-info {
+      position: absolute; bottom:0; left:0; right:0;
+      padding: 40px 30px 30px;
+      background: linear-gradient(to top, rgba(10,7,5,0.95) 0%, transparent);
+      transform: translateY(20px);
+      transition: transform 0.4s ease;
+    }
+    .dish-card:hover .dish-info { transform: translateY(0); }
+    .dish-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem; font-weight: 400;
+    }
+    .dish-desc {
+      font-size: 0.78rem; color: var(--text-muted);
+      margin-top: 6px; line-height:1.6;
+      opacity: 0; transition: opacity 0.4s 0.1s;
+    }
+    .dish-card:hover .dish-desc { opacity:1; }
+    .dish-price {
+      font-family: 'Cinzel', serif;
+      color: var(--gold); font-size: 1rem;
+      margin-top: 10px;
+    }
+
+    /* CTA Banner */
+    .cta-banner {
+      padding: 100px 60px;
+      background: var(--dark2);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-banner::before {
+      content:'';
+      position: absolute; inset:0;
+      background: radial-gradient(ellipse at center, rgba(139,26,10,0.12), transparent 70%);
+    }
+    .cta-banner h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 300; margin-bottom: 20px;
+    }
+    .cta-banner h2 em { color: var(--gold); font-style: italic; }
+    .cta-banner p {
+      font-size: 0.85rem; color: var(--text-muted);
+      max-width: 500px; margin: 0 auto 40px; line-height:1.8;
+    }
+    .btn-gold {
+      display: inline-block;
+      font-size: 0.65rem; letter-spacing: 0.35em;
+      text-transform: uppercase;
+      background: var(--gold);
+      color: var(--dark);
+      padding: 16px 48px;
+      text-decoration: none;
+      font-weight: 400;
+      transition: background 0.3s, letter-spacing 0.3s;
+    }
+    .btn-gold:hover { background: var(--gold-light); letter-spacing: 0.45em; }
+    .btn-outline {
+      display: inline-block;
+      font-size: 0.65rem; letter-spacing: 0.35em;
+      text-transform: uppercase;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 15px 48px;
+      text-decoration: none;
+      margin-left: 16px;
+      transition: background 0.3s, color 0.3s;
+    }
+    .btn-outline:hover { background: var(--gold); color: var(--dark); }
+
+    /* ===== MENU PAGE ===== */
+    #menu { padding-top: 100px; }
+    .menu-hero {
+      padding: 60px;
+      text-align: center;
+      border-bottom: 1px solid rgba(201,168,76,0.15);
+      background: linear-gradient(rgba(10,7,5,0.7), rgba(10,7,5,0.7)), url('https://images.unsplash.com/photo-1516714435131-44d6b64dc6a2?auto=format&fit=crop&w=1600&q=80') center/cover;
+    }
+    .menu-hero h1 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(3rem, 6vw, 5rem);
+      font-weight: 900;
+      letter-spacing: 0.3em;
+      color: var(--gold);
+    }
+    .menu-hero p {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.1rem;
+      color: var(--cream);
+      margin-top: 12px;
+      letter-spacing: 0.2em;
+    }
+    .menu-tabs {
+      display: flex; justify-content: center; gap: 0;
+      border-bottom: 1px solid rgba(201,168,76,0.15);
+      background: var(--dark);
+    }
+    .menu-tab {
+      font-size: 0.65rem; letter-spacing: 0.3em;
+      text-transform: uppercase;
+      padding: 20px 40px;
+      color: var(--text-muted);
+      cursor: pointer;
+      border: none; background: none;
+      border-bottom: 2px solid transparent;
+      transition: color 0.3s, border-color 0.3s;
+    }
+    .menu-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+    .menu-tab:hover { color: var(--cream); }
+    .menu-section { display: none; padding: 80px 60px; }
+    .menu-section.active { display: block; }
+    .menu-section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem; font-style: italic;
+      color: var(--gold); margin-bottom: 50px;
+      text-align: center; letter-spacing: 0.1em;
+    }
+    .menu-items {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      padding-top: 40px;
+    }
+    .menu-item {
+      padding: 0;
+      border: 1px solid rgba(201,168,76,0.1);
+      display: flex; 
+      align-items: stretch;
+      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+      background: var(--dark2);
+      overflow: hidden;
+      height: 160px;
+    }
+    .menu-item:hover { 
+      background: rgba(201,168,76,0.06); 
+      transform: translateY(-5px);
+      border-color: rgba(201,168,76,0.3);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    .item-img {
+      width: 140px;
+      height: 100%;
+      flex-shrink: 0;
+      overflow: hidden;
+      background: var(--dark3);
+    }
+    .item-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s;
+    }
+    .menu-item:hover .item-img img {
+      transform: scale(1.1);
+    }
+    .item-info {
+      padding: 24px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .item-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem; color: var(--cream);
+      margin-bottom: 6px;
+    }
+    .item-desc {
+      font-size: 0.75rem; color: var(--text-muted);
+      line-height: 1.6; max-width: 280px;
+    }
+    .item-tag {
+      display: inline-block;
+      font-size: 0.5rem; letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold); border: 1px solid rgba(201,168,76,0.4);
+      padding: 3px 8px; margin-top: 8px; margin-right: 4px;
+    }
+    .item-price {
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem; color: var(--gold);
+      white-space: nowrap; margin-left: 24px;
+    }
+
+    /* ===== REVIEWS PAGE ===== */
+    #reviews { padding-top: 100px; }
+    .reviews-hero {
+      padding: 60px;
+      text-align: center;
+      border-bottom: 1px solid rgba(201,168,76,0.15);
+    }
+    .reviews-hero h1 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(3rem, 6vw, 5rem);
+      font-weight: 900;
+      letter-spacing: 0.3em;
+      color: var(--gold);
+    }
+    .reviews-hero p {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      margin-top: 12px;
+      letter-spacing: 0.2em;
+    }
+    .reviews-grid {
+      padding: 80px 60px;
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 30px;
+    }
+    .review-card {
+      background: var(--dark2);
+      padding: 44px 36px;
+      border: 1px solid rgba(201,168,76,0.12);
+      position: relative;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .review-card:hover { border-color: rgba(201,168,76,0.4); transform: translateY(-4px); }
+    .review-quote {
+      font-family: 'Cinzel', serif;
+      font-size: 4rem; color: rgba(201,168,76,0.15);
+      line-height:1; margin-bottom:10px;
+    }
+    .review-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem; font-style: italic;
+      color: var(--cream); line-height:1.7; margin-bottom: 30px;
+    }
+    .review-stars { color: var(--gold); font-size: 0.8rem; margin-bottom: 16px; }
+    .review-author {
+      font-size: 0.65rem; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--text-muted);
+    }
+    .review-author strong { color: var(--cream); display: block; margin-bottom: 2px; }
+    .reviews-featured {
+      padding: 0 60px 80px;
+      text-align: center;
+    }
+    .reviews-featured blockquote {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-style: italic;
+      font-weight: 300;
+      color: var(--cream);
+      line-height:1.5;
+      max-width: 900px; margin: 0 auto 24px;
+    }
+    .reviews-featured cite {
+      font-size: 0.65rem; letter-spacing: 0.4em;
+      text-transform: uppercase; color: var(--gold);
+    }
+    .gold-divider {
+      width: 1px; height: 60px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      margin: 40px auto;
+    }
+    .press-logos {
+      display: flex; justify-content: center; align-items: center;
+      gap: 60px; padding: 60px;
+      border-top: 1px solid rgba(201,168,76,0.15);
+    }
+    .press-logo {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem; letter-spacing: 0.4em;
+      color: var(--text-muted); text-transform: uppercase;
+    }
+
+    /* ===== BOOK NOW PAGE ===== */
+    #book { padding-top: 100px; min-height: 100vh; }
+    .book-layout {
+      display: grid; grid-template-columns: 1fr 1fr;
+      min-height: calc(100vh - 100px);
+    }
+    .book-left {
+      background: url('https://images.unsplash.com/photo-1550966842-2849a225ff98?auto=format&fit=crop&w=900&q=80') center/cover;
+      position: relative;
+    }
+    .book-left::after {
+      content:''; position:absolute; inset:0;
+      background: linear-gradient(to right, rgba(10,7,5,0.3), rgba(10,7,5,0.8));
+    }
+    .book-left-content {
+      position: relative; z-index:2;
+      padding: 80px 70px;
+      display: flex; flex-direction:column; justify-content: flex-end;
+      height:100%;
+    }
+    .book-left h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.2rem, 3.5vw, 3rem);
+      font-weight: 300; margin-bottom: 16px; line-height: 1.2;
+    }
+    .book-left h2 em { color: var(--gold); font-style: italic; }
+    .book-left p {
+      font-size: 0.85rem; color: var(--text-muted);
+      line-height: 1.8; max-width: 340px; margin-bottom: 40px;
+    }
+    .book-detail {
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 20px;
+    }
+    .book-detail-icon {
+      width: 36px; height: 36px;
+      border: 1px solid rgba(201,168,76,0.4);
+      display: flex; align-items:center; justify-content:center;
+      font-size: 1rem; color: var(--gold);
+    }
+    .book-detail-text {
+      font-size: 0.78rem; color: var(--cream); letter-spacing: 0.05em;
+    }
+    .book-detail-text span { display:block; color: var(--text-muted); font-size: 0.68rem; margin-top:2px; }
+    .book-right {
+      background: var(--dark2);
+      padding: 80px 70px;
+      display: flex; flex-direction:column; justify-content:center;
+    }
+    .book-right h3 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.6rem; letter-spacing: 0.2em;
+      color: var(--gold); margin-bottom: 40px;
+    }
+    .form-group { margin-bottom: 28px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    label {
+      display: block;
+      font-size: 0.58rem; letter-spacing: 0.35em;
+      text-transform: uppercase; color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    input, select, textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(201,168,76,0.2);
+      color: var(--cream);
+      padding: 14px 16px;
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.3s;
+      appearance: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--gold);
+      background: rgba(201,168,76,0.04);
+    }
+    select option { background: var(--dark2); }
+    textarea { resize: vertical; min-height: 100px; }
+    .form-submit {
+      width: 100%;
+      background: var(--gold);
+      color: var(--dark);
+      border: none;
+      padding: 18px;
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.3s, letter-spacing 0.3s;
+    }
+    .form-submit:hover { background: var(--gold-light); letter-spacing: 0.5em; }
+    .form-note {
+      font-size: 0.7rem; color: var(--text-muted);
+      margin-top: 16px; line-height:1.6; text-align:center;
+    }
+
+    /* FOOTER */
+    footer {
+      background: var(--dark);
+      border-top: 1px solid rgba(201,168,76,0.15);
+      padding: 70px 60px 40px;
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 60px; margin-bottom: 60px;
+    }
+    .footer-brand .logo {
+      font-family: 'Cinzel', serif;
+      font-size: 1.4rem; color: var(--gold);
+      letter-spacing: 0.2em; margin-bottom: 16px;
+    }
+    .footer-brand p {
+      font-size: 0.8rem; color: var(--text-muted);
+      line-height: 1.8; max-width: 240px;
+    }
+    .footer-col h4 {
+      font-size: 0.6rem; letter-spacing: 0.4em;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 20px;
+    }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 10px; }
+    .footer-col a {
+      font-size: 0.8rem; color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .footer-col a:hover { color: var(--cream); }
+    .footer-col p {
+      font-size: 0.8rem; color: var(--text-muted);
+      line-height: 1.8;
+    }
+    .footer-bottom {
+      border-top: 1px solid rgba(201,168,76,0.1);
+      padding-top: 30px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-copy { font-size: 0.7rem; color: var(--text-muted); }
+    .footer-social { display: flex; gap: 20px; }
+    .footer-social a {
+      font-size: 0.65rem; letter-spacing: 0.3em;
+      text-transform: uppercase; color: var(--text-muted);
+      text-decoration: none; transition: color 0.3s;
+    }
+    .footer-social a:hover { color: var(--gold); }
+
+    /* Page transition */
+    .page-overlay {
+      position: fixed; inset:0;
+      background: var(--dark);
+      z-index: 5000;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .page-overlay.in { opacity:1; pointer-events:all; }
+
+    @media (max-width: 900px) {
+      nav { padding: 20px 24px; }
+      .nav-links { display: none; }
+      .story { grid-template-columns: 1fr; }
+      .story-image { height: 300px; }
+      .dishes-grid { grid-template-columns: 1fr; }
+      .menu-items { grid-template-columns: 1fr; }
+      .menu-item:nth-child(odd) { border-right: none; }
+      .reviews-grid { grid-template-columns: 1fr; }
+      .book-layout { grid-template-columns: 1fr; }
+      .book-left { height: 350px; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="page-overlay" id="pageOverlay"></div>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <a class="nav-logo" href="#" onclick="showPage('home')">SRK</a>
+  <ul class="nav-links">
+    <li><a href="#" onclick="showPage('home')">Home</a></li>
+    <li><a href="#" onclick="showPage('menu')">Menu</a></li>
+    <li><a href="#" onclick="showPage('reviews')">Reviews</a></li>
+    <li><a href="#" onclick="showPage('book')">Book a Table</a></li>
+  </ul>
+  <a href="#" class="nav-reserve" onclick="showPage('book')">Make a Reservation</a>
+</nav>
+
+<!-- ===== HOME ===== -->
+<div id="home" class="page active">
+
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">Est. 2012 · Cape Town</p>
+      <h1 class="hero-logo">SRK</h1>
+      <p class="hero-tagline">Spice Route Kitchen · Where Tradition Meets Desire</p>
+      <div class="hero-divider"></div>
+      <a href="#" class="hero-cta" onclick="showPage('menu')">Explore the Menu</a>
+    </div>
+    <div class="scroll-hint">
+      <span>Discover</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <section class="story reveal">
+    <div class="story-image">
+      <img src="https://images.unsplash.com/photo-1552566626-52f8b828add9?w=900&q=80" alt="Restaurant interior"/>
+    </div>
+    <div class="story-text">
+      <p class="section-label">Our Story</p>
+      <h2>A Journey Through <em>Ancient Spice Routes</em></h2>
+      <p>Nestled in the heart of Cape Town, Spice Route Kitchen was born from a singular obsession — to honour the ancient trade paths that carried saffron from Kashmir, cinnamon from Ceylon, and cardamom from the Malabar Coast.</p>
+      <p>Our kitchen is a living archive. Every dish is a memory, every plate a destination. We believe that cooking is the most honest form of storytelling.</p>
+      <div class="story-stats">
+        <div>
+          <div class="stat-num">12+</div>
+          <div class="stat-label">Years of Craft</div>
+        </div>
+        <div>
+          <div class="stat-num">40+</div>
+          <div class="stat-label">Curated Dishes</div>
+        </div>
+        <div>
+          <div class="stat-num">3</div>
+          <div class="stat-label">Awards Won</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="featured reveal">
+    <p class="section-label">Signature Creations</p>
+    <h2>The <em>Finest</em> on Our Table</h2>
+    <p class="featured-sub">Handpicked by our Executive Chef · Seasonal & Inspired</p>
+    <div class="dishes-grid">
+      <div class="dish-card">
+        <img src="https://images.unsplash.com/photo-1542367592-8849eb950fd8?auto=format&fit=crop&w=800&q=80" alt="Rogan Josh"/>
+        <div class="dish-info">
+          <div class="dish-name">Kashmiri Lamb Rogan Josh</div>
+          <div class="dish-desc">Slow-braised leg of lamb in a symphony of fennel, Kashmiri chilli and aged yoghurt — served with saffron pilaf.</div>
+          <div class="dish-price">R 245</div>
+        </div>
+      </div>
+      <div class="dish-card">
+        <img src="https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=800&q=80" alt="Black Cardamom Prawn"/>
+        <div class="dish-info">
+          <div class="dish-name">Black Cardamom Prawn</div>
+          <div class="dish-desc">Tiger prawns kissed by smoked cardamom oil, tamarind reduction and a turmeric cream emulsion.</div>
+          <div class="dish-price">R 285</div>
+        </div>
+      </div>
+      <div class="dish-card">
+        <img src="https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?auto=format&fit=crop&w=800&q=80" alt="Malabar Gold Curry"/>
+        <div class="dish-info">
+          <div class="dish-name">Malabar Gold Curry</div>
+          <div class="dish-desc">A vegetarian monument — coconut milk, golden turmeric, fresh curry leaves and the heat of Byadagi chillies.</div>
+          <div class="dish-price">R 195</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-banner reveal">
+    <p class="section-label">Reserve Your Evening</p>
+    <h2>Every Table Tells a <em>Story</em></h2>
+    <p>Whether it's an intimate dinner or a grand celebration, Spice Route Kitchen provides an experience unlike any other. Secure your table today.</p>
+    <a href="#" class="btn-gold" onclick="showPage('book')">Book a Table</a>
+    <a href="#" class="btn-outline" onclick="showPage('menu')">View Full Menu</a>
+  </section>
+
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">SRK</div>
+        <p>Spice Route Kitchen — a sanctuary of flavour, warmth and culinary artistry in the heart of Cape Town.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Navigate</h4>
+        <ul>
+          <li><a href="#" onclick="showPage('home')">Home</a></li>
+          <li><a href="#" onclick="showPage('menu')">Menu</a></li>
+          <li><a href="#" onclick="showPage('reviews')">Reviews</a></li>
+          <li><a href="#" onclick="showPage('book')">Reservations</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Hours</h4>
+        <p>Tuesday – Friday<br>12pm – 3pm · 6pm – 11pm</p><br>
+        <p>Saturday – Sunday<br>11am – 11pm</p><br>
+        <p>Closed Monday</p>
+      </div>
+      <div class="footer-col">
+        <h4>Find Us</h4>
+        <p>123 Bree Street<br>Cape Town City Centre<br>Cape Town, 8001<br><br>+27 21 424 1234<br>info@spiceroutekitchen.co.za</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2025 Spice Route Kitchen. All rights reserved.</p>
+      <div class="footer-social">
+        <a href="#">Instagram</a>
+        <a href="#">Facebook</a>
+        <a href="#">TripAdvisor</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ===== MENU ===== -->
+<div id="menu" class="page">
+  <div class="menu-hero">
+    <p class="section-label">Fine Dining · Artisan Kitchen</p>
+    <h1>THE MENU</h1>
+    <p>Crafted with intention. Served with soul.</p>
+  </div>
+  <div class="menu-tabs">
+    <button class="menu-tab active" onclick="switchMenuTab(this,'starters')">Starters</button>
+    <button class="menu-tab" onclick="switchMenuTab(this,'mains')">Mains</button>
+    <button class="menu-tab" onclick="switchMenuTab(this,'breads')">Breads & Sides</button>
+    <button class="menu-tab" onclick="switchMenuTab(this,'desserts')">Desserts</button>
+    <button class="menu-tab" onclick="switchMenuTab(this,'drinks')">Drinks</button>
+  </div>
+
+  <div id="starters" class="menu-section active">
+    <p class="menu-section-title">— To Begin —</p>
+    <div class="menu-items">
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=400&q=80" alt="Samosas"/></div>
+        <div class="item-info">
+          <div class="item-name">Spiced Lamb Samosas</div>
+          <div class="item-desc">Golden pastry filled with slow-cooked spiced lamb mince, fresh coriander and green chilli chutney.</div>
+          <span class="item-tag">Signature</span>
+          <div class="item-price">R 85</div>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=400&q=80" alt="Aubergine Bharta"/></div>
+        <div class="item-info">
+          <div class="item-name">Smoked Aubergine Bharta</div>
+          <div class="item-desc">Fire-roasted aubergine blended with tomato, cumin and fresh herb oil. Served with warm naan.</div>
+          <span class="item-tag">Vegan</span>
+          <div class="item-price">R 75</div>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=400&q=80" alt="Prawn Koliwada"/></div>
+        <div class="item-info">
+          <div class="item-name">Prawn Koliwada</div>
+          <div class="item-desc">Crisp-fried prawns with carom seeds, ajwain batter and tamarind dipping sauce.</div>
+          <span class="item-tag">Gluten-Free Option</span>
+          <div class="item-price">R 125</div>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1514326640560-7d063ef2aed5?auto=format&fit=crop&w=400&q=80" alt="Tandoori Mushroom"/></div>
+        <div class="item-info">
+          <div class="item-name">Tandoori Mushroom Tikka</div>
+          <div class="item-desc">Portobello mushrooms marinated in smoked yoghurt and saffron, char-kissed in our clay oven.</div>
+          <span class="item-tag">Vegetarian</span>
+          <div class="item-price">R 95</div>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1606471191009-63994c53433b?auto=format&fit=crop&w=400&q=80" alt="Chicken Seekh Kebab"/></div>
+        <div class="item-info">
+          <div class="item-name">Chicken Seekh Kebab</div>
+          <div class="item-desc">Minced chicken with ginger, cardamom and fresh herbs, grilled on iron skewers over charcoal.</div>
+          <div class="item-price">R 110</div>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=400&q=80" alt="Lentil Soup"/></div>
+        <div class="item-info">
+          <div class="item-name">Lentil Soup of the Day</div>
+          <div class="item-desc">A rotating dal inspired by regional Indian kitchens — ask your server for today's preparation.</div>
+          <span class="item-tag">Vegan</span>
+          <div class="item-price">R 65</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="mains" class="menu-section">
+    <p class="menu-section-title">— The Main Act —</p>
+    <div class="menu-items">
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1631515243349-e0cb75fb8d3a?auto=format&fit=crop&w=400&q=80" alt="Lamb Rogan Josh"/></div>
+        <div class="item-info">
+          <div class="item-name">Kashmiri Lamb Rogan Josh</div>
+          <div class="item-desc">Slow-braised lamb, fennel seed, Kashmiri chilli, aged yoghurt, saffron pilaf.</div>
+          <span class="item-tag">Chef's Choice</span>
+          <div class="item-price">R 245</div>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?auto=format&fit=crop&w=400&q=80" alt="Butter Chicken"/></div>
+        <div class="item-info">
+          <div class="item-name">Butter Chicken Royale</div>
+          <div class="item-desc">Free-range chicken in a rich tomato-butter sauce, fenugreek cream and hand-ground garam masala.</div>
+          <span class="item-tag">Signature</span>
+          <div class="item-price">R 210</div>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=400&q=80" alt="Black Cardamom Prawn"/></div>
+        <div class="item-info">
+          <div class="item-name">Black Cardamom Tiger Prawn</div>
+          <div class="item-desc">Smoked cardamom oil, tamarind reduction, turmeric cream emulsion, jasmine rice.</div>
+          <div class="item-price">R 285</div>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1585937421612-70a0f285573d?auto=format&fit=crop&w=400&q=80" alt="Malabar Gold Curry"/></div>
+        <div class="item-info">
+          <div class="item-name">Malabar Gold Curry</div>
+          <div class="item-desc">Coconut milk, golden turmeric, curry leaf oil, Byadagi chilli, served with appam.</div>
+          <span class="item-tag">Vegan</span>
+          <div class="item-price">R 195</div>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=400&q=80" alt="Grilled Linefish"/></div>
+        <div class="item-info">
+          <div class="item-name">Grilled Linefish of the Day</div>
+          <div class="item-desc">South African catch, marinated in coastal spice blend, served with kokum butter and local greens.</div>
+          <div class="item-price">R 230</div>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=400&q=80" alt="Paneer Makhani"/></div>
+        <div class="item-info">
+          <div class="item-name">Paneer Makhani</div>
+          <div class="item-desc">House-pressed cottage cheese in a velvety tomato-cream sauce with dried fenugreek leaves.</div>
+          <span class="item-tag">Vegetarian</span>
+          <div class="item-price">R 185</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="breads" class="menu-section">
+    <p class="menu-section-title">— From Our Tandoor —</p>
+    <div class="menu-items">
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1533777857889-4be7c70b33f7?auto=format&fit=crop&w=400&q=80" alt="Butter Naan"/></div>
+        <div class="item-info">
+          <div class="item-name">Butter Naan</div>
+          <div class="item-desc">Classic leavened bread baked in clay oven, brushed with cultured butter.</div>
+          <div class="item-price">R 35</div>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1573140441964-31f77c8282f3?auto=format&fit=crop&w=400&q=80" alt="Garlic Naan"/></div>
+        <div class="item-info">
+          <div class="item-name">Garlic & Coriander Naan</div>
+          <div class="item-desc">Flame-blistered dough with roasted garlic and hand-torn coriander.</div>
+          <div class="item-price">R 45</div>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1505253149613-112d21d9f6a9?auto=format&fit=crop&w=400&q=80" alt="Paratha"/></div>
+        <div class="item-info">
+          <div class="item-name">Paratha Layered Flatbread</div>
+          <div class="item-desc">Whole wheat, hand-laminated, served with house pickle and raita.</div>
+          <span class="item-tag">Vegetarian</span>
+          <div class="item-price">R 55</div>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1512058560366-cd2427ff06bb?auto=format&fit=crop&w=400&q=80" alt="Saffron Rice"/></div>
+        <div class="item-info">
+          <div class="item-name">Saffron Rice</div>
+          <div class="item-desc">Basmati perfumed with Iranian saffron and whole spices.</div>
+          <div class="item-price">R 65</div>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1546833998-877b37c2e5c6?auto=format&fit=crop&w=400&q=80" alt="Dal Tadka"/></div>
+        <div class="item-info">
+          <div class="item-name">Dal Tadka</div>
+          <div class="item-desc">Yellow lentils tempered with ghee, cumin and dried chilli.</div>
+          <span class="item-tag">Vegan</span>
+          <div class="item-price">R 85</div>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1517244492180-2583094c03aa?auto=format&fit=crop&w=400&q=80" alt="Cucumber Raita"/></div>
+        <div class="item-info">
+          <div class="item-name">Cucumber & Mint Raita</div>
+          <div class="item-desc">Hand-set yoghurt with grated cucumber, dried mint and black salt.</div>
+          <div class="item-price">R 45</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="desserts" class="menu-section">
+    <p class="menu-section-title">— A Sweet Conclusion —</p>
+    <div class="menu-items">
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1593701461253-0302071063ca?auto=format&fit=crop&w=400&q=80" alt="Gulab Jamun Royale"/></div>
+        <div class="item-info">
+          <div class="item-name">Gulab Jamun Royale</div>
+          <div class="item-desc">Cardamom-scented milk dumplings in rose syrup with pistachio ice cream.</div>
+          <span class="item-tag">Signature</span>
+          <div class="item-price">R 85</div>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1512484776495-a09d92e87c3b?auto=format&fit=crop&w=400&q=80" alt="Saffron Crème Brûlée"/></div>
+        <div class="item-info">
+          <div class="item-name">Saffron Crème Brûlée</div>
+          <div class="item-desc">A Franco-Indian reimagining — Persian saffron custard with a crackling sugar crust.</div>
+          <div class="item-price">R 95</div>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1579954115545-a95591f28be0?auto=format&fit=crop&w=400&q=80" alt="Mango & Cardamom Kulfi"/></div>
+        <div class="item-info">
+          <div class="item-name">Mango & Cardamom Kulfi</div>
+          <div class="item-desc">Slow-churned Indian ice cream with Alphonso mango and green cardamom.</div>
+          <span class="item-tag">Gluten-Free</span>
+          <div class="item-price">R 75</div>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1624353335558-62a7446bc402?auto=format&fit=crop&w=400&q=80" alt="Chocolate & Chilli Fondant"/></div>
+        <div class="item-info">
+          <div class="item-name">Chocolate & Chilli Fondant</div>
+          <div class="item-desc">Dark chocolate lava cake infused with a whisper of Kashmiri chilli, served with vanilla cream.</div>
+          <div class="item-price">R 110</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="drinks" class="menu-section">
+    <p class="menu-section-title">— Libations & Elixirs —</p>
+    <div class="menu-items">
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1626132647523-66f5bf380ee2?auto=format&fit=crop&w=400&q=80" alt="Rose Lassi"/></div>
+        <div class="item-info">
+          <div class="item-name">Rose & Cardamom Lassi</div>
+          <div class="item-desc">Chilled yoghurt drink with dried rose petals and fresh cardamom. Non-alcoholic.</div>
+          <div class="item-price">R 65</div>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1546173159-315724a31696?auto=format&fit=crop&w=400&q=80" alt="Spiced Mango Mocktail"/></div>
+        <div class="item-info">
+          <div class="item-name">Spiced Mango Mocktail</div>
+          <div class="item-desc">Alphonso mango purée, fresh lime, chaat masala and soda. Non-alcoholic.</div>
+          <div class="item-price">R 75</div>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1574096079513-d8259312b785?auto=format&fit=crop&w=400&q=80" alt="Masala Chai Martini"/></div>
+        <div class="item-info">
+          <div class="item-name">Masala Chai Martini</div>
+          <div class="item-desc">Vodka infused with house chai blend, condensed milk foam, cinnamon dust.</div>
+          <div class="item-price">R 125</div>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=400&q=80" alt="Turmeric Old Fashioned"/></div>
+        <div class="item-info">
+          <div class="item-name">Turmeric Old Fashioned</div>
+          <div class="item-desc">Bourbon, golden turmeric syrup, Angostura bitters, smoked orange peel.</div>
+          <div class="item-price">R 145</div>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=400&q=80" alt="Wine Pairing"/></div>
+        <div class="item-info">
+          <div class="item-name">Wine Pairing (per course)</div>
+          <div class="item-desc">Curated South African and international wines selected by our sommelier.</div>
+          <span class="item-tag">Ask Your Server</span>
+          <div class="item-price">R 150</div>
+        </div>
+      </div>
+      <div class="menu-item">
+        <div class="item-img"><img src="https://images.unsplash.com/photo-1548919973-5cfe5d4fc494?auto=format&fit=crop&w=400&q=80" alt="Water"/></div>
+        <div class="item-info">
+          <div class="item-name">Still / Sparkling Water</div>
+          <div class="item-desc">Premium still or sparkling water, served in glass carafes.</div>
+          <div class="item-price">R 45</div>
+        </div>
+      </div>
+    </div>
+    
+    <footer>
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="logo">SRK</div>
+          <p>Spice Route Kitchen — a sanctuary of flavour, warmth and culinary artistry in the heart of Cape Town.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Navigate</h4>
+          <ul>
+            <li><a href="#" onclick="showPage('home')">Home</a></li>
+            <li><a href="#" onclick="showPage('menu')">Menu</a></li>
+            <li><a href="#" onclick="showPage('reviews')">Reviews</a></li>
+            <li><a href="#" onclick="showPage('book')">Reservations</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Hours</h4>
+          <p>Tuesday – Friday<br>12pm – 3pm · 6pm – 11pm</p><br>
+          <p>Saturday – Sunday<br>11am – 11pm</p>
+        </div>
+        <div class="footer-col">
+          <h4>Find Us</h4>
+          <p>123 Bree Street<br>Cape Town, 8001<br><br>+27 21 424 1234</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2025 Spice Route Kitchen. All rights reserved.</p>
+        <div class="footer-social">
+          <a href="#">Instagram</a><a href="#">Facebook</a><a href="#">TripAdvisor</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+<!-- ===== REVIEWS ===== -->
+<div id="reviews" class="page">
+  <div class="reviews-hero">
+    <p class="section-label">What Our Guests Say</p>
+    <h1>REVIEWS</h1>
+    <p>Words from those who have dined with us.</p>
+  </div>
+
+  <div class="reviews-featured">
+    <div class="gold-divider"></div>
+    <blockquote>"An extraordinary journey through the spice routes of the ancient world — every dish a poem, every sip a sonnet."</blockquote>
+    <cite>— The Cape Times, 2024</cite>
+    <div class="gold-divider"></div>
+  </div>
+
+  <div class="reviews-grid">
+    <div class="review-card">
+      <div class="review-quote">"</div>
+      <p class="review-text">The Rogan Josh melted on my tongue. I've eaten in restaurants across three continents and Spice Route Kitchen stands alongside the very finest.</p>
+      <div class="review-stars">★★★★★</div>
+      <div class="review-author"><strong>Sarah Jenkins</strong> Verified Diner · Google</div>
+    </div>
+    <div class="review-card">
+      <div class="review-quote">"</div>
+      <p class="review-text">From the moment we walked in, the ambiance wrapped around us like a warm shawl. The service was impeccable — attentive without being intrusive.</p>
+      <div class="review-stars">★★★★★</div>
+      <div class="review-author"><strong>David van der Merwe</strong> Verified Diner · Google</div>
+    </div>
+    <div class="review-card">
+      <div class="review-quote">"</div>
+      <p class="review-text">The tasting menu is a masterclass. Each course told a story of trade winds and ancient ports. We will absolutely be returning next month.</p>
+      <div class="review-stars">★★★★★</div>
+      <div class="review-author"><strong>Elena Rodriguez</strong> Verified Diner · TripAdvisor</div>
+    </div>
+    <div class="review-card">
+      <div class="review-quote">"</div>
+      <p class="review-text">Celebrated my anniversary here. The team had rose petals on the table and a handwritten note from the chef. It was an evening I shall never forget.</p>
+      <div class="review-stars">★★★★★</div>
+      <div class="review-author"><strong>Michael Smith</strong> Special Occasion Diner</div>
+    </div>
+    <div class="review-card">
+      <div class="review-quote">"</div>
+      <p class="review-text">As a vegetarian I sometimes feel like an afterthought. Here I felt like the star. The Malabar Gold and the Paneer Makhani were simply divine.</p>
+      <div class="review-stars">★★★★★</div>
+      <div class="review-author"><strong>Priya Naidoo</strong> Regular Guest</div>
+    </div>
+    <div class="review-card">
+      <div class="review-quote">"</div>
+      <p class="review-text">The wine pairing curated by their sommelier was extraordinary. Watching the Indian spices dance with a South African Chenin Blanc was revelatory.</p>
+      <div class="review-stars">★★★★★</div>
+      <div class="review-author"><strong>James Wilson</strong> Wine Enthusiast · Google</div>
+    </div>
+  </div>
+
+  <div class="press-logos">
+    <div class="press-logo">The Cape Times</div>
+    <div class="press-logo">Eat Out Guide</div>
+    <div class="press-logo">Michelin Plate</div>
+    <div class="press-logo">World's 50 Best</div>
+  </div>
+
+  <div class="cta-banner">
+    <p class="section-label">Join the Journey</p>
+    <h2>Be Our Next <em>Honoured Guest</em></h2>
+    <p>Your table awaits. Reserve your experience at Spice Route Kitchen today.</p>
+    <a href="#" class="btn-gold" onclick="showPage('book')">Reserve Now</a>
+  </div>
+
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">SRK</div>
+        <p>Spice Route Kitchen — where every guest is family in the heart of Cape Town.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Navigate</h4>
+        <ul>
+          <li><a href="#" onclick="showPage('home')">Home</a></li>
+          <li><a href="#" onclick="showPage('menu')">Menu</a></li>
+          <li><a href="#" onclick="showPage('reviews')">Reviews</a></li>
+          <li><a href="#" onclick="showPage('book')">Reservations</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Hours</h4>
+        <p>Tuesday – Friday<br>12pm – 3pm · 6pm – 11pm</p><br>
+        <p>Saturday – Sunday<br>11am – 11pm</p>
+      </div>
+      <div class="footer-col">
+        <h4>Find Us</h4>
+        <p>123 Bree Street<br>Cape Town, 8001<br><br>+27 21 424 1234</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2025 Spice Route Kitchen. All rights reserved.</p>
+      <div class="footer-social">
+        <a href="#">Instagram</a><a href="#">Facebook</a><a href="#">TripAdvisor</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ===== BOOK ===== -->
+<div id="book" class="page">
+  <div class="book-layout">
+    <div class="book-left">
+      <div class="book-left-content">
+        <p class="section-label" style="margin-bottom:12px;">Reserve Your Table</p>
+        <h2>An Evening <em>Crafted</em><br>Just for You</h2>
+        <p>We believe every reservation is a promise — a commitment to giving you an unforgettable evening. Let us take care of everything.</p>
+        <div class="book-detail">
+          <div class="book-detail-icon">⊙</div>
+          <div class="book-detail-text">123 Bree Street, City Centre<span>Cape Town, 8001, South Africa</span></div>
+        </div>
+        <div class="book-detail">
+          <div class="book-detail-icon">☎</div>
+          <div class="book-detail-text">+27 21 424 1234<span>Available during opening hours</span></div>
+        </div>
+        <div class="book-detail">
+          <div class="book-detail-icon">✉</div>
+          <div class="book-detail-text">reservations@spiceroutekitchen.co.za<span>We respond within 2 hours</span></div>
+        </div>
+        <div class="book-detail">
+          <div class="book-detail-icon">◷</div>
+          <div class="book-detail-text">Tue–Fri: 12pm–3pm, 6pm–11pm<span>Sat–Sun: 11am–11pm · Mon: Closed</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="book-right">
+      <h3>MAKE A RESERVATION</h3>
+      <div class="form-row form-group">
+        <div>
+          <label>First Name</label>
+          <input type="text" placeholder="e.g. John"/>
+        </div>
+        <div>
+          <label>Last Name</label>
+          <input type="text" placeholder="e.g. Doe"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" placeholder="john.doe@example.com"/>
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" placeholder="+27 71 234 5678"/>
+      </div>
+      <div class="form-row form-group">
+        <div>
+          <label>Date</label>
+          <input type="date"/>
+        </div>
+        <div>
+          <label>Time</label>
+          <select>
+            <option>12:00 PM</option>
+            <option>12:30 PM</option>
+            <option>1:00 PM</option>
+            <option>6:00 PM</option>
+            <option>6:30 PM</option>
+            <option>7:00 PM</option>
+            <option>7:30 PM</option>
+            <option>8:00 PM</option>
+            <option>8:30 PM</option>
+            <option>9:00 PM</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Number of Guests</label>
+        <select>
+          <option>1 Guest</option>
+          <option>2 Guests</option>
+          <option>3 Guests</option>
+          <option>4 Guests</option>
+          <option>5 Guests</option>
+          <option>6 Guests</option>
+          <option>7+ Guests (Please call us)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Occasion / Special Requests</label>
+        <textarea placeholder="Anniversary, birthday, dietary requirements, seating preferences..."></textarea>
+      </div>
+      <button class="form-submit" onclick="handleSubmit()">Confirm Reservation</button>
+      <p class="form-note">You will receive a confirmation email within 2 hours. For same-day reservations, please call us directly.</p>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">SRK</div>
+        <p>Spice Route Kitchen — a sanctuary of flavour, warmth and culinary artistry in the heart of Cape Town.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Navigate</h4>
+        <ul>
+          <li><a href="#" onclick="showPage('home')">Home</a></li>
+          <li><a href="#" onclick="showPage('menu')">Menu</a></li>
+          <li><a href="#" onclick="showPage('reviews')">Reviews</a></li>
+          <li><a href="#" onclick="showPage('book')">Reservations</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Hours</h4>
+        <p>Tuesday – Friday<br>12pm – 3pm · 6pm – 11pm</p><br>
+        <p>Saturday – Sunday<br>11am – 11pm</p>
+      </div>
+      <div class="footer-col">
+        <h4>Find Us</h4>
+        <p>123 Bree Street<br>Cape Town, 8001<br><br>+27 21 424 1234</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2025 Spice Route Kitchen. All rights reserved.</p>
+      <div class="footer-social">
+        <a href="#">Instagram</a><a href="#">Facebook</a><a href="#">TripAdvisor</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+    ring.style.left = e.clientX + 'px';
+    ring.style.top = e.clientY + 'px';
+  });
+
+  // Cursor hover effect
+  const interactiveElements = document.querySelectorAll('a, button, .menu-tab, .dish-card, .menu-item, input, select, textarea');
+  interactiveElements.forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.classList.add('hover');
+      ring.classList.add('hover');
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.classList.remove('hover');
+      ring.classList.remove('hover');
+    });
+  });
+
+  // Reveal on scroll
+  const reveal = () => {
+    const reveals = document.querySelectorAll('.reveal');
+    reveals.forEach(el => {
+      const windowHeight = window.innerHeight;
+      const revealTop = el.getBoundingClientRect().top;
+      const revealPoint = 150;
+      if (revealTop < windowHeight - revealPoint) {
+        el.classList.add('active');
+      }
+    });
+  };
+  window.addEventListener('scroll', reveal);
+  reveal(); // Initial check
+
+  // Nav scroll effect
+  window.addEventListener('scroll', () => {
+    document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 80);
+  });
+
+  // Page switching with transition
+  function showPage(id) {
+    const overlay = document.getElementById('pageOverlay');
+    overlay.classList.add('in');
+    setTimeout(() => {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      window.scrollTo(0,0);
+      overlay.classList.remove('in');
+    }, 300);
+  }
+
+  // Menu tabs
+  function switchMenuTab(btn, sectionId) {
+    document.querySelectorAll('.menu-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.menu-section').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(sectionId).classList.add('active');
+  }
+
+  // Reservation submit
+  function handleSubmit() {
+    const btn = document.querySelector('.form-submit');
+    btn.textContent = '✓  Reservation Request Sent';
+    btn.style.background = '#2a6e3f';
+    btn.style.color = '#fff';
+    setTimeout(() => {
+      btn.textContent = 'Confirm Reservation';
+      btn.style.background = '';
+      btn.style.color = '';
+    }, 4000);
+  }
+</script>
+</body>
+</html>
