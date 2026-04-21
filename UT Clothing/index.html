@@ -1,0 +1,1894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UT Clothing — Urban Thread</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+
+<style>
+  /* ─── DESIGN TOKENS ─────────────────────────────────────────── */
+  :root {
+    --c-black:   #0d0d0d;
+    --c-off-black: #1a1a1a;
+    --c-dark:    #242424;
+    --c-mid:     #555;
+    --c-muted:   #888;
+    --c-border:  #e2e2e2;
+    --c-light:   #f5f4f1;
+    --c-white:   #ffffff;
+    --c-accent:  #c8a96e;      /* warm gold — the ONE accent */
+    --c-accent-dk: #a8873e;
+
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-body:    'DM Sans', sans-serif;
+    --font-serif:   'Playfair Display', serif;
+
+    /* ── Swappable image references — change here, updates everywhere ── */
+    --img-hero-bg:     url('https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=1600&q=80');
+    --img-hero-model:  url('https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=900&q=80');
+    --img-feat-1:      url('https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800&q=80');
+    --img-feat-2:      url('https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=800&q=80');
+    --img-feat-3:      url('https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=800&q=80');
+
+    --img-p1:  url('https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=600&q=80');
+    --img-p2:  url('https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=600&q=80');
+    --img-p3:  url('https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=600&q=80');
+    --img-p4:  url('https://images.unsplash.com/photo-1571945153237-4929e783af4a?w=600&q=80');
+    --img-p5:  url('https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=600&q=80');
+    --img-p6:  url('https://images.unsplash.com/photo-1560243563-062bfc001d68?w=600&q=80');
+    --img-p7:  url('https://images.unsplash.com/photo-1542272454315-4c01d7abdf4a?w=600&q=80');
+    --img-p8:  url('https://images.unsplash.com/photo-1609803384069-19f3f36fb279?w=600&q=80');
+
+    --img-detail-main:  url('https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=900&q=80');
+    --img-detail-thumb1: url('https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=300&q=80');
+    --img-detail-thumb2: url('https://images.unsplash.com/photo-1578681994506-b8f463449011?w=300&q=80');
+    --img-detail-thumb3: url('https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=300&q=80');
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--c-white);
+    color: var(--c-black);
+    font-size: 15px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ─── SCREEN SYSTEM ──────────────────────────────────────────── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ─── NAV ────────────────────────────────────────────────────── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px;
+    height: 64px;
+    transition: background .3s, border-color .3s;
+  }
+  nav.light-nav {
+    background: rgba(255,255,255,.95);
+    border-bottom: 1px solid var(--c-border);
+    backdrop-filter: blur(8px);
+  }
+  nav.dark-nav {
+    background: rgba(13,13,13,.92);
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    backdrop-filter: blur(8px);
+  }
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 26px;
+    letter-spacing: .06em;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  nav.light-nav .nav-logo { color: var(--c-black); }
+  nav.dark-nav  .nav-logo { color: var(--c-white); }
+
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a {
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: color .2s;
+  }
+  nav.light-nav .nav-links a { color: var(--c-mid); }
+  nav.light-nav .nav-links a:hover { color: var(--c-black); }
+  nav.dark-nav  .nav-links a { color: rgba(255,255,255,.6); }
+  nav.dark-nav  .nav-links a:hover { color: var(--c-white); }
+
+  .nav-actions { display: flex; align-items: center; gap: 20px; }
+  .nav-icon-btn {
+    background: none; border: none; cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    font-family: var(--font-body); font-size: 13px;
+    letter-spacing: .04em; padding: 6px 0;
+    transition: opacity .2s;
+  }
+  .nav-icon-btn:hover { opacity: .7; }
+  nav.light-nav .nav-icon-btn { color: var(--c-black); }
+  nav.dark-nav  .nav-icon-btn { color: var(--c-white); }
+
+  .cart-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 18px; height: 18px; border-radius: 50%; font-size: 10px;
+    font-weight: 500;
+  }
+  nav.light-nav .cart-badge { background: var(--c-black); color: var(--c-white); }
+  nav.dark-nav  .cart-badge { background: var(--c-accent); color: var(--c-black); }
+
+  /* ─── BUTTONS ────────────────────────────────────────────────── */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 8px; cursor: pointer; border: none;
+    font-family: var(--font-body); font-weight: 500;
+    letter-spacing: .06em; text-transform: uppercase; font-size: 12px;
+    transition: all .2s; text-decoration: none;
+  }
+  .btn-primary {
+    background: var(--c-black); color: var(--c-white);
+    padding: 14px 32px;
+  }
+  .btn-primary:hover { background: var(--c-accent); color: var(--c-black); }
+  .btn-outline {
+    background: transparent; color: var(--c-white);
+    border: 1px solid rgba(255,255,255,.4);
+    padding: 14px 32px;
+  }
+  .btn-outline:hover { border-color: var(--c-white); background: rgba(255,255,255,.08); }
+  .btn-outline-dark {
+    background: transparent; color: var(--c-black);
+    border: 1px solid var(--c-black); padding: 12px 28px;
+  }
+  .btn-outline-dark:hover { background: var(--c-black); color: var(--c-white); }
+  .btn-accent {
+    background: var(--c-accent); color: var(--c-black);
+    padding: 16px 40px; font-size: 13px;
+  }
+  .btn-accent:hover { background: var(--c-accent-dk); }
+
+  /* ══════════════════════════════════════════════════════════════
+     HOME PAGE
+  ══════════════════════════════════════════════════════════════ */
+  #page-home {}
+
+  /* Hero */
+  .hero {
+    height: 100vh; position: relative; overflow: hidden;
+    background: var(--c-off-black);
+    display: flex; align-items: flex-end;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background-image: var(--img-hero-bg);
+    background-size: cover; background-position: center top;
+    opacity: .35;
+  }
+  .hero-content {
+    position: relative; z-index: 2;
+    padding: 0 64px 80px;
+    max-width: 760px;
+  }
+  .hero-eyebrow {
+    font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--c-accent); margin-bottom: 20px;
+  }
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(72px, 9vw, 136px);
+    line-height: .92; letter-spacing: .02em;
+    color: var(--c-white); margin-bottom: 28px;
+  }
+  .hero-title em {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--c-accent);
+    font-size: .85em;
+    font-weight: 400;
+  }
+  .hero-sub {
+    font-size: 16px; color: rgba(255,255,255,.55);
+    max-width: 420px; line-height: 1.7; margin-bottom: 40px;
+  }
+  .hero-ctas { display: flex; gap: 16px; }
+
+  .hero-side-info {
+    position: absolute; right: 64px; bottom: 80px; z-index: 2;
+    text-align: right;
+  }
+  .hero-side-info p {
+    font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+    color: rgba(255,255,255,.4); margin-bottom: 8px;
+  }
+  .hero-side-info strong {
+    font-family: var(--font-display); font-size: 36px;
+    color: var(--c-white); display: block;
+  }
+
+  .hero-scroll-hint {
+    position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+    z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+  .hero-scroll-hint span {
+    font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+    color: rgba(255,255,255,.3);
+  }
+  .scroll-line {
+    width: 1px; height: 40px;
+    background: linear-gradient(to bottom, rgba(255,255,255,.3), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+  @keyframes scrollPulse {
+    0%,100% { opacity: .3; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(.6) translateY(10px); }
+  }
+
+  /* Marquee */
+  .marquee-strip {
+    background: var(--c-accent); overflow: hidden;
+    padding: 14px 0; white-space: nowrap;
+  }
+  .marquee-inner {
+    display: inline-flex; gap: 60px;
+    animation: marquee 22s linear infinite;
+  }
+  .marquee-inner span {
+    font-family: var(--font-display); font-size: 18px;
+    letter-spacing: .1em; color: var(--c-black);
+  }
+  .marquee-inner .dot { color: rgba(0,0,0,.4); }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* Collections grid */
+  .section { padding: 100px 64px; }
+  .section-label {
+    font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--c-muted); margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: var(--font-display); font-size: clamp(40px, 5vw, 72px);
+    line-height: 1; letter-spacing: .02em; margin-bottom: 48px;
+  }
+
+  .collections-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 480px 280px;
+    gap: 12px;
+  }
+  .col-card {
+    position: relative; overflow: hidden; cursor: pointer;
+  }
+  .col-card:first-child { grid-row: span 2; }
+  .col-card-img {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center;
+    transition: transform .7s ease;
+  }
+  .col-card:hover .col-card-img { transform: scale(1.04); }
+  .col-card-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,.65) 0%, transparent 55%);
+  }
+  .col-card-info {
+    position: absolute; bottom: 28px; left: 28px; right: 28px;
+  }
+  .col-card-info h3 {
+    font-family: var(--font-display); font-size: 32px;
+    color: var(--c-white); letter-spacing: .04em; margin-bottom: 6px;
+  }
+  .col-card-info p {
+    font-size: 12px; color: rgba(255,255,255,.55);
+    letter-spacing: .08em; text-transform: uppercase; margin-bottom: 16px;
+  }
+  .col-card-tag {
+    display: inline-block; padding: 5px 14px;
+    border: 1px solid rgba(255,255,255,.4);
+    font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--c-white); transition: all .2s;
+  }
+  .col-card:hover .col-card-tag {
+    background: var(--c-accent); border-color: var(--c-accent); color: var(--c-black);
+  }
+
+  /* Featured products strip */
+  .products-strip {
+    padding: 0 64px 100px;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+  }
+  .product-card-mini { cursor: pointer; }
+  .product-card-mini-img {
+    aspect-ratio: 3/4; background-size: cover; background-position: center top;
+    margin-bottom: 14px; overflow: hidden; position: relative;
+  }
+  .product-card-mini-img img-overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0); transition: background .3s;
+  }
+  .product-card-mini:hover .product-card-mini-img { }
+  .product-card-mini h4 {
+    font-size: 14px; font-weight: 400; margin-bottom: 4px;
+  }
+  .product-card-mini .price {
+    font-size: 14px; font-weight: 500; color: var(--c-mid);
+  }
+  .product-card-mini .badge-new {
+    position: absolute; top: 12px; left: 12px;
+    background: var(--c-accent); color: var(--c-black);
+    font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+    padding: 3px 10px; font-weight: 500;
+  }
+
+  /* Brand statement */
+  .brand-statement {
+    background: var(--c-off-black); color: var(--c-white);
+    padding: 120px 64px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+    align-items: center;
+  }
+  .brand-statement h2 {
+    font-family: var(--font-display); font-size: clamp(48px, 6vw, 88px);
+    line-height: .95; letter-spacing: .02em;
+  }
+  .brand-statement h2 em {
+    font-family: var(--font-serif); font-style: italic;
+    color: var(--c-accent); font-weight: 400; font-size: .8em;
+  }
+  .brand-right p {
+    font-size: 16px; color: rgba(255,255,255,.5);
+    line-height: 1.9; margin-bottom: 36px;
+  }
+  .brand-stats { display: flex; gap: 48px; margin-top: 40px; }
+  .stat { }
+  .stat-num {
+    font-family: var(--font-display); font-size: 48px;
+    color: var(--c-accent); line-height: 1;
+  }
+  .stat-label { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.4); }
+
+  /* ══════════════════════════════════════════════════════════════
+     CATALOG PAGE
+  ══════════════════════════════════════════════════════════════ */
+  #page-catalog { padding-top: 64px; }
+
+  .catalog-header {
+    background: var(--c-light); padding: 60px 64px 40px;
+  }
+  .catalog-header h1 {
+    font-family: var(--font-display); font-size: 64px;
+    letter-spacing: .02em; margin-bottom: 8px;
+  }
+  .catalog-header p { color: var(--c-muted); font-size: 14px; }
+
+  .catalog-controls {
+    display: flex; align-items: center; gap: 16px;
+    padding: 20px 64px;
+    border-bottom: 1px solid var(--c-border);
+    background: var(--c-white); position: sticky; top: 64px; z-index: 50;
+  }
+  .filter-chips { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
+  .chip {
+    padding: 7px 18px; border: 1px solid var(--c-border);
+    font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
+    cursor: pointer; background: var(--c-white); color: var(--c-black);
+    transition: all .2s; font-family: var(--font-body);
+  }
+  .chip.active, .chip:hover {
+    background: var(--c-black); color: var(--c-white); border-color: var(--c-black);
+  }
+  .sort-select {
+    border: 1px solid var(--c-border); padding: 8px 16px;
+    font-family: var(--font-body); font-size: 12px; cursor: pointer;
+    letter-spacing: .04em; background: var(--c-white); color: var(--c-black);
+  }
+  .count-label { font-size: 12px; color: var(--c-muted); white-space: nowrap; }
+
+  .catalog-layout {
+    display: grid; grid-template-columns: 240px 1fr;
+    min-height: calc(100vh - 200px);
+  }
+
+  /* Sidebar */
+  .sidebar {
+    border-right: 1px solid var(--c-border);
+    padding: 32px 28px;
+    position: sticky; top: 138px; height: fit-content;
+  }
+  .sidebar-section { margin-bottom: 32px; }
+  .sidebar-section h4 {
+    font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--c-muted); margin-bottom: 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer;
+  }
+  .sidebar-section h4::after {
+    content: '—'; font-size: 10px; color: var(--c-border);
+  }
+
+  .size-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .size-btn {
+    padding: 8px 0; text-align: center; border: 1px solid var(--c-border);
+    font-size: 12px; cursor: pointer; transition: all .2s; background: var(--c-white);
+    font-family: var(--font-body); letter-spacing: .04em;
+  }
+  .size-btn:hover, .size-btn.active {
+    background: var(--c-black); color: var(--c-white); border-color: var(--c-black);
+  }
+
+  .color-dots { display: flex; gap: 8px; flex-wrap: wrap; }
+  .color-dot {
+    width: 24px; height: 24px; border-radius: 50%; cursor: pointer;
+    position: relative; transition: transform .2s;
+  }
+  .color-dot:hover { transform: scale(1.15); }
+  .color-dot.active::after {
+    content: ''; position: absolute; inset: -3px;
+    border-radius: 50%; border: 2px solid var(--c-black);
+  }
+
+  .price-range-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--c-muted); margin-bottom: 8px; }
+  input[type=range].price-slider {
+    width: 100%; accent-color: var(--c-black); cursor: pointer;
+  }
+
+  .category-list { list-style: none; }
+  .category-list li {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 9px 0; border-bottom: 1px solid var(--c-light);
+    cursor: pointer; font-size: 13px; transition: color .2s;
+  }
+  .category-list li:hover { color: var(--c-accent); }
+  .category-list li .cat-count {
+    font-size: 11px; color: var(--c-muted);
+    background: var(--c-light); padding: 2px 8px;
+  }
+  .category-list li.active { font-weight: 500; }
+
+  /* Product Grid */
+  .product-grid-wrap { padding: 32px 40px; }
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px 20px;
+  }
+  .prod-card { cursor: pointer; }
+  .prod-card-img {
+    aspect-ratio: 3/4; position: relative; overflow: hidden;
+    margin-bottom: 14px; background: var(--c-light);
+    background-size: cover; background-position: center top;
+  }
+  .prod-card-img:hover .prod-quick-add { opacity: 1; transform: translateY(0); }
+  .prod-quick-add {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 14px; background: rgba(13,13,13,.9);
+    font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--c-white); text-align: center;
+    opacity: 0; transform: translateY(8px); transition: all .25s;
+    cursor: pointer;
+  }
+  .prod-card h3 { font-size: 14px; font-weight: 400; margin-bottom: 4px; }
+  .prod-card .prod-meta { display: flex; justify-content: space-between; align-items: center; }
+  .prod-card .prod-price { font-size: 14px; font-weight: 500; }
+  .prod-card .prod-colors { display: flex; gap: 5px; }
+  .prod-mini-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .prod-badge {
+    position: absolute; top: 12px; right: 12px; z-index: 2;
+    font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+    padding: 4px 10px; font-weight: 500;
+  }
+  .badge-sale { background: var(--c-black); color: var(--c-white); }
+  .badge-new2 { background: var(--c-accent); color: var(--c-black); }
+
+  /* ══════════════════════════════════════════════════════════════
+     PRODUCT DETAIL PAGE
+  ══════════════════════════════════════════════════════════════ */
+  #page-detail { padding-top: 64px; }
+
+  .detail-layout {
+    display: grid; grid-template-columns: 1fr 1fr;
+    min-height: 100vh;
+  }
+  .detail-media { position: relative; }
+  .detail-main-img {
+    height: 100vh; position: sticky; top: 64px;
+    background-size: cover; background-position: center top;
+    background-image: var(--img-detail-main);
+  }
+  .detail-thumbs {
+    position: absolute; left: 16px; bottom: 16px;
+    display: flex; gap: 8px;
+  }
+  .thumb {
+    width: 72px; height: 88px;
+    background-size: cover; background-position: center top;
+    border: 2px solid transparent; cursor: pointer; transition: border-color .2s;
+  }
+  .thumb.active { border-color: var(--c-black); }
+
+  .detail-info {
+    padding: 60px 56px 80px;
+  }
+  .detail-crumb {
+    font-size: 12px; color: var(--c-muted); margin-bottom: 24px;
+    display: flex; gap: 8px; align-items: center;
+  }
+  .detail-crumb a { cursor: pointer; text-decoration: none; color: var(--c-muted); }
+  .detail-crumb a:hover { color: var(--c-black); }
+  .detail-crumb .sep { color: var(--c-border); }
+  .detail-info h1 {
+    font-family: var(--font-display); font-size: 56px;
+    line-height: 1; letter-spacing: .02em; margin-bottom: 8px;
+  }
+  .detail-tagline {
+    font-size: 13px; color: var(--c-muted); margin-bottom: 28px; font-style: italic;
+  }
+  .detail-price {
+    font-size: 28px; font-weight: 500; margin-bottom: 32px;
+  }
+  .detail-price .original {
+    font-size: 18px; color: var(--c-muted); text-decoration: line-through; margin-left: 12px; font-weight: 400;
+  }
+
+  .detail-section-label {
+    font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--c-muted); margin-bottom: 12px;
+  }
+  .color-picker { display: flex; gap: 10px; margin-bottom: 28px; }
+  .color-swatch {
+    width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+    position: relative; transition: transform .2s;
+    border: 2px solid transparent;
+  }
+  .color-swatch:hover { transform: scale(1.1); }
+  .color-swatch.active { border-color: var(--c-black); }
+  .color-swatch.active::after {
+    content: ''; position: absolute; inset: -4px;
+    border-radius: 50%; border: 1px solid var(--c-black);
+  }
+
+  .size-picker { display: flex; gap: 8px; margin-bottom: 8px; }
+  .sz-btn {
+    min-width: 48px; padding: 10px 8px; text-align: center;
+    border: 1px solid var(--c-border); font-size: 13px;
+    cursor: pointer; transition: all .2s; background: var(--c-white);
+    font-family: var(--font-body);
+  }
+  .sz-btn:hover, .sz-btn.active {
+    background: var(--c-black); color: var(--c-white); border-color: var(--c-black);
+  }
+  .size-guide-link { font-size: 12px; color: var(--c-accent); cursor: pointer; text-decoration: underline; margin-bottom: 32px; display: inline-block; }
+
+  .qty-row { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; }
+  .qty-control {
+    display: flex; align-items: center; border: 1px solid var(--c-border); height: 52px;
+  }
+  .qty-btn {
+    width: 44px; height: 100%; background: none; border: none; cursor: pointer;
+    font-size: 18px; display: flex; align-items: center; justify-content: center;
+    transition: background .2s; color: var(--c-black);
+  }
+  .qty-btn:hover { background: var(--c-light); }
+  .qty-num { width: 44px; text-align: center; font-size: 15px; font-weight: 500; }
+  .add-to-cart-btn {
+    flex: 1; background: var(--c-black); color: var(--c-white);
+    border: none; height: 52px; cursor: pointer;
+    font-family: var(--font-body); font-size: 13px; font-weight: 500;
+    letter-spacing: .08em; text-transform: uppercase; transition: background .2s;
+  }
+  .add-to-cart-btn:hover { background: var(--c-accent); color: var(--c-black); }
+  .wishlist-btn {
+    width: 52px; height: 52px; border: 1px solid var(--c-border);
+    background: none; cursor: pointer; font-size: 20px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s;
+  }
+  .wishlist-btn:hover { border-color: var(--c-black); }
+
+  .detail-divider { border: none; border-top: 1px solid var(--c-border); margin: 32px 0; }
+
+  .detail-desc { font-size: 14px; color: var(--c-mid); line-height: 1.8; margin-bottom: 28px; }
+  .detail-attrs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .attr-item { font-size: 13px; }
+  .attr-label { color: var(--c-muted); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 3px; }
+
+  .accordion { border-top: 1px solid var(--c-border); }
+  .accordion-item { border-bottom: 1px solid var(--c-border); }
+  .accordion-header {
+    width: 100%; background: none; border: none; text-align: left;
+    padding: 18px 0; cursor: pointer; display: flex; justify-content: space-between;
+    align-items: center; font-family: var(--font-body); font-size: 13px;
+    letter-spacing: .06em; text-transform: uppercase;
+  }
+  .accordion-header .acc-icon { font-size: 18px; color: var(--c-muted); transition: transform .3s; }
+  .accordion-body { font-size: 13px; color: var(--c-mid); line-height: 1.8; padding-bottom: 18px; display: none; }
+  .accordion-body.open { display: block; }
+  .accordion-header.open .acc-icon { transform: rotate(45deg); }
+
+  /* ══════════════════════════════════════════════════════════════
+     CHECKOUT FLOW
+  ══════════════════════════════════════════════════════════════ */
+  #page-checkout { padding-top: 64px; background: var(--c-light); min-height: 100vh; }
+
+  .checkout-wrapper {
+    max-width: 1100px; margin: 0 auto; padding: 60px 32px;
+    display: grid; grid-template-columns: 1fr 400px; gap: 48px;
+  }
+  .checkout-main {}
+  .checkout-title {
+    font-family: var(--font-display); font-size: 48px;
+    letter-spacing: .02em; margin-bottom: 8px;
+  }
+  .checkout-steps {
+    display: flex; gap: 0; margin-bottom: 40px; margin-top: 16px;
+  }
+  .step-indicator {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--c-muted); padding: 0 24px 0 0; position: relative;
+  }
+  .step-indicator:not(:last-child)::after {
+    content: ''; position: absolute; right: 8px;
+    width: 16px; height: 1px; background: var(--c-border);
+  }
+  .step-num {
+    width: 24px; height: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 500; border: 1px solid var(--c-border);
+  }
+  .step-indicator.active { color: var(--c-black); }
+  .step-indicator.active .step-num { background: var(--c-black); color: var(--c-white); border-color: var(--c-black); }
+  .step-indicator.done { color: var(--c-accent-dk); }
+  .step-indicator.done .step-num { background: var(--c-accent); color: var(--c-black); border-color: var(--c-accent); }
+
+  .checkout-panel {
+    background: var(--c-white); padding: 36px;
+    border: 1px solid var(--c-border);
+  }
+  .checkout-panel h3 {
+    font-size: 13px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--c-muted); margin-bottom: 24px; padding-bottom: 16px;
+    border-bottom: 1px solid var(--c-border);
+  }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .form-group { margin-bottom: 16px; }
+  .form-group.full { grid-column: span 2; }
+  .form-label {
+    font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--c-muted); display: block; margin-bottom: 6px;
+  }
+  .form-input {
+    width: 100%; padding: 12px 14px; border: 1px solid var(--c-border);
+    font-family: var(--font-body); font-size: 14px; background: var(--c-white);
+    outline: none; transition: border-color .2s; color: var(--c-black);
+  }
+  .form-input:focus { border-color: var(--c-black); }
+  .form-select {
+    width: 100%; padding: 12px 14px; border: 1px solid var(--c-border);
+    font-family: var(--font-body); font-size: 14px; background: var(--c-white);
+    color: var(--c-black); cursor: pointer; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center;
+  }
+
+  .shipping-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .shipping-opt {
+    padding: 14px 16px; border: 1px solid var(--c-border);
+    cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+    transition: border-color .2s;
+  }
+  .shipping-opt:hover { border-color: var(--c-black); }
+  .shipping-opt.selected { border-color: var(--c-black); background: var(--c-light); }
+  .shipping-opt-left { display: flex; align-items: center; gap: 12px; }
+  .ship-radio {
+    width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--c-border);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .shipping-opt.selected .ship-radio { border-color: var(--c-black); }
+  .ship-radio-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--c-black);
+    display: none;
+  }
+  .shipping-opt.selected .ship-radio-dot { display: block; }
+  .ship-name { font-size: 13px; font-weight: 500; }
+  .ship-desc { font-size: 12px; color: var(--c-muted); }
+  .ship-price { font-size: 14px; font-weight: 500; }
+
+  /* Payment */
+  .payment-methods { display: flex; gap: 10px; margin-bottom: 20px; }
+  .pay-method {
+    flex: 1; padding: 12px; border: 1px solid var(--c-border);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    cursor: pointer; transition: border-color .2s; font-size: 13px;
+  }
+  .pay-method:hover { border-color: var(--c-black); }
+  .pay-method.active { border-color: var(--c-black); background: var(--c-black); color: var(--c-white); }
+  .card-number-row { position: relative; }
+  .card-icons {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    display: flex; gap: 6px;
+  }
+  .card-icon {
+    width: 32px; height: 20px; border: 1px solid var(--c-border);
+    border-radius: 3px; display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 600; letter-spacing: .02em; background: var(--c-white);
+  }
+
+  /* Order Summary Sidebar */
+  .order-summary {
+    background: var(--c-white); border: 1px solid var(--c-border);
+    padding: 32px; position: sticky; top: 100px; height: fit-content;
+  }
+  .order-summary h3 {
+    font-size: 13px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--c-muted); margin-bottom: 20px;
+  }
+  .order-items { margin-bottom: 24px; display: flex; flex-direction: column; gap: 16px; }
+  .order-item { display: flex; gap: 14px; align-items: flex-start; }
+  .order-item-img {
+    width: 72px; height: 88px; background-size: cover;
+    background-position: center top; flex-shrink: 0;
+    position: relative;
+  }
+  .order-item-badge {
+    position: absolute; top: -6px; right: -6px;
+    width: 20px; height: 20px; background: var(--c-black); color: var(--c-white);
+    border-radius: 50%; font-size: 10px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .order-item-info { flex: 1; }
+  .order-item-info h4 { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
+  .order-item-info p { font-size: 12px; color: var(--c-muted); }
+  .order-item-price { font-size: 14px; font-weight: 500; }
+
+  .promo-row { display: flex; gap: 8px; margin-bottom: 20px; }
+  .promo-input {
+    flex: 1; padding: 10px 12px; border: 1px solid var(--c-border);
+    font-family: var(--font-body); font-size: 13px; outline: none;
+  }
+  .promo-input:focus { border-color: var(--c-black); }
+  .promo-apply {
+    padding: 10px 16px; background: var(--c-black); color: var(--c-white);
+    border: none; cursor: pointer; font-size: 12px; letter-spacing: .08em;
+    text-transform: uppercase; font-family: var(--font-body); transition: background .2s;
+  }
+  .promo-apply:hover { background: var(--c-accent); color: var(--c-black); }
+
+  .order-totals { border-top: 1px solid var(--c-border); padding-top: 16px; }
+  .total-row {
+    display: flex; justify-content: space-between; font-size: 13px;
+    padding: 6px 0; color: var(--c-mid);
+  }
+  .total-row.grand {
+    font-size: 16px; font-weight: 500; color: var(--c-black);
+    border-top: 1px solid var(--c-border); padding-top: 12px; margin-top: 6px;
+  }
+  .total-row .discount { color: var(--c-accent-dk); }
+
+  .secure-badges {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--c-border);
+    font-size: 11px; color: var(--c-muted);
+  }
+
+  /* Confirmation screen */
+  .confirmation-wrap {
+    max-width: 620px; margin: 0 auto; padding: 80px 32px; text-align: center;
+  }
+  .confirm-icon {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: var(--c-accent); display: flex; align-items: center; justify-content: center;
+    font-size: 36px; margin: 0 auto 32px;
+  }
+  .confirmation-wrap h2 {
+    font-family: var(--font-display); font-size: 56px; letter-spacing: .02em; margin-bottom: 12px;
+  }
+  .confirmation-wrap p { font-size: 15px; color: var(--c-mid); line-height: 1.8; margin-bottom: 8px; }
+  .order-num { font-size: 13px; color: var(--c-muted); margin-bottom: 40px; }
+  .order-num strong { color: var(--c-black); font-weight: 500; }
+  .confirm-details {
+    border: 1px solid var(--c-border); padding: 24px;
+    text-align: left; margin-bottom: 32px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+  }
+  .conf-detail-group .conf-label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--c-muted); margin-bottom: 4px;
+  }
+  .conf-detail-group p { font-size: 14px; }
+
+  /* ─── CHECKOUT STEP PANELS ───────────────────────────────────── */
+  .checkout-step { display: none; }
+  .checkout-step.active { display: block; }
+
+  /* ─── FOOTER ─────────────────────────────────────────────────── */
+  footer {
+    background: var(--c-off-black); color: rgba(255,255,255,.5);
+    padding: 80px 64px 40px;
+  }
+  .footer-grid {
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 48px; margin-bottom: 60px;
+  }
+  .footer-brand .f-logo {
+    font-family: var(--font-display); font-size: 36px;
+    color: var(--c-white); letter-spacing: .06em; margin-bottom: 16px;
+  }
+  .footer-brand p { font-size: 13px; line-height: 1.9; max-width: 260px; }
+  footer h4 {
+    font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--c-white); margin-bottom: 16px;
+  }
+  footer ul { list-style: none; }
+  footer ul li { margin-bottom: 10px; }
+  footer ul li a {
+    font-size: 13px; color: rgba(255,255,255,.45); cursor: pointer;
+    text-decoration: none; transition: color .2s;
+  }
+  footer ul li a:hover { color: var(--c-accent); }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,.08); padding-top: 24px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px;
+  }
+
+  /* ─── TOAST ──────────────────────────────────────────────────── */
+  .toast {
+    position: fixed; bottom: 32px; right: 32px; z-index: 999;
+    background: var(--c-black); color: var(--c-white);
+    padding: 14px 24px; font-size: 13px; letter-spacing: .04em;
+    transform: translateY(80px); opacity: 0; transition: all .35s cubic-bezier(.4,0,.2,1);
+    pointer-events: none;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* ─── RESPONSIVE HELPERS ─────────────────────────────────────── */
+  @media (max-width: 900px) {
+    nav { padding: 0 24px; }
+    .hero-content { padding: 0 24px 60px; }
+    .section { padding: 60px 24px; }
+    .products-strip { padding: 0 24px 60px; grid-template-columns: repeat(2, 1fr); }
+    .collections-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+    .col-card:first-child { grid-row: auto; }
+    .brand-statement { padding: 80px 24px; grid-template-columns: 1fr; gap: 40px; }
+    .catalog-controls { padding: 16px 24px; overflow-x: auto; }
+    .catalog-layout { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .product-grid-wrap { padding: 24px; }
+    .product-grid { grid-template-columns: repeat(2, 1fr); }
+    .detail-layout { grid-template-columns: 1fr; }
+    .detail-main-img { height: 60vw; position: static; }
+    .checkout-wrapper { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    footer { padding: 60px 24px 32px; }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ────────────────────────────────────────────────────── -->
+<nav id="main-nav" class="dark-nav">
+  <a class="nav-logo" onclick="showPage('home')">UT</a>
+  <ul class="nav-links">
+    <li><a onclick="showPage('home')">Home</a></li>
+    <li><a onclick="showPage('catalog')">Shop</a></li>
+    <li><a onclick="showPage('catalog')">Collections</a></li>
+    <li><a onclick="showPage('catalog')">New Arrivals</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="nav-icon-btn" onclick="showPage('catalog')">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    </button>
+    <button class="nav-icon-btn" onclick="showPage('checkout')">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
+      Cart
+      <span class="cart-badge" id="cart-count">3</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     HOME PAGE
+═══════════════════════════════════════════════════════════════ -->
+<div id="page-home" class="screen active">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">New Collection · SS 2025</p>
+      <h1 class="hero-title">Urban<br><em>Thread</em><br>Culture</h1>
+      <p class="hero-sub">Clothing built for the city. Crafted from sustainable materials, designed for the ones who move different.</p>
+      <div class="hero-ctas">
+        <button class="btn btn-accent" onclick="showPage('catalog')">Shop the Collection</button>
+        <button class="btn btn-outline" onclick="showPage('catalog')">View Lookbook</button>
+      </div>
+    </div>
+    <div class="hero-side-info">
+      <p>Pieces this season</p>
+      <strong>124</strong>
+    </div>
+    <div class="hero-scroll-hint">
+      <div class="scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- Marquee -->
+  <div class="marquee-strip">
+    <div class="marquee-inner">
+      <span>New Arrivals</span><span class="dot">·</span>
+      <span>Organic Cotton</span><span class="dot">·</span>
+      <span>Sustainably Made</span><span class="dot">·</span>
+      <span>Free Shipping Over R1200</span><span class="dot">·</span>
+      <span>New Arrivals</span><span class="dot">·</span>
+      <span>Organic Cotton</span><span class="dot">·</span>
+      <span>Sustainably Made</span><span class="dot">·</span>
+      <span>Free Shipping Over R1200</span><span class="dot">·</span>
+      <span>New Arrivals</span><span class="dot">·</span>
+      <span>Organic Cotton</span><span class="dot">·</span>
+      <span>Sustainably Made</span><span class="dot">·</span>
+      <span>Free Shipping Over R1200</span><span class="dot">·</span>
+    </div>
+  </div>
+
+  <!-- Collections -->
+  <section class="section">
+    <p class="section-label">Explore</p>
+    <h2 class="section-title">Shop by Collection</h2>
+    <div class="collections-grid">
+      <div class="col-card" onclick="showPage('catalog')">
+        <div class="col-card-img" style="background-image: var(--img-feat-1);"></div>
+        <div class="col-card-overlay"></div>
+        <div class="col-card-info">
+          <h3>Essentials</h3>
+          <p>48 pieces</p>
+          <span class="col-card-tag">Shop Now</span>
+        </div>
+      </div>
+      <div class="col-card" onclick="showPage('catalog')">
+        <div class="col-card-img" style="background-image: var(--img-feat-2);"></div>
+        <div class="col-card-overlay"></div>
+        <div class="col-card-info">
+          <h3>Streetwear</h3>
+          <p>32 pieces</p>
+          <span class="col-card-tag">Shop Now</span>
+        </div>
+      </div>
+      <div class="col-card" onclick="showPage('catalog')">
+        <div class="col-card-img" style="background-image: var(--img-feat-3);"></div>
+        <div class="col-card-overlay"></div>
+        <div class="col-card-info">
+          <h3>Outerwear</h3>
+          <p>22 pieces</p>
+          <span class="col-card-tag">Shop Now</span>
+        </div>
+      </div>
+      <div class="col-card" onclick="showPage('catalog')" style="background: var(--c-accent);">
+        <div class="col-card-info" style="bottom: auto; top: 28px; left: 28px;">
+          <h3 style="color: var(--c-black); font-size: 28px;">Sale</h3>
+          <p style="color: rgba(0,0,0,.5);">Up to 40% off</p>
+          <span class="col-card-tag" style="border-color: var(--c-black); color: var(--c-black);">Shop Sale</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Products -->
+  <section style="padding: 0 64px; margin-bottom: 20px;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:32px;">
+      <div>
+        <p class="section-label">Trending Now</p>
+        <h2 style="font-family:var(--font-display);font-size:clamp(32px,4vw,52px);line-height:1;letter-spacing:.02em;">New Arrivals</h2>
+      </div>
+      <button class="btn btn-outline-dark" onclick="showPage('catalog')">View All</button>
+    </div>
+  </section>
+  <div class="products-strip">
+    <div class="product-card-mini" onclick="showPage('detail')">
+      <div class="product-card-mini-img" style="background-image: var(--img-p1); position:relative;">
+        <span class="badge-new">New</span>
+      </div>
+      <h4>Relaxed Crewneck Tee</h4>
+      <span class="price">R 690</span>
+    </div>
+    <div class="product-card-mini" onclick="showPage('detail')">
+      <div class="product-card-mini-img" style="background-image: var(--img-p2); position:relative;">
+        <span class="badge-new">New</span>
+      </div>
+      <h4>Classic Heavy Sweatshirt</h4>
+      <span class="price">R 1,190</span>
+    </div>
+    <div class="product-card-mini" onclick="showPage('detail')">
+      <div class="product-card-mini-img" style="background-image: var(--img-p3); position:relative;"></div>
+      <h4>Urban Cargo Jogger</h4>
+      <span class="price">R 1,490</span>
+    </div>
+    <div class="product-card-mini" onclick="showPage('detail')">
+      <div class="product-card-mini-img" style="background-image: var(--img-p4); position:relative;">
+        <span class="badge-new">Sale</span>
+      </div>
+      <h4>Washed Canvas Jacket</h4>
+      <span class="price">R 2,190 <del style="color:var(--c-muted);font-size:12px;">R 2,890</del></span>
+    </div>
+  </div>
+
+  <!-- Brand Statement -->
+  <div class="brand-statement">
+    <div>
+      <h2>Wear the<br><em>city</em><br>differently</h2>
+    </div>
+    <div class="brand-right">
+      <p>Urban Thread isn't just clothing — it's a perspective. Built for the streets of Durban to the alleyways of Jo'burg, we design pieces that live as hard as you do. No compromises on quality. No greenwashing. Just real clothes for real movement.</p>
+      <button class="btn btn-outline" onclick="showPage('catalog')">Explore UT Clothing</button>
+      <div class="brand-stats">
+        <div class="stat">
+          <div class="stat-num">4K+</div>
+          <div class="stat-label">Happy customers</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">100%</div>
+          <div class="stat-label">Organic cotton</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">2yr</div>
+          <div class="stat-label">Quality guarantee</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="f-logo">UT</div>
+        <p>Urban Thread — clothing built for the city. Sustainably sourced, intentionally designed.</p>
+      </div>
+      <div>
+        <h4>Shop</h4>
+        <ul>
+          <li><a onclick="showPage('catalog')">New Arrivals</a></li>
+          <li><a onclick="showPage('catalog')">Essentials</a></li>
+          <li><a onclick="showPage('catalog')">Streetwear</a></li>
+          <li><a onclick="showPage('catalog')">Outerwear</a></li>
+          <li><a onclick="showPage('catalog')">Sale</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Help</h4>
+        <ul>
+          <li><a>Sizing Guide</a></li>
+          <li><a>Shipping & Returns</a></li>
+          <li><a>Track My Order</a></li>
+          <li><a>FAQ</a></li>
+          <li><a>Contact Us</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a>About UT</a></li>
+          <li><a>Sustainability</a></li>
+          <li><a>Careers</a></li>
+          <li><a>Press</a></li>
+          <li><a>Stockists</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Urban Thread Clothing. All rights reserved.</span>
+      <span>Made with care in South Africa</span>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CATALOG PAGE
+═══════════════════════════════════════════════════════════════ -->
+<div id="page-catalog" class="screen">
+  <div class="catalog-header">
+    <h1>All Products</h1>
+    <p>124 pieces · Free shipping over R1,200</p>
+  </div>
+
+  <div class="catalog-controls">
+    <div class="filter-chips">
+      <button class="chip active" onclick="filterCat(this)">All</button>
+      <button class="chip" onclick="filterCat(this)">Tops</button>
+      <button class="chip" onclick="filterCat(this)">Bottoms</button>
+      <button class="chip" onclick="filterCat(this)">Outerwear</button>
+      <button class="chip" onclick="filterCat(this)">Hoodies</button>
+      <button class="chip" onclick="filterCat(this)">Accessories</button>
+      <button class="chip" onclick="filterCat(this)">Sale</button>
+    </div>
+    <span class="count-label">Showing 8 of 124</span>
+    <select class="sort-select">
+      <option>Sort: Featured</option>
+      <option>Price: Low to High</option>
+      <option>Price: High to Low</option>
+      <option>Newest First</option>
+    </select>
+  </div>
+
+  <div class="catalog-layout">
+    <!-- Sidebar Filters -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <h4>Category</h4>
+        <ul class="category-list">
+          <li class="active"><span>All</span><span class="cat-count">124</span></li>
+          <li onclick="showPage('catalog')"><span>Tops</span><span class="cat-count">42</span></li>
+          <li><span>Bottoms</span><span class="cat-count">31</span></li>
+          <li><span>Outerwear</span><span class="cat-count">22</span></li>
+          <li><span>Hoodies</span><span class="cat-count">18</span></li>
+          <li><span>Accessories</span><span class="cat-count">11</span></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-section">
+        <h4>Size</h4>
+        <div class="size-grid">
+          <button class="size-btn" onclick="toggleSize(this)">XS</button>
+          <button class="size-btn active" onclick="toggleSize(this)">S</button>
+          <button class="size-btn" onclick="toggleSize(this)">M</button>
+          <button class="size-btn" onclick="toggleSize(this)">L</button>
+          <button class="size-btn" onclick="toggleSize(this)">XL</button>
+          <button class="size-btn" onclick="toggleSize(this)">2XL</button>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <h4>Color</h4>
+        <div class="color-dots">
+          <div class="color-dot active" style="background:#0d0d0d;" title="Black" onclick="toggleDot(this)"></div>
+          <div class="color-dot" style="background:#fff; border:1px solid #e2e2e2;" title="White" onclick="toggleDot(this)"></div>
+          <div class="color-dot" style="background:#9ca3af;" title="Grey" onclick="toggleDot(this)"></div>
+          <div class="color-dot" style="background:#92400e;" title="Brown" onclick="toggleDot(this)"></div>
+          <div class="color-dot" style="background:#1e3a5f;" title="Navy" onclick="toggleDot(this)"></div>
+          <div class="color-dot" style="background:#4a7c59;" title="Olive" onclick="toggleDot(this)"></div>
+          <div class="color-dot" style="background:#c8a96e;" title="Tan" onclick="toggleDot(this)"></div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <h4>Price Range</h4>
+        <div class="price-range-labels">
+          <span>R 200</span>
+          <span id="price-max-label">R 3,500</span>
+        </div>
+        <input type="range" class="price-slider" min="200" max="5000" value="3500"
+          oninput="document.getElementById('price-max-label').textContent = 'R ' + parseInt(this.value).toLocaleString()">
+      </div>
+
+      <div class="sidebar-section">
+        <h4>Availability</h4>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;margin-bottom:8px;">
+          <input type="checkbox" checked style="accent-color:var(--c-black)"> In Stock (108)
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
+          <input type="checkbox" style="accent-color:var(--c-black)"> Out of Stock (16)
+        </label>
+      </div>
+    </aside>
+
+    <!-- Product Grid -->
+    <div class="product-grid-wrap">
+      <div class="product-grid">
+
+        <div class="prod-card" onclick="showPage('detail')">
+          <div class="prod-card-img" style="background-image: var(--img-p1);">
+            <span class="prod-badge badge-new2">New</span>
+            <div class="prod-quick-add" onclick="addToCart(event)">+ Add to Cart</div>
+          </div>
+          <h3>Relaxed Crewneck Tee</h3>
+          <div class="prod-meta">
+            <span class="prod-price">R 690</span>
+            <div class="prod-colors">
+              <div class="prod-mini-dot" style="background:#0d0d0d;"></div>
+              <div class="prod-mini-dot" style="background:#fff;border:1px solid #e2e2e2;"></div>
+              <div class="prod-mini-dot" style="background:#9ca3af;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prod-card" onclick="showPage('detail')">
+          <div class="prod-card-img" style="background-image: var(--img-p2);">
+            <span class="prod-badge badge-new2">New</span>
+            <div class="prod-quick-add" onclick="addToCart(event)">+ Add to Cart</div>
+          </div>
+          <h3>Classic Heavy Sweatshirt</h3>
+          <div class="prod-meta">
+            <span class="prod-price">R 1,190</span>
+            <div class="prod-colors">
+              <div class="prod-mini-dot" style="background:#0d0d0d;"></div>
+              <div class="prod-mini-dot" style="background:#92400e;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prod-card" onclick="showPage('detail')">
+          <div class="prod-card-img" style="background-image: var(--img-p3);">
+            <div class="prod-quick-add" onclick="addToCart(event)">+ Add to Cart</div>
+          </div>
+          <h3>Urban Cargo Jogger</h3>
+          <div class="prod-meta">
+            <span class="prod-price">R 1,490</span>
+            <div class="prod-colors">
+              <div class="prod-mini-dot" style="background:#0d0d0d;"></div>
+              <div class="prod-mini-dot" style="background:#4a7c59;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prod-card" onclick="showPage('detail')">
+          <div class="prod-card-img" style="background-image: var(--img-p4);">
+            <span class="prod-badge badge-sale">–25%</span>
+            <div class="prod-quick-add" onclick="addToCart(event)">+ Add to Cart</div>
+          </div>
+          <h3>Washed Canvas Jacket</h3>
+          <div class="prod-meta">
+            <span class="prod-price">R 2,190 <del style="font-size:12px;color:var(--c-muted);font-weight:400;">R 2,890</del></span>
+            <div class="prod-colors">
+              <div class="prod-mini-dot" style="background:#92400e;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prod-card" onclick="showPage('detail')">
+          <div class="prod-card-img" style="background-image: var(--img-p5);">
+            <span class="prod-badge badge-new2">New</span>
+            <div class="prod-quick-add" onclick="addToCart(event)">+ Add to Cart</div>
+          </div>
+          <h3>Oversized Linen Shirt</h3>
+          <div class="prod-meta">
+            <span class="prod-price">R 890</span>
+            <div class="prod-colors">
+              <div class="prod-mini-dot" style="background:#fff;border:1px solid #e2e2e2;"></div>
+              <div class="prod-mini-dot" style="background:#c8a96e;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prod-card" onclick="showPage('detail')">
+          <div class="prod-card-img" style="background-image: var(--img-p6);">
+            <div class="prod-quick-add" onclick="addToCart(event)">+ Add to Cart</div>
+          </div>
+          <h3>Vintage Washed Hoodie</h3>
+          <div class="prod-meta">
+            <span class="prod-price">R 1,390</span>
+            <div class="prod-colors">
+              <div class="prod-mini-dot" style="background:#9ca3af;"></div>
+              <div class="prod-mini-dot" style="background:#0d0d0d;"></div>
+              <div class="prod-mini-dot" style="background:#1e3a5f;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prod-card" onclick="showPage('detail')">
+          <div class="prod-card-img" style="background-image: var(--img-p7);">
+            <span class="prod-badge badge-sale">–30%</span>
+            <div class="prod-quick-add" onclick="addToCart(event)">+ Add to Cart</div>
+          </div>
+          <h3>Slim Track Pants</h3>
+          <div class="prod-meta">
+            <span class="prod-price">R 990 <del style="font-size:12px;color:var(--c-muted);font-weight:400;">R 1,390</del></span>
+            <div class="prod-colors">
+              <div class="prod-mini-dot" style="background:#0d0d0d;"></div>
+              <div class="prod-mini-dot" style="background:#9ca3af;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prod-card" onclick="showPage('detail')">
+          <div class="prod-card-img" style="background-image: var(--img-p8);">
+            <div class="prod-quick-add" onclick="addToCart(event)">+ Add to Cart</div>
+          </div>
+          <h3>UT Logo Quarter-Zip</h3>
+          <div class="prod-meta">
+            <span class="prod-price">R 1,590</span>
+            <div class="prod-colors">
+              <div class="prod-mini-dot" style="background:#0d0d0d;"></div>
+              <div class="prod-mini-dot" style="background:#fff;border:1px solid #e2e2e2;"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Load more -->
+      <div style="text-align:center; padding: 60px 0 20px;">
+        <button class="btn btn-outline-dark" style="padding:16px 56px;">Load More Products</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-bottom" style="border-top:none; padding-top:0;">
+      <span>© 2025 Urban Thread Clothing.</span>
+      <button class="btn" onclick="showPage('home')" style="color:rgba(255,255,255,.4);font-size:12px;letter-spacing:.06em;text-transform:uppercase;">← Back to Home</button>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PRODUCT DETAIL PAGE
+═══════════════════════════════════════════════════════════════ -->
+<div id="page-detail" class="screen">
+  <div class="detail-layout">
+    <!-- Media -->
+    <div class="detail-media">
+      <div class="detail-main-img" id="detail-main-img"></div>
+      <div class="detail-thumbs">
+        <div class="thumb active" id="thumb-0" style="background-image: var(--img-detail-thumb1);" onclick="setThumb(0)"></div>
+        <div class="thumb" id="thumb-1" style="background-image: var(--img-detail-thumb2);" onclick="setThumb(1)"></div>
+        <div class="thumb" id="thumb-2" style="background-image: var(--img-detail-thumb3);" onclick="setThumb(2)"></div>
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="detail-info">
+      <div class="detail-crumb">
+        <a onclick="showPage('home')">Home</a><span class="sep">/</span>
+        <a onclick="showPage('catalog')">Shop</a><span class="sep">/</span>
+        <span>Classic Heavy Sweatshirt</span>
+      </div>
+      <h1>Classic Heavy<br>Sweatshirt</h1>
+      <p class="detail-tagline">The cornerstone of every great wardrobe.</p>
+      <div class="detail-price">
+        R 1,190
+        <span class="original"></span>
+      </div>
+
+      <!-- Colors -->
+      <p class="detail-section-label">Colour — <strong id="selected-color-name">Jet Black</strong></p>
+      <div class="color-picker">
+        <div class="color-swatch active" style="background:#0d0d0d;" title="Jet Black" onclick="selectColor(this, 'Jet Black')"></div>
+        <div class="color-swatch" style="background:#9ca3af;" title="Slate Grey" onclick="selectColor(this, 'Slate Grey')"></div>
+        <div class="color-swatch" style="background:#92400e;" title="Rust Brown" onclick="selectColor(this, 'Rust Brown')"></div>
+        <div class="color-swatch" style="background:#1e3a5f;" title="Navy Blue" onclick="selectColor(this, 'Navy Blue')"></div>
+        <div class="color-swatch" style="background:#4a7c59;" title="Olive" onclick="selectColor(this, 'Olive')"></div>
+      </div>
+
+      <!-- Size -->
+      <p class="detail-section-label">Size — <strong id="selected-size">M</strong></p>
+      <div class="size-picker">
+        <button class="sz-btn" onclick="selectSize(this)">XS</button>
+        <button class="sz-btn" onclick="selectSize(this)">S</button>
+        <button class="sz-btn active" onclick="selectSize(this)">M</button>
+        <button class="sz-btn" onclick="selectSize(this)">L</button>
+        <button class="sz-btn" onclick="selectSize(this)">XL</button>
+        <button class="sz-btn" onclick="selectSize(this)">2XL</button>
+      </div>
+      <a class="size-guide-link">Size Guide →</a>
+
+      <!-- Add to cart -->
+      <div class="qty-row">
+        <div class="qty-control">
+          <button class="qty-btn" onclick="changeQty(-1)">−</button>
+          <span class="qty-num" id="qty-num">1</span>
+          <button class="qty-btn" onclick="changeQty(1)">+</button>
+        </div>
+        <button class="add-to-cart-btn" onclick="addToCart(event);showPage('checkout')">Add to Cart</button>
+        <button class="wishlist-btn" title="Wishlist">♡</button>
+      </div>
+
+      <hr class="detail-divider">
+
+      <!-- Description -->
+      <p class="detail-desc">A premium heavyweight sweatshirt crafted from 100% organic ring-spun cotton. Pre-washed for a relaxed, slightly faded feel straight out the box. Ribbed cuffs, crew neck, and reinforced shoulder seams for a silhouette that holds its shape wash after wash.</p>
+
+      <div class="detail-attrs">
+        <div class="attr-item"><div class="attr-label">Material</div>100% Organic Cotton</div>
+        <div class="attr-item"><div class="attr-label">Fit</div>Oversized / Relaxed</div>
+        <div class="attr-item"><div class="attr-label">Weight</div>380 GSM</div>
+        <div class="attr-item"><div class="attr-label">Origin</div>Made in South Africa</div>
+      </div>
+
+      <hr class="detail-divider">
+
+      <!-- Accordion -->
+      <div class="accordion">
+        <div class="accordion-item">
+          <button class="accordion-header" onclick="toggleAcc(this)">
+            Sizing & Fit <span class="acc-icon">+</span>
+          </button>
+          <div class="accordion-body">
+            Our sweatshirts are cut for an oversized fit. We recommend ordering your usual size for a relaxed look, or sizing down for a more fitted silhouette. Model is 6'1" and wears size M.
+          </div>
+        </div>
+        <div class="accordion-item">
+          <button class="accordion-header" onclick="toggleAcc(this)">
+            Care Instructions <span class="acc-icon">+</span>
+          </button>
+          <div class="accordion-body">
+            Machine wash cold with similar colours. Do not bleach. Tumble dry low. Do not iron print. Hang to dry for best results.
+          </div>
+        </div>
+        <div class="accordion-item">
+          <button class="accordion-header" onclick="toggleAcc(this)">
+            Shipping & Returns <span class="acc-icon">+</span>
+          </button>
+          <div class="accordion-body">
+            Free shipping on orders over R1,200. Standard delivery 3–5 working days. Express delivery available at checkout. Returns accepted within 30 days of purchase for unworn items in original condition.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CHECKOUT PAGE
+═══════════════════════════════════════════════════════════════ -->
+<div id="page-checkout" class="screen">
+  <div id="checkout-flow">
+    <div class="checkout-wrapper">
+      <!-- Main checkout form -->
+      <div class="checkout-main">
+        <h1 class="checkout-title">Checkout</h1>
+
+        <!-- Step indicators -->
+        <div class="checkout-steps">
+          <div class="step-indicator done" id="step-ind-1">
+            <div class="step-num">✓</div> Cart
+          </div>
+          <div class="step-indicator active" id="step-ind-2">
+            <div class="step-num">2</div> Delivery
+          </div>
+          <div class="step-indicator" id="step-ind-3">
+            <div class="step-num">3</div> Payment
+          </div>
+          <div class="step-indicator" id="step-ind-4">
+            <div class="step-num">4</div> Review
+          </div>
+        </div>
+
+        <!-- STEP 2: Delivery -->
+        <div class="checkout-step active" id="checkout-step-2">
+          <div class="checkout-panel">
+            <h3>Delivery Information</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">First Name</label>
+                <input type="text" class="form-input" placeholder="Sipho" value="">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Last Name</label>
+                <input type="text" class="form-input" placeholder="Ndlovu" value="">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" class="form-input" placeholder="sipho@example.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number</label>
+              <input type="tel" class="form-input" placeholder="+27 82 000 0000">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Street Address</label>
+              <input type="text" class="form-input" placeholder="123 Florida Road">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">City</label>
+                <input type="text" class="form-input" placeholder="Durban">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Province</label>
+                <select class="form-select">
+                  <option>KwaZulu-Natal</option>
+                  <option>Gauteng</option>
+                  <option>Western Cape</option>
+                  <option>Eastern Cape</option>
+                  <option>Limpopo</option>
+                  <option>Mpumalanga</option>
+                  <option>North West</option>
+                  <option>Free State</option>
+                  <option>Northern Cape</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group" style="max-width:200px;">
+              <label class="form-label">Postal Code</label>
+              <input type="text" class="form-input" placeholder="4001">
+            </div>
+
+            <hr style="border:none;border-top:1px solid var(--c-border);margin:28px 0;">
+            <h3 style="font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--c-muted);margin-bottom:20px;">Shipping Method</h3>
+
+            <div class="shipping-options">
+              <div class="shipping-opt selected" onclick="selectShipping(this)">
+                <div class="shipping-opt-left">
+                  <div class="ship-radio"><div class="ship-radio-dot"></div></div>
+                  <div>
+                    <div class="ship-name">Standard Delivery</div>
+                    <div class="ship-desc">3–5 working days · Courier</div>
+                  </div>
+                </div>
+                <div class="ship-price">Free</div>
+              </div>
+              <div class="shipping-opt" onclick="selectShipping(this)">
+                <div class="shipping-opt-left">
+                  <div class="ship-radio"><div class="ship-radio-dot"></div></div>
+                  <div>
+                    <div class="ship-name">Express Delivery</div>
+                    <div class="ship-desc">1–2 working days · Courier</div>
+                  </div>
+                </div>
+                <div class="ship-price">R 95</div>
+              </div>
+              <div class="shipping-opt" onclick="selectShipping(this)">
+                <div class="shipping-opt-left">
+                  <div class="ship-radio"><div class="ship-radio-dot"></div></div>
+                  <div>
+                    <div class="ship-name">Click & Collect</div>
+                    <div class="ship-desc">Ready in 2 hrs · Durban CBD Store</div>
+                  </div>
+                </div>
+                <div class="ship-price">Free</div>
+              </div>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+              <button class="btn btn-outline-dark" onclick="showPage('catalog')">← Continue Shopping</button>
+              <button class="btn btn-primary" style="padding:14px 40px;" onclick="goToStep(3)">Continue to Payment →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: Payment -->
+        <div class="checkout-step" id="checkout-step-3">
+          <div class="checkout-panel">
+            <h3>Payment Details</h3>
+            <div class="payment-methods">
+              <div class="pay-method active" onclick="selectPay(this)">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M1 10h22" stroke="currentColor" stroke-width="1.5"/></svg>
+                Card
+              </div>
+              <div class="pay-method" onclick="selectPay(this)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+                PayFast
+              </div>
+              <div class="pay-method" onclick="selectPay(this)">EFT</div>
+            </div>
+
+            <div class="form-group card-number-row">
+              <label class="form-label">Card Number</label>
+              <input type="text" class="form-input" placeholder="1234 5678 9012 3456" style="padding-right:100px;">
+              <div class="card-icons">
+                <div class="card-icon" style="font-size:8px;color:#1a1f71;">VISA</div>
+                <div class="card-icon" style="font-size:7px;color:#eb001b;">MC</div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Expiry Date</label>
+                <input type="text" class="form-input" placeholder="MM / YY">
+              </div>
+              <div class="form-group">
+                <label class="form-label">CVV</label>
+                <input type="text" class="form-input" placeholder="•••">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Name on Card</label>
+              <input type="text" class="form-input" placeholder="As it appears on your card">
+            </div>
+
+            <label style="display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer;margin-bottom:28px;">
+              <input type="checkbox" style="accent-color:var(--c-black);">
+              Save card for future purchases
+            </label>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <button class="btn btn-outline-dark" onclick="goToStep(2)">← Back</button>
+              <button class="btn btn-primary" style="padding:14px 40px;" onclick="goToStep(4)">Review Order →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 4: Review -->
+        <div class="checkout-step" id="checkout-step-4">
+          <div class="checkout-panel">
+            <h3>Review Your Order</h3>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
+              <div>
+                <p style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--c-muted);margin-bottom:8px;">Delivering to</p>
+                <p style="font-size:14px;line-height:1.7;">Sipho Ndlovu<br>123 Florida Road<br>Durban, KwaZulu-Natal, 4001<br>+27 82 000 0000</p>
+              </div>
+              <div>
+                <p style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--c-muted);margin-bottom:8px;">Shipping method</p>
+                <p style="font-size:14px;">Standard Delivery — Free<br>Arrives in 3–5 working days</p>
+              </div>
+            </div>
+
+            <div style="border:1px solid var(--c-border);padding:16px;margin-bottom:24px;">
+              <p style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--c-muted);margin-bottom:12px;">Payment</p>
+              <div style="display:flex;align-items:center;gap:12px;font-size:14px;">
+                <div class="card-icon" style="font-size:8px;color:#1a1f71;width:36px;height:22px;">VISA</div>
+                •••• •••• •••• 3456 &nbsp;|&nbsp; Expires 12/27
+              </div>
+            </div>
+
+            <p style="font-size:13px;color:var(--c-muted);line-height:1.7;margin-bottom:28px;">
+              By placing your order you agree to Urban Thread's <a style="color:var(--c-accent-dk);cursor:pointer;">Terms of Service</a> and <a style="color:var(--c-accent-dk);cursor:pointer;">Privacy Policy</a>. You will receive an order confirmation email once your order has been placed.
+            </p>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <button class="btn btn-outline-dark" onclick="goToStep(3)">← Back</button>
+              <button class="btn btn-accent" style="padding:16px 48px;font-size:14px;" onclick="placeOrder()">
+                Place Order · R 3,870
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Order Summary Sidebar -->
+      <div class="order-summary">
+        <h3>Order Summary</h3>
+        <div class="order-items">
+          <div class="order-item">
+            <div class="order-item-img" style="background-image: var(--img-p2);">
+              <div class="order-item-badge">1</div>
+            </div>
+            <div class="order-item-info">
+              <h4>Classic Heavy Sweatshirt</h4>
+              <p>Size: M · Colour: Jet Black</p>
+            </div>
+            <div class="order-item-price">R 1,190</div>
+          </div>
+          <div class="order-item">
+            <div class="order-item-img" style="background-image: var(--img-p3);">
+              <div class="order-item-badge">1</div>
+            </div>
+            <div class="order-item-info">
+              <h4>Urban Cargo Jogger</h4>
+              <p>Size: M · Colour: Black</p>
+            </div>
+            <div class="order-item-price">R 1,490</div>
+          </div>
+          <div class="order-item">
+            <div class="order-item-img" style="background-image: var(--img-p6);">
+              <div class="order-item-badge">1</div>
+            </div>
+            <div class="order-item-info">
+              <h4>Vintage Washed Hoodie</h4>
+              <p>Size: L · Colour: Grey</p>
+            </div>
+            <div class="order-item-price">R 1,390</div>
+          </div>
+        </div>
+
+        <div class="promo-row">
+          <input type="text" class="promo-input" placeholder="Promo code" id="promo-input">
+          <button class="promo-apply" onclick="applyPromo()">Apply</button>
+        </div>
+
+        <div class="order-totals">
+          <div class="total-row"><span>Subtotal (3 items)</span><span>R 4,070</span></div>
+          <div class="total-row"><span>Shipping</span><span>Free</span></div>
+          <div class="total-row" id="discount-row" style="display:none;"><span>Discount (UT20)</span><span class="discount">– R 200</span></div>
+          <div class="total-row grand"><span>Total</span><span id="grand-total">R 4,070</span></div>
+        </div>
+
+        <div class="secure-badges">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Secure checkout · SSL encrypted
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Screen (hidden until order placed) -->
+  <div id="confirmation-screen" style="display:none; background: var(--c-light); min-height: 100vh; padding-top: 64px;">
+    <div class="confirmation-wrap">
+      <div class="confirm-icon">✓</div>
+      <h2>Order Placed!</h2>
+      <p>Thank you for shopping with Urban Thread.</p>
+      <p>A confirmation has been sent to your email address.</p>
+      <p class="order-num">Order number: <strong>#UT-29481</strong></p>
+
+      <div class="confirm-details">
+        <div class="conf-detail-group">
+          <div class="conf-label">Estimated Delivery</div>
+          <p>Mon–Wed, May 5–7</p>
+        </div>
+        <div class="conf-detail-group">
+          <div class="conf-label">Shipping To</div>
+          <p>Durban, KwaZulu-Natal</p>
+        </div>
+        <div class="conf-detail-group">
+          <div class="conf-label">Payment</div>
+          <p>Visa •••• 3456</p>
+        </div>
+        <div class="conf-detail-group">
+          <div class="conf-label">Order Total</div>
+          <p style="font-weight:500;">R 3,870</p>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn btn-primary" style="padding:14px 36px;" onclick="showPage('catalog')">Continue Shopping</button>
+        <button class="btn btn-outline-dark" style="padding:14px 36px;">Track My Order</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ─── PAGE ROUTING ──────────────────────────────────────────── */
+  const navEl = document.getElementById('main-nav');
+  const darkPages = ['home'];
+
+  function showPage(name) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const pg = document.getElementById('page-' + name);
+    if (pg) {
+      pg.classList.add('active');
+      window.scrollTo(0, 0);
+    }
+    if (darkPages.includes(name)) {
+      navEl.className = 'dark-nav';
+    } else {
+      navEl.className = 'light-nav';
+    }
+  }
+
+  /* ─── CATALOG ───────────────────────────────────────────────── */
+  function filterCat(el) {
+    document.querySelectorAll('.filter-chips .chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+  }
+  function toggleSize(el) { el.classList.toggle('active'); }
+  function toggleDot(el) {
+    document.querySelectorAll('.color-dots .color-dot').forEach(d => d.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  /* ─── PRODUCT DETAIL ────────────────────────────────────────── */
+  const thumbSrcs = [
+    'var(--img-detail-thumb1)',
+    'var(--img-detail-thumb2)',
+    'var(--img-detail-thumb3)'
+  ];
+  const mainSrcs = [
+    'var(--img-detail-main)',
+    'var(--img-detail-thumb2)',
+    'var(--img-detail-thumb3)'
+  ];
+
+  function setThumb(i) {
+    document.querySelectorAll('.thumb').forEach((t, idx) => {
+      t.classList.toggle('active', idx === i);
+    });
+    const mainEl = document.getElementById('detail-main-img');
+    mainEl.style.backgroundImage = mainSrcs[i];
+  }
+
+  function selectColor(el, name) {
+    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('selected-color-name').textContent = name;
+  }
+
+  function selectSize(el) {
+    document.querySelectorAll('.sz-btn').forEach(s => s.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('selected-size').textContent = el.textContent;
+  }
+
+  let qty = 1;
+  function changeQty(delta) {
+    qty = Math.max(1, qty + delta);
+    document.getElementById('qty-num').textContent = qty;
+  }
+
+  /* ─── ACCORDION ─────────────────────────────────────────────── */
+  function toggleAcc(btn) {
+    const body = btn.nextElementSibling;
+    const isOpen = body.classList.contains('open');
+    document.querySelectorAll('.accordion-body').forEach(b => b.classList.remove('open'));
+    document.querySelectorAll('.accordion-header').forEach(h => h.classList.remove('open'));
+    if (!isOpen) {
+      body.classList.add('open');
+      btn.classList.add('open');
+    }
+  }
+
+  /* ─── CHECKOUT STEPS ────────────────────────────────────────── */
+  function goToStep(n) {
+    document.querySelectorAll('.checkout-step').forEach(s => s.classList.remove('active'));
+    const step = document.getElementById('checkout-step-' + n);
+    if (step) step.classList.add('active');
+    window.scrollTo(0, 0);
+
+    // Update step indicators
+    [2, 3, 4].forEach(i => {
+      const ind = document.getElementById('step-ind-' + i);
+      if (!ind) return;
+      ind.classList.remove('active', 'done');
+      if (i < n) ind.classList.add('done');
+      else if (i === n) ind.classList.add('active');
+      if (i < n) ind.querySelector('.step-num').textContent = '✓';
+      else ind.querySelector('.step-num').textContent = i;
+    });
+  }
+
+  function selectShipping(el) {
+    document.querySelectorAll('.shipping-opt').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  function selectPay(el) {
+    document.querySelectorAll('.pay-method').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function applyPromo() {
+    const val = document.getElementById('promo-input').value.trim().toUpperCase();
+    const discRow = document.getElementById('discount-row');
+    const totalEl = document.getElementById('grand-total');
+    const placeBtn = document.querySelector('.btn-accent');
+    if (val === 'UT20' || val === 'URBAN20') {
+      discRow.style.display = 'flex';
+      totalEl.textContent = 'R 3,870';
+      if (placeBtn) placeBtn.textContent = 'Place Order · R 3,870';
+      showToast('Promo code applied! R 200 off.');
+    } else if (val) {
+      showToast('Invalid promo code. Try UT20.');
+    }
+  }
+
+  function placeOrder() {
+    document.getElementById('checkout-flow').style.display = 'none';
+    document.getElementById('confirmation-screen').style.display = 'block';
+    document.getElementById('cart-count').textContent = '0';
+    window.scrollTo(0, 0);
+  }
+
+  /* ─── TOAST ─────────────────────────────────────────────────── */
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function addToCart(e) {
+    e.stopPropagation();
+    const count = document.getElementById('cart-count');
+    count.textContent = parseInt(count.textContent) + 1;
+    showToast('Item added to cart ✓');
+  }
+
+  /* ─── NAV SCROLL EFFECT ─────────────────────────────────────── */
+  window.addEventListener('scroll', () => {
+    const activePage = document.querySelector('.screen.active');
+    if (!activePage) return;
+    const isHome = activePage.id === 'page-home';
+    if (isHome) {
+      navEl.className = window.scrollY > 80 ? 'light-nav' : 'dark-nav';
+    }
+  });
+</script>
+</body>
+</html>

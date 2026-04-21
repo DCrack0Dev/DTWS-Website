@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Our Agents | PP GROUP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+<style>
+  :root {
+    --gold: #c9a84c; --gold-light: #e8c97a; --gold-dark: #9a7530;
+    --black: #080808; --dark: #0f0f0f; --dark2: #161616; --dark3: #1e1e1e;
+    --mid: #2a2a2a; --light: #f5f0e8; --white: #fdfaf4; --muted: #888;
+    --serif: 'Cormorant Garamond', serif; --sans: 'Montserrat', sans-serif; --display: 'Playfair Display', serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; font-size: 16px; }
+  body { background: var(--black); color: var(--white); font-family: var(--sans); font-weight: 300; overflow-x: hidden; }
+
+  /* Shared UI Elements */
+  .cursor { position: fixed; width: 8px; height: 8px; background: var(--gold); border-radius: 50%; pointer-events: none; z-index: 100000; transform: translate(-50%,-50%); transition: width 0.3s, height 0.3s, background 0.3s; opacity: 0; }
+  .cursor-ring { position: fixed; width: 40px; height: 40px; border: 1.5px solid var(--gold); border-radius: 50%; pointer-events: none; z-index: 99999; transform: translate(-50%,-50%); transition: width 0.3s, height 0.3s, border-color 0.3s, opacity 0.3s; opacity: 0; }
+  .cursor.active, .cursor-ring.active { opacity: 1; }
+  .cursor.hover { width: 12px; height: 12px; background: var(--white); }
+  .cursor-ring.hover { width: 60px; height: 60px; border-color: var(--white); opacity: 0.8; }
+  @media (pointer: fine) { body, a, button, select, .agent-card { cursor: none; } }
+
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 22px 60px; background: rgba(8,8,8,0.97); border-bottom: 1px solid rgba(201,168,76,0.1); backdrop-filter: blur(20px); }
+  .logo-with-icon {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    perspective: 1000px;
+  }
+  .logo-icon-container {
+    width: 40px;
+    height: 40px;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: logoPulse 3s ease-in-out infinite;
+  }
+  .house-svg {
+    width: 32px;
+    height: 32px;
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .door-path {
+    fill: var(--gold);
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: left;
+  }
+  .logo-with-icon:hover .door-path {
+    transform: rotateY(-110deg);
+  }
+  @keyframes logoPulse {
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(201,168,76,0)); }
+    50% { transform: scale(1.05); filter: drop-shadow(0 0 8px rgba(201,168,76,0.3)); }
+  }
+  .nav-logo { display: flex; flex-direction: column; line-height: 1; }
+  .nav-logo span:first-child { font-family: var(--serif); font-size: 1.6rem; font-weight: 600; letter-spacing: 0.12em; color: var(--gold); }
+  .nav-logo span:last-child { font-family: var(--sans); font-size: 0.55rem; letter-spacing: 0.35em; color: var(--muted); text-transform: uppercase; margin-top: 3px; }
+  .nav-links { display: flex; gap: 38px; list-style: none; }
+  .nav-links a { font-family: var(--sans); font-size: 0.7rem; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(253,250,244,0.75); text-decoration: none; position: relative; transition: color 0.3s; }
+  .nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px; background: var(--gold); transition: width 0.3s; }
+  .nav-links a:hover, .nav-links a.active { color: var(--gold); }
+  .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+  .nav-cta { font-family: var(--sans); font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--black); background: var(--gold); border: none; padding: 11px 26px; font-weight: 500; text-decoration: none; }
+
+  section { padding: 140px 60px 100px; }
+  .section-eyebrow { font-family: var(--sans); font-size: 0.6rem; letter-spacing: 0.38em; text-transform: uppercase; color: var(--gold); display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+  .section-eyebrow::before { content: ''; width: 30px; height: 1px; background: var(--gold); }
+  .section-title { font-family: var(--display); font-size: clamp(2rem, 4vw, 3.4rem); font-weight: 400; line-height: 1.15; color: var(--white); margin-bottom: 20px; }
+  .section-title em { font-style: italic; color: var(--gold); }
+
+  /* Agents Grid */
+  .agents-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin-top: 60px; }
+  .agent-card { position: relative; overflow: hidden; background: var(--dark2); aspect-ratio: 3/4; }
+  .agent-fake-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s; }
+  .agent-card:hover .agent-fake-img { transform: scale(1.04); }
+  .agent-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(8,8,8,0.92) 0%, transparent 50%); padding: 28px; display: flex; flex-direction: column; justify-content: flex-end; transition: background 0.4s; }
+  .agent-card:hover .agent-overlay { background: linear-gradient(to top, rgba(8,8,8,0.96) 0%, rgba(8,8,8,0.2) 50%, transparent 100%); }
+  .agent-name { font-family: var(--serif); font-size: 1.2rem; font-weight: 400; color: var(--white); margin-bottom: 4px; }
+  .agent-title-role { font-family: var(--sans); font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+  .agent-stats-row { display: flex; gap: 18px; }
+  .agent-stat { font-family: var(--sans); font-size: 0.6rem; color: rgba(253,250,244,0.55); letter-spacing: 0.08em; }
+  .agent-contact-btn { display: none; margin-top: 14px; font-family: var(--sans); font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase; background: var(--gold); color: var(--black); border: none; padding: 10px 22px; font-weight: 500; text-decoration: none; text-align: center; }
+  .agent-card:hover .agent-contact-btn { display: block; }
+
+  footer { background: #050505; padding: 80px 60px 20px; border-top: 1px solid rgba(201,168,76,0.12); }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 60px; padding-bottom: 60px; border-bottom: 1px solid rgba(201,168,76,0.08); }
+  .footer-logo span:first-child { font-family: var(--serif); font-size: 2rem; font-weight: 600; color: var(--gold); }
+  .footer-logo span:last-child { display: block; font-family: var(--sans); font-size: 0.52rem; letter-spacing: 0.35em; color: var(--muted); text-transform: uppercase; margin: 4px 0 22px; }
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .footer-links a { font-family: var(--sans); font-size: 0.7rem; color: rgba(253,250,244,0.45); text-decoration: none; }
+  .footer-links a:hover { color: var(--gold); }
+
+  @media (max-width: 1100px) { section, footer { padding-left: 36px; padding-right: 36px; } .footer-grid { grid-template-columns: 1fr 1fr; } .agents-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 800px) { .nav-links { display: none; } .agents-grid, .footer-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<nav id="mainNav">
+  <a href="index.html" class="logo-with-icon">
+    <div class="logo-icon-container">
+      <svg class="house-svg" viewBox="0 0 24 24">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        <!-- Door that will animate -->
+        <rect class="door-path" x="9" y="12" width="6" height="10"></rect>
+      </svg>
+    </div>
+    <div class="nav-logo"><span>PP GROUP</span><span>Prestige Property Group</span></div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="properties.html">Properties</a></li>
+    <li><a href="services.html">Services</a></li>
+    <li><a href="agents.html" class="active">Our Agents</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <a href="contact.html" class="nav-cta">Book a Consultation</a>
+</nav>
+
+<section>
+  <div class="section-eyebrow">Our People</div>
+  <h2 class="section-title">Meet the <em>Specialists</em></h2>
+  
+  <div class="agents-grid">
+    <div class="agent-card">
+      <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800" class="agent-fake-img" />
+      <div class="agent-overlay">
+        <div class="agent-name">Alexandra van der Berg</div><div class="agent-title-role">Head of Luxury Sales</div>
+        <div class="agent-stats-row"><span class="agent-stat">R 1.2B sold</span><span class="agent-stat">14 years</span></div>
+        <a href="contact.html" class="agent-contact-btn">Book Consultation</a>
+      </div>
+    </div>
+    <div class="agent-card">
+      <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=800" class="agent-fake-img" />
+      <div class="agent-overlay">
+        <div class="agent-name">James Khumalo</div><div class="agent-title-role">Private Acquisitions Director</div>
+        <div class="agent-stats-row"><span class="agent-stat">R 890M sold</span><span class="agent-stat">11 years</span></div>
+        <a href="contact.html" class="agent-contact-btn">Book Consultation</a>
+      </div>
+    </div>
+    <div class="agent-card">
+      <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=800" class="agent-fake-img" />
+      <div class="agent-overlay">
+        <div class="agent-name">Nadine Fourie</div><div class="agent-title-role">Cape Town Specialist</div>
+        <div class="agent-stats-row"><span class="agent-stat">R 740M sold</span><span class="agent-stat">9 years</span></div>
+        <a href="contact.html" class="agent-contact-btn">Book Consultation</a>
+      </div>
+    </div>
+    <div class="agent-card">
+      <img src="https://images.unsplash.com/photo-1531384441138-2736e62e0919?auto=format&fit=crop&q=80&w=800" class="agent-fake-img" />
+      <div class="agent-overlay">
+        <div class="agent-name">Michael Dlamini</div><div class="agent-title-role">KZN Director</div>
+        <div class="agent-stats-row"><span class="agent-stat">R 620M sold</span><span class="agent-stat">8 years</span></div>
+        <a href="contact.html" class="agent-contact-btn">Book Consultation</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer id="footerMain">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="footer-logo"><span>PP GROUP</span><span>Prestige Property Group</span></div>
+      <p class="footer-brand-text">South Africa's most trusted luxury property specialists.</p>
+    </div>
+    <div><div class="footer-col-title">Links</div><ul class="footer-links"><li><a href="about.html">About</a></li><li><a href="properties.html">Properties</a></li><li><a href="services.html">Services</a></li></ul></div>
+    <div><div class="footer-col-title">Support</div><ul class="footer-links"><li><a href="contact.html">Contact</a></li><li><a href="#">Privacy</a></li></ul></div>
+  </div>
+</footer>
+
+<script>
+  const cur = document.getElementById('cursor'); const ring = document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    if (!cur.classList.contains('active')) { cur.classList.add('active'); ring.classList.add('active'); }
+    cur.style.left = mx + 'px'; cur.style.top = my + 'px';
+    if (e.target.closest('a, button, .agent-card')) { cur.classList.add('hover'); ring.classList.add('hover'); } else { cur.classList.remove('hover'); ring.classList.remove('hover'); }
+  });
+  (function animRing() { rx += (mx - rx) * 0.15; ry += (my - ry) * 0.15; ring.style.left = rx + 'px'; ring.style.top = ry + 'px'; requestAnimationFrame(animRing); })();
+</script>
+</body>
+</html>

@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crown The Barb | Luxury Hair Studio</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Tenor+Sans&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav" id="navbar">
+    <div class="nav__logo">
+      <span class="logo-crown">♛</span>
+      <span class="logo-text">Crown <em>The Barb</em></span>
+    </div>
+    <ul class="nav__links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#team">Artisans</a></li>
+      <li><a href="#testimonials">Reviews</a></li>
+    </ul>
+    <a href="#booking" class="btn btn--gold nav__cta">Book Now</a>
+    <button class="nav__burger" id="burger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- MOBILE MENU -->
+  <div class="mobile-menu" id="mobileMenu">
+    <ul>
+      <li><a href="#about" onclick="closeMobile()">About</a></li>
+      <li><a href="#services" onclick="closeMobile()">Services</a></li>
+      <li><a href="#gallery" onclick="closeMobile()">Gallery</a></li>
+      <li><a href="#team" onclick="closeMobile()">Artisans</a></li>
+      <li><a href="#testimonials" onclick="closeMobile()">Reviews</a></li>
+      <li><a href="#booking" class="btn btn--gold" onclick="closeMobile()">Book Now</a></li>
+    </ul>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="hero__bg">
+      <div class="hero__overlay"></div>
+      <div class="hero__grain"></div>
+    </div>
+    <div class="hero__content">
+      <p class="hero__eyebrow">Est. 2019 · Durban, South Africa</p>
+      <h1 class="hero__title">
+        Where Royalty<br />
+        <em>Wears Its Crown</em>
+      </h1>
+      <p class="hero__sub">Precision cuts. Timeless grooming. An experience crafted for those who demand nothing less than excellence.</p>
+      <div class="hero__actions">
+        <a href="#booking" class="btn btn--gold btn--lg">Reserve Your Throne</a>
+        <a href="#services" class="btn btn--ghost btn--lg">Our Services</a>
+      </div>
+      <div class="hero__stats">
+        <div class="stat">
+          <span class="stat__num">200<sup>+</sup></span>
+          <span class="stat__label">Loyal Clients</span>
+        </div>
+        <div class="stat__divider"></div>
+        <div class="stat">
+          <span class="stat__num">5<sup>★</sup></span>
+          <span class="stat__label">Average Rating</span>
+        </div>
+        <div class="stat__divider"></div>
+        <div class="stat">
+          <span class="stat__num">6+</span>
+          <span class="stat__label">Years Mastery</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero__scroll-hint">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- MARQUEE STRIP -->
+  <div class="marquee-strip">
+    <div class="marquee-track">
+      <span>Precision Cuts</span><span class="dot">♛</span>
+      <span>Beard Artistry</span><span class="dot">♛</span>
+      <span>Hot Towel Shaves</span><span class="dot">♛</span>
+      <span>Luxury Grooming</span><span class="dot">♛</span>
+      <span>Scalp Treatments</span><span class="dot">♛</span>
+      <span>Crown The Barb</span><span class="dot">♛</span>
+      <span>Precision Cuts</span><span class="dot">♛</span>
+      <span>Beard Artistry</span><span class="dot">♛</span>
+      <span>Hot Towel Shaves</span><span class="dot">♛</span>
+      <span>Luxury Grooming</span><span class="dot">♛</span>
+      <span>Scalp Treatments</span><span class="dot">♛</span>
+      <span>Crown The Barb</span><span class="dot">♛</span>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section class="about section" id="about">
+    <div class="container about__grid">
+      <div class="about__image-wrap">
+        <div class="about__image about__image--main">
+          <img src="images/about-main.jpg" alt="Interior of Crown The Barb" />
+        </div>
+        <div class="about__image about__image--accent">
+          <img src="images/about-accent.jpg" alt="Artisan at work" />
+        </div>
+        <div class="about__badge">
+          <span class="badge__num">6</span>
+          <span class="badge__label">Years of<br/>Excellence</span>
+        </div>
+      </div>
+      <div class="about__text">
+        <p class="section-eyebrow">Our Story</p>
+        <h2 class="section-title">More Than a Salon,<br /><em>An Experience</em></h2>
+        <p class="body-text">Crown The Barb was born from a singular belief — that every person deserves to leave feeling like royalty. Founded in Durban, we've built a sanctuary where old-world barbering tradition meets contemporary luxury.</p>
+        <p class="body-text">Every detail — from the warm lighting to the precision of the blade — is curated for one purpose: to make you look and feel your absolute best.</p>
+        <div class="about__pillars">
+          <div class="pillar">
+            <div class="pillar__icon">✦</div>
+            <div>
+              <strong>Artisan Craft</strong>
+              <p>Trained in classical and modern techniques for flawless results.</p>
+            </div>
+          </div>
+          <div class="pillar">
+            <div class="pillar__icon">✦</div>
+            <div>
+              <strong>Premium Products</strong>
+              <p>We use only the finest grooming products curated for your hair type.</p>
+            </div>
+          </div>
+          <div class="pillar">
+            <div class="pillar__icon">✦</div>
+            <div>
+              <strong>Bespoke Service</strong>
+              <p>No two clients are the same. Every visit is tailored to you.</p>
+            </div>
+          </div>
+        </div>
+        <a href="#booking" class="btn btn--gold">Claim Your Seat</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="services section section--dark" id="services">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-eyebrow section-eyebrow--light">What We Offer</p>
+        <h2 class="section-title section-title--light">Signature <em>Services</em></h2>
+        <p class="section-sub section-sub--light">Each service is a ritual, not a routine.</p>
+      </div>
+      <div class="services__grid">
+        <div class="service-card">
+          <div class="service-card__icon">✂</div>
+          <h3>The Royal Cut</h3>
+          <p>A bespoke cut tailored to your face shape and lifestyle. Includes a consultation, shampoo, precision cut, and style finish.</p>
+          <span class="service-card__price">From R180</span>
+          <a href="#booking" class="service-card__link">Book →</a>
+        </div>
+        <div class="service-card service-card--featured">
+          <div class="service-card__badge">Most Popular</div>
+          <div class="service-card__icon">♛</div>
+          <h3>Crown Experience</h3>
+          <p>The full ritual — cut, beard sculpt, hot towel, straight-razor finish, scalp massage, and premium styling. The ultimate in grooming luxury.</p>
+          <span class="service-card__price">From R350</span>
+          <a href="#booking" class="service-card__link">Book →</a>
+        </div>
+        <div class="service-card">
+          <div class="service-card__icon">◈</div>
+          <h3>Beard Artistry</h3>
+          <p>Shape, define, and condition your beard to perfection. Hot towel prep included for a clean, comfortable result.</p>
+          <span class="service-card__price">From R120</span>
+          <a href="#booking" class="service-card__link">Book →</a>
+        </div>
+        <div class="service-card">
+          <div class="service-card__icon">◉</div>
+          <h3>Hot Towel Shave</h3>
+          <p>A classic straight-razor shave with hot towel treatment and post-shave balm. Smooth, refined, and indulgent.</p>
+          <span class="service-card__price">From R150</span>
+          <a href="#booking" class="service-card__link">Book →</a>
+        </div>
+        <div class="service-card">
+          <div class="service-card__icon">❋</div>
+          <h3>Scalp Therapy</h3>
+          <p>A targeted scalp treatment to cleanse, nourish, and revitalize. Perfect for dry scalp or promoting healthy hair growth.</p>
+          <span class="service-card__price">From R200</span>
+          <a href="#booking" class="service-card__link">Book →</a>
+        </div>
+        <div class="service-card">
+          <div class="service-card__icon">✦</div>
+          <h3>Kids' Cuts</h3>
+          <p>Gentle, patient, and professional cuts for the little royals in your life. A calm and positive experience every time.</p>
+          <span class="service-card__price">From R100</span>
+          <a href="#booking" class="service-card__link">Book →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section class="gallery section" id="gallery">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-eyebrow">Our Work</p>
+        <h2 class="section-title">The <em>Gallery</em></h2>
+        <p class="section-sub">Every cut tells a story.</p>
+      </div>
+    </div>
+    <div class="gallery__grid">
+      <div class="gallery__item gallery__item--tall"><img src="images/gallery-1.jpg" alt="Cut 1" /><div class="gallery__overlay"><span>The Fade</span></div></div>
+      <div class="gallery__item"><img src="images/gallery-2.jpg" alt="Cut 2" /><div class="gallery__overlay"><span>Classic Taper</span></div></div>
+      <div class="gallery__item"><img src="images/gallery-3.jpg" alt="Cut 3" /><div class="gallery__overlay"><span>Beard Sculpt</span></div></div>
+      <div class="gallery__item gallery__item--wide"><img src="images/gallery-4.jpg" alt="Cut 4" /><div class="gallery__overlay"><span>The Crown Experience</span></div></div>
+      <div class="gallery__item"><img src="images/gallery-5.jpg" alt="Cut 5" /><div class="gallery__overlay"><span>Sharp Lines</span></div></div>
+      <div class="gallery__item"><img src="images/gallery-6.jpg" alt="Cut 6" /><div class="gallery__overlay"><span>Loc Styling</span></div></div>
+    </div>
+  </section>
+
+  <!-- TEAM -->
+  <section class="team section section--dark" id="team">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-eyebrow section-eyebrow--light">Meet the Artisans</p>
+        <h2 class="section-title section-title--light">The <em>Masters</em> Behind<br />Your Crown</h2>
+      </div>
+      <div class="team__grid">
+        <div class="team-card">
+          <div class="team-card__img"><img src="images/barber-1.jpg" alt="Lead Barber" /></div>
+          <div class="team-card__info">
+            <h3>Shaun Benard</h3>
+            <p class="team-card__role">Founder & Lead Artisan</p>
+            <p>10+ years honing his craft across Durban and Joburg. Specialises in fades, tapers, and beard design.</p>
+          </div>
+        </div>
+        <div class="team-card">
+          <div class="team-card__img"><img src="images/barber-2.jpg" alt="Barber 2" /></div>
+          <div class="team-card__info">
+            <h3>Lennie Charlston</h3>
+            <p class="team-card__role">Senior Stylist</p>
+            <p>A master of texture and curl. Expert in natural hair, locs, and creative cuts for every hair type.</p>
+          </div>
+        </div>
+        <div class="team-card">
+          <div class="team-card__img"><img src="images/barber-3.jpg" alt="Barber 3" /></div>
+          <div class="team-card__info">
+            <h3>Liam James</h3>
+            <p class="team-card__role">Grooming Specialist</p>
+            <p>Known for his precision line work and his unmatched hot-towel shave technique. Clients call it transformative.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials section" id="testimonials">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-eyebrow">Hear From the Family</p>
+        <h2 class="section-title">What Our <em>Royals</em> Say</h2>
+      </div>
+      <div class="testimonials__grid">
+        <div class="testi-card">
+          <div class="testi-stars">★★★★★</div>
+          <p>"I've never felt more confident walking out of a barber. The Crown Experience is worth every cent — they treat you like actual royalty."</p>
+          <div class="testi-author">
+            <div class="testi-avatar">KM</div>
+            <div>
+              <strong>Kagiso Mokoena</strong>
+              <span>Durban, KZN</span>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card testi-card--featured">
+          <div class="testi-stars">★★★★★</div>
+          <p>"Liam understands hair on a level I've never encountered. Three years a loyal client, and they never miss. This is my place."</p>
+          <div class="testi-author">
+            <div class="testi-avatar">LN</div>
+            <div>
+              <strong>Lungelo Ndlovu</strong>
+              <span>Verified Client</span>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-stars">★★★★★</div>
+          <p>"The atmosphere alone is worth the visit — warm, clean, professional. But the cuts? Consistently impeccable. My whole family comes here."</p>
+          <div class="testi-author">
+            <div class="testi-avatar">RD</div>
+            <div>
+              <strong>Rayan Dlamini</strong>
+              <span>Durban North</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOOKING -->
+  <section class="booking section section--dark" id="booking">
+    <div class="container booking__grid">
+      <div class="booking__text">
+        <p class="section-eyebrow section-eyebrow--light">Ready?</p>
+        <h2 class="section-title section-title--light">Reserve Your<br /><em>Throne</em></h2>
+        <p class="body-text" style="color: var(--text-muted);">Book your appointment online or call us directly. Walk-ins are welcome, but reservations guarantee your royal treatment.</p>
+        <div class="booking__details">
+          <div class="b-detail">
+            <span class="b-detail__icon">⊕</span>
+            <div>
+              <strong>Location</strong>
+              <p>123 Umhlanga Ridge, Durban, KZN</p>
+            </div>
+          </div>
+          <div class="b-detail">
+            <span class="b-detail__icon">⊕</span>
+            <div>
+              <strong>Hours</strong>
+              <p>Mon–Fri: 8am–7pm · Sat: 8am–5pm · Sun: 10am–3pm</p>
+            </div>
+          </div>
+          <div class="b-detail">
+            <span class="b-detail__icon">⊕</span>
+            <div>
+              <strong>Phone</strong>
+              <p>+27 31 000 0000</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <form class="booking__form" onsubmit="handleBooking(event)">
+        <h3>Book an Appointment</h3>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" placeholder="Your name" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="tel" placeholder="+27 00 000 0000" required />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" placeholder="you@email.com" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Service</label>
+            <select required>
+              <option value="">Select a service</option>
+              <option>The Royal Cut (R180)</option>
+              <option>Crown Experience (R350)</option>
+              <option>Beard Artistry (R120)</option>
+              <option>Hot Towel Shave (R150)</option>
+              <option>Scalp Therapy (R200)</option>
+              <option>Kids' Cut (R100)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Preferred Date</label>
+            <input type="date" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Preferred Artisan (optional)</label>
+          <select>
+            <option value="">Any available</option>
+            <option>Sibusiso Dlamini</option>
+            <option>Thabo Nkosi</option>
+            <option>Ayanda Mthembu</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <textarea placeholder="Any special requests or preferences…" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn--gold btn--full">Confirm Booking</button>
+        <div class="form-success" id="formSuccess">
+          ♛ Your throne awaits. We'll confirm your booking shortly.
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer__grid">
+      <div class="footer__brand">
+        <div class="nav__logo">
+          <span class="logo-crown">♛</span>
+          <span class="logo-text">Crown <em>The Barb</em></span>
+        </div>
+        <p>Luxury grooming for those who carry themselves with purpose.</p>
+        <div class="footer__social">
+          <a href="#" aria-label="Instagram">IG</a>
+          <a href="#" aria-label="Facebook">FB</a>
+          <a href="#" aria-label="TikTok">TK</a>
+        </div>
+      </div>
+      <div class="footer__col">
+        <h4>Services</h4>
+        <ul>
+          <li><a href="#services">The Royal Cut</a></li>
+          <li><a href="#services">Crown Experience</a></li>
+          <li><a href="#services">Beard Artistry</a></li>
+          <li><a href="#services">Hot Towel Shave</a></li>
+          <li><a href="#services">Scalp Therapy</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Studio</h4>
+        <ul>
+          <li><a href="#about">Our Story</a></li>
+          <li><a href="#team">The Artisans</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+          <li><a href="#testimonials">Reviews</a></li>
+          <li><a href="#booking">Book Now</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Contact</h4>
+        <ul>
+          <li>38 Hibiscus road</li>
+          <li>Pinetown, KZN</li>
+          <li>+27 65 024 1517</li>
+          <li>hello@demitechwebservices.live</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <p>© 2025 Crown The Barb Hair Studio. All rights reserved.</p>
+      <div>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

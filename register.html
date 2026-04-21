@@ -5,8 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Register – DemiTech Web Services</title>
 <link rel="stylesheet" href="style.css"/>
-<script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
-<script src="appwrite-config.js" defer></script>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="/firebase-config.js"></script>
+<style>
+    /* Mobile Responsive Fixes */
+    @media (max-width: 768px) {
+      .auth-container {
+        padding: 2rem;
+        margin: 1rem;
+        width: calc(100% - 2rem);
+      }
+      .section-title {
+        font-size: 2rem;
+      }
+      .btn-full {
+        padding: 12px;
+      }
+    }
+  </style>
 </head>
 <body class="auth-page">
 
@@ -48,6 +67,10 @@
         <label for="reg-password">Password</label>
         <input type="password" id="reg-password" name="password" placeholder="••••••••" required minlength="8"/>
       </div>
+      <div class="form-group">
+        <label for="admin-key">Admin Key (Optional)</label>
+        <input type="password" id="admin-key" name="admin_key" placeholder="For admins only"/>
+      </div>
       <button type="submit" class="btn btn-gold btn-full">🚀 Join DemiTech</button>
       <p class="auth-toggle">Already have an account? <a href="login.html">Login here</a></p>
     </form>
@@ -61,18 +84,51 @@ document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('registerForm');
     const errorMsg = document.getElementById('reg-error');
 
+    // Use global Firebase from firebase-config.js
+    if (typeof firebase === 'undefined') {
+        console.error("Firebase SDK failed to load or firebase-config.js is missing.");
+        return;
+    }
+
     registerForm.onsubmit = async (e) => {
         e.preventDefault();
         const name = registerForm.name.value;
         const email = registerForm.email.value;
         const password = registerForm.password.value;
+        const adminKey = registerForm.admin_key.value;
         
         try {
-            await Auth.register(email, password, name);
-            window.location.href = 'dashboard.html';
+            // Verify initialization
+            if (!window.auth) throw new Error("Firebase initialization failed. Check your configuration.");
+
+            // Create user account using Firebase Auth
+            const userCredential = await window.auth.createUserWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+            
+            // Update profile (display name)
+            await user.updateProfile({ displayName: name });
+            
+            // Check if secret key matches for admin elevation
+            // Secret is: demitech_admin_2026
+            const role = adminKey === 'demitech_admin_2026' ? 'admin' : 'client';
+            
+            // Create database profile in Firestore
+            await window.db.collection('profiles').doc(user.uid).set({ 
+                nickname: name, 
+                email: email,
+                role: role, 
+                isActive: true,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            if (role === 'admin') {
+                window.location.href = 'admin.html';
+            } else {
+                window.location.href = 'dashboard.html';
+            }
         } catch (error) {
             errorMsg.style.display = 'block';
-            errorMsg.textContent = error.message;
+            errorMsg.textContent = error.message || "Registration failed. Please try again.";
             console.error('Registration error:', error);
         }
     };

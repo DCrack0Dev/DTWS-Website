@@ -1,0 +1,2874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PP GROUP | Prestige Property Group</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --gold-dark: #9a7530;
+    --black: #080808;
+    --dark: #0f0f0f;
+    --dark2: #161616;
+    --dark3: #1e1e1e;
+    --mid: #2a2a2a;
+    --light: #f5f0e8;
+    --white: #fdfaf4;
+    --muted: #888;
+    --serif: 'Cormorant Garamond', serif;
+    --sans: 'Montserrat', sans-serif;
+    --display: 'Playfair Display', serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; font-size: 16px; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--sans);
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 8px; height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 100000;
+    transform: translate(-50%,-50%);
+    transition: width 0.3s, height 0.3s, background 0.3s;
+    opacity: 0; /* Hidden initially */
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 40px; height: 40px;
+    border: 1.5px solid var(--gold);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999;
+    transform: translate(-50%,-50%);
+    transition: width 0.3s, height 0.3s, border-color 0.3s, opacity 0.3s;
+    opacity: 0; /* Hidden initially */
+  }
+  
+  .cursor.active, .cursor-ring.active {
+    opacity: 1;
+  }
+  
+  .cursor.hover {
+    width: 12px; height: 12px;
+    background: var(--white);
+  }
+  .cursor-ring.hover {
+    width: 60px; height: 60px;
+    border-color: var(--white);
+    opacity: 0.8;
+  }
+
+  /* Only hide default cursor on desktop */
+  @media (pointer: fine) {
+    body, a, button, select, .prop-card, .service-card, .listing-card, .agent-card, .area-card, .time-slot {
+      cursor: none;
+    }
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 1000;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 22px 60px;
+    background: linear-gradient(to bottom, rgba(8,8,8,0.95) 0%, transparent 100%);
+    backdrop-filter: blur(2px);
+    transition: background 0.4s, padding 0.4s;
+  }
+  nav.scrolled {
+    background: rgba(8,8,8,0.97);
+    padding: 14px 60px;
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+    backdrop-filter: blur(20px);
+  }
+  .logo-with-icon {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    perspective: 1000px;
+  }
+  .logo-icon-container {
+    width: 40px;
+    height: 40px;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: logoPulse 3s ease-in-out infinite;
+  }
+  .house-svg {
+    width: 32px;
+    height: 32px;
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .door-path {
+    fill: var(--gold);
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: left;
+  }
+  .logo-with-icon:hover .door-path {
+    transform: rotateY(-110deg);
+  }
+  @keyframes logoPulse {
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(201,168,76,0)); }
+    50% { transform: scale(1.05); filter: drop-shadow(0 0 8px rgba(201,168,76,0.3)); }
+  }
+  .nav-logo {
+    display: flex; flex-direction: column; line-height: 1;
+  }
+  .nav-logo span:first-child {
+    font-family: var(--serif);
+    font-size: 1.6rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+  }
+  .nav-logo span:last-child {
+    font-family: var(--sans);
+    font-size: 0.55rem;
+    letter-spacing: 0.35em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+  .nav-links {
+    display: flex; gap: 38px; list-style: none;
+  }
+  .nav-links a {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(253,250,244,0.75);
+    text-decoration: none;
+    position: relative;
+    transition: color 0.3s;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute; bottom: -4px; left: 0;
+    width: 0; height: 1px;
+    background: var(--gold);
+    transition: width 0.3s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-cta {
+    font-family: var(--sans);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--black);
+    background: var(--gold);
+    border: none;
+    padding: 11px 26px;
+    cursor: none;
+    transition: background 0.3s, transform 0.2s;
+    font-weight: 500;
+  }
+  .nav-cta:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+  /* ─── HERO ─── */
+  #hero {
+    position: relative;
+    height: 100vh; min-height: 700px;
+    display: flex; align-items: flex-end;
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1510 40%, #0d0d0d 100%);
+    overflow: hidden;
+  }
+  .hero-bg::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 65% 40%, rgba(201,168,76,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 20% 80%, rgba(201,168,76,0.04) 0%, transparent 50%);
+  }
+  .hero-grid-lines {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
+    background-size: 80px 80px;
+    opacity: 0.5;
+  }
+  .hero-img-container {
+    position: absolute;
+    right: -2%; top: 5%; bottom: 0;
+    width: 62%;
+    overflow: hidden;
+  }
+  .hero-img-container::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0; width: 45%;
+    background: linear-gradient(to right, var(--black) 0%, transparent 100%);
+    z-index: 2;
+  }
+  .hero-img-container::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, transparent 60%, var(--black) 100%);
+    z-index: 2;
+  }
+  .hero-prop-img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center;
+    filter: brightness(0.7) contrast(1.05);
+    animation: heroZoom 18s ease-in-out infinite alternate;
+  }
+  @keyframes heroZoom {
+    from { transform: scale(1); }
+    to { transform: scale(1.06); }
+  }
+  /* Removed fake image with gradient house silhouette */
+  .hero-fake-img {
+    display: none;
+  }
+  .hero-number {
+    position: absolute;
+    top: 28%; right: 4%;
+    font-family: var(--serif);
+    font-size: 9rem;
+    font-weight: 300;
+    color: rgba(201,168,76,0.08);
+    line-height: 1;
+    z-index: 3;
+    letter-spacing: -0.02em;
+    pointer-events: none;
+  }
+  .hero-content {
+    position: relative; z-index: 10;
+    padding: 0 60px 80px;
+    width: 52%;
+    animation: heroFadeUp 1.2s ease 0.3s both;
+  }
+  @keyframes heroFadeUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .hero-eyebrow {
+    font-family: var(--sans);
+    font-size: 0.62rem;
+    letter-spacing: 0.38em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 22px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .hero-eyebrow::before {
+    content: ''; width: 40px; height: 1px; background: var(--gold);
+  }
+  .hero-title {
+    font-family: var(--display);
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    font-weight: 400;
+    line-height: 1.05;
+    color: var(--white);
+    margin-bottom: 28px;
+    letter-spacing: -0.01em;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+  .hero-sub {
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    line-height: 1.9;
+    color: rgba(253,250,244,0.55);
+    max-width: 380px;
+    margin-bottom: 44px;
+    letter-spacing: 0.04em;
+  }
+  .hero-actions { display: flex; gap: 18px; align-items: center; }
+  .btn-gold {
+    display: inline-block;
+    font-family: var(--sans);
+    font-size: 0.65rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--black);
+    background: var(--gold);
+    border: none;
+    padding: 15px 34px;
+    text-decoration: none;
+    cursor: none;
+    font-weight: 500;
+    transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-gold::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: var(--gold-light);
+    transform: translateX(-100%);
+    transition: transform 0.35s ease;
+    z-index: 0;
+  }
+  .btn-gold:hover::before { transform: translateX(0); }
+  .btn-gold span { position: relative; z-index: 1; }
+  .btn-gold:hover { box-shadow: 0 8px 30px rgba(201,168,76,0.3); transform: translateY(-2px); }
+  .btn-outline {
+    display: inline-block;
+    font-family: var(--sans);
+    font-size: 0.65rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--white);
+    background: transparent;
+    border: 1px solid rgba(253,250,244,0.25);
+    padding: 15px 34px;
+    text-decoration: none;
+    cursor: none;
+    transition: border-color 0.3s, color 0.3s;
+  }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+  .hero-stats {
+    position: absolute; bottom: 80px; right: 60px;
+    display: flex; gap: 50px;
+    z-index: 10;
+    animation: heroFadeUp 1.2s ease 0.6s both;
+  }
+  .stat-item { text-align: right; }
+  .stat-number {
+    font-family: var(--serif);
+    font-size: 2.4rem;
+    font-weight: 300;
+    color: var(--gold);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .stat-label {
+    font-family: var(--sans);
+    font-size: 0.58rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 5px;
+  }
+  .hero-scroll {
+    position: absolute; bottom: 40px; left: 60px;
+    display: flex; align-items: center; gap: 14px;
+    font-family: var(--sans);
+    font-size: 0.58rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+    z-index: 10;
+    animation: heroFadeUp 1.2s ease 0.9s both;
+  }
+  .scroll-line {
+    width: 60px; height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold));
+    position: relative; overflow: hidden;
+  }
+  .scroll-line::after {
+    content: '';
+    position: absolute; top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: var(--gold-light);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+  @keyframes scrollPulse {
+    0% { left: -100%; }
+    100% { left: 200%; }
+  }
+
+  /* ─── SEARCH BAR ─── */
+  .search-section {
+    background: var(--dark2);
+    border-top: 1px solid rgba(201,168,76,0.15);
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+    padding: 36px 60px;
+    display: flex; align-items: center; gap: 0;
+    position: relative; z-index: 5;
+  }
+  .search-label {
+    font-family: var(--serif);
+    font-size: 0.85rem;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    white-space: nowrap;
+    margin-right: 40px;
+    text-transform: uppercase;
+  }
+  .search-input-wrap {
+    flex: 1;
+    display: flex; align-items: center;
+    border-bottom: 1px solid rgba(201,168,76,0.3);
+    padding-bottom: 10px;
+    gap: 14px;
+  }
+  .search-icon { color: var(--gold); font-size: 1rem; }
+  .search-input {
+    flex: 1;
+    background: none; border: none;
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    color: var(--white);
+    outline: none;
+    letter-spacing: 0.06em;
+  }
+  .search-input::placeholder { color: var(--muted); }
+  .search-filters {
+    display: flex; gap: 0;
+    margin: 0 30px;
+  }
+  .filter-select {
+    background: none;
+    border: none;
+    border-left: 1px solid rgba(201,168,76,0.2);
+    color: rgba(253,250,244,0.65);
+    font-family: var(--sans);
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0 22px;
+    cursor: none;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .filter-select option { background: var(--dark2); color: var(--white); }
+  .search-btn {
+    background: var(--gold);
+    border: none;
+    color: var(--black);
+    font-family: var(--sans);
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    padding: 14px 32px;
+    cursor: none;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: background 0.3s;
+  }
+  .search-btn:hover { background: var(--gold-light); }
+
+  /* ─── SECTIONS ─── */
+  section { padding: 100px 60px; }
+  .section-eyebrow {
+    font-family: var(--sans);
+    font-size: 0.6rem;
+    letter-spacing: 0.38em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 18px;
+  }
+  .section-eyebrow::before { content: ''; width: 30px; height: 1px; background: var(--gold); }
+  .section-title {
+    font-family: var(--display);
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    font-weight: 400;
+    line-height: 1.15;
+    color: var(--white);
+    margin-bottom: 20px;
+    letter-spacing: -0.01em;
+  }
+  .section-title em { font-style: italic; color: var(--gold); }
+  .section-sub {
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    line-height: 1.9;
+    color: rgba(253,250,244,0.5);
+    max-width: 480px;
+    letter-spacing: 0.04em;
+  }
+  .divider {
+    width: 60px; height: 1px;
+    background: linear-gradient(to right, var(--gold), transparent);
+    margin: 30px 0;
+  }
+
+  /* ─── FEATURED PROPERTIES ─── */
+  #properties { background: var(--dark); }
+  .properties-header {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    margin-bottom: 60px;
+  }
+  .view-all-link {
+    font-family: var(--sans);
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid rgba(201,168,76,0.3);
+    padding-bottom: 4px;
+    transition: gap 0.3s;
+  }
+  .view-all-link:hover { gap: 16px; }
+  .props-grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 2px;
+  }
+  .prop-card {
+    position: relative;
+    overflow: hidden;
+    cursor: none;
+    background: var(--dark3);
+  }
+  .prop-card:first-child { grid-row: span 2; }
+  .prop-img {
+    width: 100%;
+    height: 100%;
+    min-height: 260px;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 0.7s ease;
+    display: block;
+  }
+  .prop-card:first-child .prop-img { min-height: 540px; }
+  .prop-fake-img {
+    width: 100%; height: 100%;
+    min-height: 260px;
+    object-fit: cover;
+    object-position: center;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.7s ease;
+    display: block;
+  }
+  .prop-card:first-child .prop-fake-img { min-height: 540px; }
+  /* Removed silhouette */
+  .prop-fake-img::after {
+    display: none;
+  }
+  .prop-card:hover .prop-fake-img,
+  .prop-card:hover .prop-img { transform: scale(1.06); }
+  .prop-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(8,8,8,0.9) 0%, rgba(8,8,8,0.1) 60%, transparent 100%);
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 28px;
+    transition: background 0.4s;
+  }
+  .prop-card:hover .prop-overlay {
+    background: linear-gradient(to top, rgba(8,8,8,0.95) 0%, rgba(8,8,8,0.3) 60%, rgba(8,8,8,0.1) 100%);
+  }
+  .prop-tag {
+    position: absolute; top: 20px; left: 20px;
+    font-family: var(--sans);
+    font-size: 0.55rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    background: var(--gold);
+    color: var(--black);
+    padding: 5px 12px;
+    font-weight: 500;
+  }
+  .prop-name {
+    font-family: var(--serif);
+    font-size: 1.35rem;
+    font-weight: 400;
+    color: var(--white);
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+  }
+  .prop-card:first-child .prop-name { font-size: 2rem; }
+  .prop-location {
+    font-family: var(--sans);
+    font-size: 0.62rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .prop-details {
+    display: flex; gap: 20px; margin-bottom: 18px;
+  }
+  .prop-detail {
+    font-family: var(--sans);
+    font-size: 0.6rem;
+    color: rgba(253,250,244,0.6);
+    letter-spacing: 0.1em;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .prop-price {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    color: var(--gold);
+    font-weight: 300;
+    letter-spacing: 0.02em;
+  }
+  .prop-card:first-child .prop-price { font-size: 1.9rem; }
+  .prop-btn {
+    display: none;
+    margin-top: 16px;
+  }
+  .prop-card:hover .prop-btn { display: block; }
+  .prop-btn a {
+    font-family: var(--sans);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    border-bottom: 1px solid var(--gold);
+    padding-bottom: 3px;
+    cursor: none;
+  }
+
+  /* ─── ABOUT ─── */
+  #about {
+    background: var(--black);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 100px;
+    align-items: center;
+  }
+  .about-visual {
+    position: relative;
+  }
+  .about-main-img {
+    width: 100%; aspect-ratio: 4/5;
+    position: relative;
+    overflow: hidden;
+  }
+  .about-main-img img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  /* Removed silhouettes */
+  .about-main-img::before, .about-main-img::after {
+    display: none;
+  }
+  .about-accent-box {
+    position: absolute;
+    right: -40px; bottom: 60px;
+    width: 200px;
+    background: var(--dark2);
+    border: 1px solid rgba(201,168,76,0.25);
+    padding: 28px;
+    z-index: 2;
+  }
+  .about-accent-box .big-num {
+    font-family: var(--serif);
+    font-size: 3.5rem;
+    font-weight: 300;
+    color: var(--gold);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .about-accent-box .big-label {
+    font-family: var(--sans);
+    font-size: 0.6rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+  .gold-frame {
+    position: absolute;
+    top: -20px; left: -20px;
+    width: 50%; height: 50%;
+    border-top: 2px solid var(--gold);
+    border-left: 2px solid var(--gold);
+    pointer-events: none;
+    opacity: 0.4;
+  }
+  .about-features {
+    margin-top: 44px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 26px;
+  }
+  .feature-item {
+    display: flex; gap: 16px;
+  }
+  .feature-icon {
+    width: 38px; height: 38px;
+    border: 1px solid rgba(201,168,76,0.35);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    color: var(--gold);
+    font-size: 0.9rem;
+  }
+  .feature-text h4 {
+    font-family: var(--serif);
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--white);
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+  .feature-text p {
+    font-family: var(--sans);
+    font-size: 0.65rem;
+    color: var(--muted);
+    line-height: 1.7;
+    letter-spacing: 0.03em;
+  }
+
+  /* ─── SERVICES ─── */
+  #services {
+    background: var(--dark2);
+    position: relative;
+    overflow: hidden;
+  }
+  #services::before {
+    content: 'SERVICES';
+    position: absolute; top: 50%; right: -5%;
+    transform: translateY(-50%);
+    font-family: var(--serif);
+    font-size: 18vw;
+    font-weight: 300;
+    color: rgba(201,168,76,0.03);
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .services-header {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 60px; margin-bottom: 70px;
+    align-items: end;
+  }
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+  .service-card {
+    background: var(--dark3);
+    padding: 44px 36px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.4s;
+    cursor: none;
+  }
+  .service-card::before {
+    content: '';
+    position: absolute; bottom: 0; left: 0;
+    width: 0; height: 3px;
+    background: var(--gold);
+    transition: width 0.5s ease;
+  }
+  .service-card:hover { background: rgba(201,168,76,0.04); }
+  .service-card:hover::before { width: 100%; }
+  .service-num {
+    font-family: var(--serif);
+    font-size: 4rem;
+    font-weight: 300;
+    color: rgba(201,168,76,0.12);
+    line-height: 1;
+    position: absolute;
+    top: 28px; right: 28px;
+  }
+  .service-icon {
+    width: 52px; height: 52px;
+    border: 1px solid rgba(201,168,76,0.3);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--gold);
+    font-size: 1.2rem;
+    margin-bottom: 28px;
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .service-card:hover .service-icon {
+    background: rgba(201,168,76,0.1);
+    border-color: var(--gold);
+  }
+  .service-name {
+    font-family: var(--serif);
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: var(--white);
+    letter-spacing: 0.05em;
+    margin-bottom: 14px;
+  }
+  .service-desc {
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    color: rgba(253,250,244,0.5);
+    line-height: 1.85;
+    letter-spacing: 0.03em;
+  }
+
+  /* ─── LISTINGS ─── */
+  #listings { background: var(--black); }
+  .listings-tabs {
+    display: flex; gap: 0;
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+    margin-bottom: 50px;
+  }
+  .tab-btn {
+    font-family: var(--sans);
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: none; border: none;
+    padding: 16px 32px;
+    cursor: none;
+    transition: color 0.3s;
+    position: relative;
+  }
+  .tab-btn::after {
+    content: '';
+    position: absolute; bottom: -1px; left: 0; right: 0;
+    height: 2px; background: var(--gold);
+    transform: scaleX(0);
+    transition: transform 0.3s;
+  }
+  .tab-btn.active { color: var(--gold); }
+  .tab-btn.active::after { transform: scaleX(1); }
+  .tab-btn:hover { color: rgba(201,168,76,0.7); }
+  .listings-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .listing-card {
+    background: var(--dark2);
+    overflow: hidden;
+    cursor: none;
+    transition: transform 0.4s, box-shadow 0.4s;
+    border: 1px solid rgba(201,168,76,0.07);
+  }
+  .listing-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,168,76,0.2);
+  }
+  .listing-img {
+    height: 220px;
+    overflow: hidden;
+    position: relative;
+  }
+  .listing-fake-img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center;
+    position: relative;
+    transition: transform 0.6s;
+  }
+  /* Removed silhouette */
+  .listing-fake-img::after {
+    display: none;
+  }
+  .listing-card:hover .listing-fake-img { transform: scale(1.05); }
+  .listing-img-tag {
+    position: absolute; top: 14px; left: 14px;
+    font-family: var(--sans);
+    font-size: 0.52rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    background: var(--gold);
+    color: var(--black);
+    padding: 4px 10px;
+    font-weight: 500;
+    z-index: 2;
+  }
+  .listing-body { padding: 24px 24px 26px; }
+  .listing-name {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    font-weight: 400;
+    color: var(--white);
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+  }
+  .listing-loc {
+    font-family: var(--sans);
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .listing-meta {
+    display: flex; gap: 16px;
+    border-top: 1px solid rgba(201,168,76,0.1);
+    padding-top: 16px;
+    margin-bottom: 16px;
+  }
+  .listing-meta-item {
+    font-family: var(--sans);
+    font-size: 0.62rem;
+    color: rgba(253,250,244,0.55);
+    letter-spacing: 0.06em;
+  }
+  .listing-footer {
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .listing-price {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    color: var(--gold);
+    font-weight: 300;
+  }
+  .listing-cta {
+    font-family: var(--sans);
+    font-size: 0.58rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--black);
+    background: var(--gold);
+    border: none;
+    padding: 10px 20px;
+    cursor: none;
+    transition: background 0.3s;
+    font-weight: 500;
+  }
+  .listing-cta:hover { background: var(--gold-light); }
+
+  /* ─── AGENTS ─── */
+  #agents {
+    background: var(--dark);
+    position: relative;
+  }
+  .agents-header {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    margin-bottom: 60px;
+  }
+  .agents-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+  }
+  .agent-card {
+    position: relative;
+    overflow: hidden;
+    cursor: none;
+    background: var(--dark2);
+    aspect-ratio: 3/4;
+  }
+  .agent-fake-img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.6s;
+  }
+  /* Removed silhouette */
+  .agent-fake-img::before {
+    display: none;
+  }
+  .agent-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(8,8,8,0.92) 0%, transparent 50%);
+    padding: 28px;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    transition: background 0.4s;
+  }
+  .agent-card:hover .agent-fake-img { transform: scale(1.04); }
+  .agent-card:hover .agent-overlay {
+    background: linear-gradient(to top, rgba(8,8,8,0.96) 0%, rgba(8,8,8,0.2) 50%, transparent 100%);
+  }
+  .agent-name {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: var(--white);
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+  }
+  .agent-title-role {
+    font-family: var(--sans);
+    font-size: 0.58rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 14px;
+  }
+  .agent-stats-row {
+    display: flex; gap: 18px;
+  }
+  .agent-stat {
+    font-family: var(--sans);
+    font-size: 0.6rem;
+    color: rgba(253,250,244,0.55);
+    letter-spacing: 0.08em;
+  }
+  .agent-contact-btn {
+    display: none;
+    margin-top: 14px;
+    font-family: var(--sans);
+    font-size: 0.58rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    background: var(--gold);
+    color: var(--black);
+    border: none;
+    padding: 10px 22px;
+    cursor: none;
+    transition: background 0.3s;
+    font-weight: 500;
+  }
+  .agent-card:hover .agent-contact-btn { display: block; }
+  .agent-contact-btn:hover { background: var(--gold-light); }
+
+  /* ─── TESTIMONIALS ─── */
+  #testimonials {
+    background: var(--dark2);
+    overflow: hidden;
+    position: relative;
+  }
+  #testimonials::before {
+    content: '"';
+    position: absolute; top: -40px; left: 40px;
+    font-family: var(--serif);
+    font-size: 40rem;
+    color: rgba(201,168,76,0.025);
+    line-height: 1;
+    pointer-events: none;
+  }
+  .testimonials-inner {
+    display: grid; grid-template-columns: 1fr 2fr; gap: 100px; align-items: center;
+  }
+  .test-cards { display: flex; flex-direction: column; gap: 24px; }
+  .test-card {
+    background: var(--dark3);
+    padding: 34px;
+    border-left: 2px solid rgba(201,168,76,0.2);
+    position: relative;
+    transition: border-color 0.3s, background 0.3s;
+    cursor: none;
+  }
+  .test-card.active, .test-card:hover {
+    border-left-color: var(--gold);
+    background: rgba(201,168,76,0.04);
+  }
+  .test-quote {
+    font-family: var(--serif);
+    font-size: 1rem;
+    font-style: italic;
+    color: rgba(253,250,244,0.7);
+    line-height: 1.7;
+    margin-bottom: 18px;
+  }
+  .test-author {
+    display: flex; align-items: center; gap: 14px;
+  }
+  .test-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold-dark), var(--dark3));
+    border: 1px solid rgba(201,168,76,0.35);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--serif);
+    font-size: 1rem;
+    color: var(--gold);
+  }
+  .test-name {
+    font-family: var(--sans);
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--white);
+  }
+  .test-role {
+    font-family: var(--sans);
+    font-size: 0.58rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    margin-top: 3px;
+  }
+  .test-stars { color: var(--gold); font-size: 0.7rem; margin-bottom: 12px; }
+  .test-big {
+    position: relative;
+  }
+  .test-big-quote {
+    font-family: var(--display);
+    font-size: clamp(1.4rem, 3vw, 2.2rem);
+    font-style: italic;
+    color: var(--white);
+    line-height: 1.5;
+    margin-bottom: 36px;
+    letter-spacing: -0.01em;
+  }
+  .test-big-author {
+    display: flex; align-items: center; gap: 18px;
+  }
+  .test-big-avatar {
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold-dark), var(--dark3));
+    border: 2px solid var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    color: var(--gold);
+  }
+
+  /* ─── BOOK A CALL ─── */
+  #book {
+    background: var(--black);
+    display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: start;
+  }
+  .book-info { padding-top: 10px; }
+  .book-contact-items {
+    margin-top: 50px;
+    display: flex; flex-direction: column; gap: 22px;
+  }
+  .book-contact-item {
+    display: flex; gap: 18px; align-items: flex-start;
+  }
+  .contact-icon {
+    width: 44px; height: 44px; flex-shrink: 0;
+    border: 1px solid rgba(201,168,76,0.3);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--gold); font-size: 1rem;
+  }
+  .contact-label {
+    font-family: var(--sans);
+    font-size: 0.58rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+  .contact-value {
+    font-family: var(--serif);
+    font-size: 1rem;
+    color: var(--white);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    transition: color 0.3s;
+  }
+  a.contact-value:hover { color: var(--gold); }
+
+  /* ─── FORM ─── */
+  .book-form {
+    background: var(--dark2);
+    padding: 50px;
+    border: 1px solid rgba(201,168,76,0.1);
+  }
+  .form-title {
+    font-family: var(--serif);
+    font-size: 1.8rem;
+    font-weight: 400;
+    color: var(--white);
+    letter-spacing: 0.04em;
+    margin-bottom: 10px;
+  }
+  .form-sub {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    margin-bottom: 36px;
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .form-group {
+    display: flex; flex-direction: column; gap: 8px;
+    margin-bottom: 20px;
+  }
+  .form-group.full { grid-column: span 2; }
+  .form-label {
+    font-family: var(--sans);
+    font-size: 0.58rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .form-control {
+    background: var(--dark3);
+    border: 1px solid rgba(201,168,76,0.12);
+    color: var(--white);
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    padding: 14px 16px;
+    outline: none;
+    transition: border-color 0.3s;
+    width: 100%;
+    appearance: none;
+  }
+  .form-control:focus { border-color: var(--gold); }
+  .form-control::placeholder { color: rgba(136,136,136,0.5); }
+  .form-control option { background: var(--dark3); color: var(--white); }
+  textarea.form-control { resize: vertical; min-height: 100px; }
+  .form-time-slots {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+    margin-bottom: 24px;
+  }
+  .time-slot {
+    border: 1px solid rgba(201,168,76,0.15);
+    color: rgba(253,250,244,0.55);
+    font-family: var(--sans);
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-align: center;
+    padding: 12px 8px;
+    cursor: none;
+    transition: all 0.3s;
+    background: none;
+  }
+  .time-slot:hover, .time-slot.selected {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(201,168,76,0.08);
+  }
+  .form-note {
+    font-family: var(--sans);
+    font-size: 0.62rem;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 28px;
+    letter-spacing: 0.03em;
+  }
+  .form-submit {
+    width: 100%;
+    font-family: var(--sans);
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--black);
+    background: var(--gold);
+    border: none;
+    padding: 18px;
+    cursor: none;
+    font-weight: 500;
+    transition: background 0.3s, transform 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .form-submit::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: var(--gold-light);
+    transform: translateX(-100%);
+    transition: transform 0.35s;
+  }
+  .form-submit:hover::before { transform: translateX(0); }
+  .form-submit span { position: relative; z-index: 1; }
+  .form-submit:hover { transform: translateY(-2px); }
+
+  /* ─── MODAL ─── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(8,8,8,0.92);
+    z-index: 9000;
+    display: none; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--dark2);
+    border: 1px solid rgba(201,168,76,0.2);
+    padding: 60px;
+    max-width: 540px; width: 100%;
+    position: relative;
+    animation: modalIn 0.4s ease;
+    text-align: center;
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.9) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .modal-close {
+    position: absolute; top: 20px; right: 24px;
+    background: none; border: none;
+    color: var(--muted);
+    font-size: 1.2rem;
+    cursor: none;
+    transition: color 0.3s;
+  }
+  .modal-close:hover { color: var(--gold); }
+  .modal-icon {
+    width: 72px; height: 72px;
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 28px;
+    color: var(--gold);
+    font-size: 1.8rem;
+  }
+  .modal-title {
+    font-family: var(--display);
+    font-size: 1.9rem;
+    font-style: italic;
+    color: var(--white);
+    margin-bottom: 14px;
+    letter-spacing: -0.01em;
+  }
+  .modal-body {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.8;
+    letter-spacing: 0.04em;
+    margin-bottom: 10px;
+  }
+  .modal-ref {
+    font-family: var(--serif);
+    font-size: 1rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    margin: 16px 0 32px;
+  }
+  .modal-btn {
+    display: inline-block;
+    font-family: var(--sans);
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--black);
+    background: var(--gold);
+    border: none;
+    padding: 14px 36px;
+    cursor: none;
+    font-weight: 500;
+    transition: background 0.3s;
+  }
+  .modal-btn:hover { background: var(--gold-light); }
+
+  /* ─── PROPERTY MODAL ─── */
+  .prop-modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(8,8,8,0.95);
+    z-index: 9000;
+    display: none;
+    overflow-y: auto;
+    padding: 40px 20px;
+  }
+  .prop-modal-overlay.open { display: block; }
+  .prop-modal {
+    background: var(--dark2);
+    border: 1px solid rgba(201,168,76,0.15);
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    animation: modalIn 0.4s ease;
+  }
+  .prop-modal-close {
+    position: absolute; top: 20px; right: 24px;
+    background: none; border: none;
+    color: var(--muted);
+    font-size: 1.2rem;
+    cursor: none;
+    transition: color 0.3s;
+    z-index: 10;
+  }
+  .prop-modal-close:hover { color: var(--gold); }
+  .prop-modal-img {
+    width: 100%; height: 360px;
+    position: relative;
+    overflow: hidden;
+  }
+  .prop-modal-img img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  /* Removed silhouette */
+  .prop-modal-img::before {
+    display: none;
+  }
+  .prop-modal-tag {
+    position: absolute; top: 24px; left: 24px;
+    font-family: var(--sans);
+    font-size: 0.58rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    background: var(--gold);
+    color: var(--black);
+    padding: 6px 16px;
+    font-weight: 500;
+    z-index: 2;
+  }
+  .prop-modal-body { padding: 44px 50px; }
+  .prop-modal-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 28px;
+  }
+  .prop-modal-title {
+    font-family: var(--display);
+    font-size: 2rem;
+    font-weight: 400;
+    color: var(--white);
+    letter-spacing: -0.01em;
+    margin-bottom: 6px;
+  }
+  .prop-modal-price {
+    font-family: var(--serif);
+    font-size: 2.2rem;
+    color: var(--gold);
+    font-weight: 300;
+  }
+  .prop-modal-specs {
+    display: flex; gap: 30px;
+    border-top: 1px solid rgba(201,168,76,0.12);
+    border-bottom: 1px solid rgba(201,168,76,0.12);
+    padding: 22px 0;
+    margin-bottom: 28px;
+  }
+  .prop-spec {
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .prop-spec-val {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    color: var(--white);
+  }
+  .prop-spec-key {
+    font-family: var(--sans);
+    font-size: 0.58rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .prop-modal-desc {
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    line-height: 1.9;
+    color: rgba(253,250,244,0.6);
+    letter-spacing: 0.03em;
+    margin-bottom: 36px;
+  }
+  .prop-modal-actions {
+    display: flex; gap: 16px;
+  }
+
+  /* ─── MAP / AREAS ─── */
+  #areas { background: var(--dark); }
+  .areas-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+    margin-top: 50px;
+  }
+  .area-card {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 3/4;
+    cursor: none;
+    background: var(--dark2);
+  }
+  .area-fake-img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 0.6s;
+  }
+  .area-card:hover .area-fake-img { transform: scale(1.08); }
+  .area-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(8,8,8,0.85) 0%, transparent 60%);
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 22px;
+    transition: background 0.4s;
+  }
+  .area-card:hover .area-overlay {
+    background: linear-gradient(to top, rgba(8,8,8,0.92) 0%, rgba(8,8,8,0.1) 60%, transparent 100%);
+  }
+  .area-name {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    color: var(--white);
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+  .area-count {
+    font-family: var(--sans);
+    font-size: 0.58rem;
+    color: var(--gold);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: #050505;
+    padding: 80px 60px 0;
+    border-top: 1px solid rgba(201,168,76,0.12);
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.5fr;
+    gap: 60px;
+    padding-bottom: 60px;
+    border-bottom: 1px solid rgba(201,168,76,0.08);
+  }
+  .footer-brand {}
+  .footer-logo span:first-child {
+    font-family: var(--serif);
+    font-size: 2rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+  }
+  .footer-logo span:last-child {
+    display: block;
+    font-family: var(--sans);
+    font-size: 0.52rem;
+    letter-spacing: 0.35em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 4px;
+    margin-bottom: 22px;
+  }
+  .footer-brand-text {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    line-height: 1.9;
+    color: rgba(253,250,244,0.4);
+    letter-spacing: 0.03em;
+    max-width: 280px;
+    margin-bottom: 28px;
+  }
+  .footer-social { display: flex; gap: 12px; }
+  .social-btn {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(201,168,76,0.25);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted);
+    font-size: 0.8rem;
+    text-decoration: none;
+    transition: border-color 0.3s, color 0.3s, background 0.3s;
+    cursor: none;
+  }
+  .social-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.08); }
+  .footer-col-title {
+    font-family: var(--sans);
+    font-size: 0.62rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 24px;
+  }
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .footer-links a {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    color: rgba(253,250,244,0.45);
+    text-decoration: none;
+    letter-spacing: 0.06em;
+    transition: color 0.3s;
+    cursor: none;
+  }
+  .footer-links a:hover { color: var(--gold); }
+  .footer-newsletter {}
+  .footer-newsletter-input {
+    background: var(--dark2);
+    border: 1px solid rgba(201,168,76,0.18);
+    color: var(--white);
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    padding: 13px 16px;
+    width: 100%;
+    outline: none;
+    margin-bottom: 12px;
+    transition: border-color 0.3s;
+    letter-spacing: 0.04em;
+  }
+  .footer-newsletter-input:focus { border-color: var(--gold); }
+  .footer-newsletter-input::placeholder { color: rgba(136,136,136,0.5); }
+  .footer-newsletter-btn {
+    width: 100%;
+    background: var(--gold);
+    border: none;
+    color: var(--black);
+    font-family: var(--sans);
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    padding: 13px;
+    cursor: none;
+    font-weight: 500;
+    transition: background 0.3s;
+  }
+  .footer-newsletter-btn:hover { background: var(--gold-light); }
+  .footer-bottom {
+    padding: 26px 0;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .footer-copy {
+    font-family: var(--sans);
+    font-size: 0.62rem;
+    color: rgba(253,250,244,0.25);
+    letter-spacing: 0.08em;
+  }
+  .footer-legal {
+    display: flex; gap: 28px;
+  }
+  .footer-legal a {
+    font-family: var(--sans);
+    font-size: 0.6rem;
+    color: rgba(253,250,244,0.3);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.3s;
+    cursor: none;
+  }
+  .footer-legal a:hover { color: var(--gold); }
+
+  /* ─── TOAST ─── */
+  .toast {
+    position: fixed;
+    bottom: 40px; right: 40px;
+    background: var(--dark2);
+    border: 1px solid var(--gold);
+    padding: 18px 28px;
+    z-index: 9999;
+    display: none;
+    animation: toastIn 0.4s ease;
+    max-width: 340px;
+  }
+  .toast.show { display: block; }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .toast-title {
+    font-family: var(--serif);
+    font-size: 1rem;
+    color: var(--gold);
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+  }
+  .toast-msg {
+    font-family: var(--sans);
+    font-size: 0.68rem;
+    color: rgba(253,250,244,0.65);
+    line-height: 1.6;
+    letter-spacing: 0.03em;
+  }
+
+  /* ─── INLINE PAGES ─── */
+  .page-section {
+    display: none;
+    padding: 120px 60px 80px;
+    min-height: 60vh;
+    background: var(--black);
+    border-top: 1px solid rgba(201,168,76,0.1);
+  }
+  .page-section.visible { display: block; }
+  .page-section h2 {
+    font-family: var(--display);
+    font-size: 3rem;
+    font-style: italic;
+    color: var(--white);
+    margin-bottom: 40px;
+  }
+  .page-section h2 span { color: var(--gold); }
+  .page-section h3 {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--gold);
+    letter-spacing: 0.06em;
+    margin: 28px 0 10px;
+  }
+  .page-section p {
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    line-height: 1.95;
+    color: rgba(253,250,244,0.55);
+    letter-spacing: 0.03em;
+    max-width: 740px;
+    margin-bottom: 16px;
+  }
+  .page-section ul {
+    padding-left: 24px;
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    line-height: 2;
+    color: rgba(253,250,244,0.55);
+    letter-spacing: 0.03em;
+    max-width: 740px;
+    margin-bottom: 16px;
+  }
+  .page-section li { margin-bottom: 6px; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: var(--sans);
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    margin-bottom: 50px;
+    cursor: none;
+    border-bottom: 1px solid rgba(201,168,76,0.3);
+    padding-bottom: 4px;
+  }
+  .back-link:hover { gap: 16px; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 1100px) {
+    nav { padding: 18px 36px; }
+    nav.scrolled { padding: 12px 36px; }
+    section { padding: 80px 36px; }
+    .search-section { padding: 28px 36px; }
+    #hero .hero-content { padding: 0 36px 70px; width: 60%; }
+    .hero-stats { right: 36px; }
+    .agents-grid { grid-template-columns: repeat(2, 1fr); }
+    .areas-grid { grid-template-columns: repeat(3, 1fr); }
+    footer { padding: 60px 36px 0; }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+    .book-form { padding: 36px; }
+  }
+  @media (max-width: 800px) {
+    nav { padding: 16px 24px; }
+    nav.scrolled { padding: 12px 24px; }
+    .nav-links { display: none; }
+    section { padding: 60px 24px; }
+    .search-section { flex-direction: column; gap: 16px; padding: 24px; }
+    .search-filters { margin: 0; }
+    #hero .hero-content { width: 90%; padding: 0 24px 120px; }
+    .hero-stats { display: none; }
+    .hero-number { display: none; }
+    .props-grid { grid-template-columns: 1fr; }
+    .prop-card:first-child { grid-row: auto; }
+    #about { grid-template-columns: 1fr; gap: 50px; padding: 60px 24px; }
+    .about-accent-box { right: 10px; }
+    .services-header { grid-template-columns: 1fr; gap: 20px; }
+    .services-grid { grid-template-columns: 1fr; }
+    .listings-grid { grid-template-columns: 1fr; }
+    .agents-grid { grid-template-columns: 1fr 1fr; }
+    #book { grid-template-columns: 1fr; gap: 50px; padding: 60px 24px; }
+    .book-form { padding: 28px 22px; }
+    .form-row { grid-template-columns: 1fr; }
+    .form-group.full { grid-column: auto; }
+    .testimonials-inner { grid-template-columns: 1fr; gap: 40px; }
+    .areas-grid { grid-template-columns: repeat(2, 1fr); }
+    footer { padding: 50px 24px 0; }
+    .footer-grid { grid-template-columns: 1fr; gap: 30px; }
+    .footer-bottom { flex-direction: column; gap: 14px; text-align: center; }
+    .prop-modal-body { padding: 28px 24px; }
+    .prop-modal-actions { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- ── NAV ── -->
+<nav id="mainNav">
+  <a href="ppgroup.html" class="logo-with-icon">
+    <div class="logo-icon-container">
+      <svg class="house-svg" viewBox="0 0 24 24">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        <!-- Door that will animate -->
+        <rect class="door-path" x="9" y="12" width="6" height="10"></rect>
+      </svg>
+    </div>
+    <div class="nav-logo">
+      <span>PP GROUP</span>
+      <span>Prestige Property Group</span>
+    </div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="properties.html">Properties</a></li>
+    <li><a href="services.html">Services</a></li>
+    <li><a href="agents.html">Our Agents</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <a href="contact.html" class="nav-cta">Book a Consultation</a>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="hero">
+  <div class="hero-bg">
+    <div class="hero-grid-lines"></div>
+    <div class="hero-img-container">
+      <img src="images/1.jpg" class="hero-prop-img" />
+    </div>
+  </div>
+  <div class="hero-number">150K</div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Prestige Property Group</div>
+    <h1 class="hero-title">
+      Curated<br><em>Luxury Living</em><br>Redefined
+    </h1>
+    <p class="hero-sub">South Africa's most trusted luxury property specialists. We present exceptional residences to discerning clients who expect nothing less than perfection.</p>
+    <div class="hero-actions">
+      <a href="properties.html" class="btn-gold"><span>View Properties</span></a>
+      <a href="contact.html" class="btn-outline">Speak to an Agent</a>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-item">
+      <div class="stat-number">R8.2B+</div>
+      <div class="stat-label">Total Sales</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">1,400+</div>
+      <div class="stat-label">Properties Sold</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">22yr</div>
+      <div class="stat-label">Of Excellence</div>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    Scroll to Explore
+  </div>
+</section>
+
+<!-- ── PROPERTY SEARCH ── -->
+<div class="search-section">
+  <div class="search-label">Find your Estate</div>
+  <div class="search-input-wrap">
+    <span class="search-icon">⌕</span>
+    <input type="text" class="search-input" placeholder="Location, suburb or estate name…" id="searchInput" />
+  </div>
+  <div class="search-filters">
+    <select class="filter-select" onchange="">
+      <option>Residential</option>
+      <option>Commercial</option>
+      <option>Estate</option>
+      <option>Land</option>
+    </select>
+    <select class="filter-select">
+      <option>Buy</option>
+      <option>Rent</option>
+      <option>Auction</option>
+    </select>
+    <select class="filter-select">
+      <option>Any Price</option>
+      <option>R5M – R10M</option>
+      <option>R10M – R20M</option>
+      <option>R20M – R50M</option>
+      <option>R50M+</option>
+    </select>
+  </div>
+  <button class="search-btn" onclick="handleSearch()">Search</button>
+</div>
+
+<!-- ── FEATURED PROPERTIES ── -->
+<section id="properties">
+  <div class="properties-header">
+    <div>
+      <div class="section-eyebrow">Featured Properties</div>
+      <h2 class="section-title">Exceptional <em>Residences</em></h2>
+    </div>
+    <a href="properties.html" class="view-all-link">View All Properties →</a>
+  </div>
+  <div class="props-grid">
+    <div class="prop-card" onclick="openPropModal('Clifton Villa Royale','Clifton, Cape Town','R 38,500,000','For Sale','5 Bed · 6 Bath · 920m²','A landmark clifftop villa commanding breathtaking views of the Atlantic Ocean. Featuring an infinity pool, private cinema, wine cellar and staff quarters. The finest address in South Africa\'s most exclusive enclave.','images/2.jpg')">
+      <img src="images/2.jpg" class="prop-img" />
+      <div class="prop-overlay">
+        <div class="prop-tag">Exclusive Mandate</div>
+        <div class="prop-name">Clifton Villa Royale</div>
+        <div class="prop-location">📍 Clifton, Cape Town</div>
+        <div class="prop-details">
+          <span class="prop-detail">🛏 5 Beds</span>
+          <span class="prop-detail">🛁 6 Baths</span>
+          <span class="prop-detail">📐 920m²</span>
+          <span class="prop-detail">🌊 Sea Views</span>
+        </div>
+        <div class="prop-price">R 38,500,000</div>
+        <div class="prop-btn"><a href="javascript:void(0)" onclick="event.stopPropagation();openPropModal('Clifton Villa Royale','Clifton, Cape Town','R 38,500,000','For Sale','5 Bed · 6 Bath · 920m²','A landmark clifftop villa commanding breathtaking views of the Atlantic Ocean.','images/2.jpg')">View Details →</a></div>
+      </div>
+    </div>
+    <div class="prop-card" onclick="openPropModal('Sandhurst Manor','Sandhurst, Johannesburg','R 22,000,000','For Sale','6 Bed · 7 Bath · 1,200m²','A palatial double-storey family residence set behind secure automated gates in the heart of Sandhurst. Features a championship tennis court, heated pool, and professional entertainment pavilion.','images/3.jpg')">
+      <img src="images/3.jpg" class="prop-img" />
+      <div class="prop-overlay">
+        <div class="prop-tag">New Listing</div>
+        <div class="prop-name">Sandhurst Manor</div>
+        <div class="prop-location">📍 Sandhurst, Jhb</div>
+        <div class="prop-details">
+          <span class="prop-detail">🛏 6 Beds</span>
+          <span class="prop-detail">🛁 7 Baths</span>
+        </div>
+        <div class="prop-price">R 22,000,000</div>
+      </div>
+    </div>
+    <div class="prop-card" onclick="openPropModal('Constantia Wine Estate','Constantia, Cape Town','R 45,000,000','For Sale','8 Bed · 9 Bath · 3.2ha','A fully operational wine estate nestled against the Constantiaberg mountains. Includes a working cellar, tasting room, guest lodge and exquisite Cape Dutch homestead.','images/4.jpg')">
+     <img src="images/4.jpg" class="prop-img" />
+      <div class="prop-overlay">
+        <div class="prop-tag">Estate</div>
+        <div class="prop-name">Constantia Wine Estate</div>
+        <div class="prop-location">📍 Constantia, Cape Town</div>
+        <div class="prop-details">
+          <span class="prop-detail">🛏 8 Beds</span>
+          <span class="prop-detail">🍷 Cellar</span>
+        </div>
+        <div class="prop-price">R 45,000,000</div>
+      </div>
+    </div>
+    <div class="prop-card" onclick="openPropModal('Umhlanga Penthouse','Umhlanga Ridge, Durban','R 14,800,000','For Sale','4 Bed · 5 Bath · 450m²','A sky-high penthouse residence above the vibrant Umhlanga skyline. Private rooftop terrace with pool, floor-to-ceiling glazing and seamless indoor-outdoor living.','images/5.jpg')">
+      <img src="images/5.jpg" class="prop-img" />
+      <div class="prop-overlay">
+        <div class="prop-tag">Penthouse</div>
+        <div class="prop-name">Umhlanga Penthouse</div>
+        <div class="prop-location">📍 Umhlanga, Durban</div>
+        <div class="prop-details">
+          <span class="prop-detail">🛏 4 Beds</span>
+          <span class="prop-detail">🌊 Ocean Views</span>
+        </div>
+        <div class="prop-price">R 14,800,000</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── ABOUT ── -->
+<section id="about">
+  <div class="about-visual">
+    <div class="gold-frame"></div>
+    <div class="about-main-img">
+      <img src="images/6.jpg" alt="About PP Group" />
+    </div>
+    <div class="about-accent-box">
+      <div class="big-num">22</div>
+      <div class="big-label">Years of Prestige</div>
+    </div>
+  </div>
+  <div class="about-content">
+    <div class="section-eyebrow">About PP Group</div>
+    <h2 class="section-title">A Legacy of <em>Excellence</em> in Property</h2>
+    <div class="divider"></div>
+    <p class="section-sub">Since 2002, Prestige Property Group has been at the forefront of South Africa's luxury real estate market. Founded on the principle that exceptional properties deserve exceptional representation, we have assembled a team of specialists who live and breathe luxury property.</p>
+    <p class="section-sub" style="margin-top:16px">Our mandate is singular: to match the right property with the right buyer, ensuring every transaction exceeds expectations and every client feels truly valued.</p>
+    <div class="about-features">
+      <div class="feature-item">
+        <div class="feature-icon">◆</div>
+        <div class="feature-text">
+          <h4>Exclusive Mandates</h4>
+          <p>Direct access to off-market properties unavailable elsewhere.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">◈</div>
+        <div class="feature-text">
+          <h4>Global Reach</h4>
+          <p>Connected to leading agencies across Europe, UAE and Americas.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">◇</div>
+        <div class="feature-text">
+          <h4>White Glove Service</h4>
+          <p>Discreet, personalised attention from first viewing to handover.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">⟡</div>
+        <div class="feature-text">
+          <h4>Expert Valuations</h4>
+          <p>Certified assessors delivering precise, independent valuations.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SERVICES ── -->
+<section id="services">
+  <div class="services-header">
+    <div>
+      <div class="section-eyebrow">What We Offer</div>
+      <h2 class="section-title">Premium <em>Services</em></h2>
+    </div>
+    <p class="section-sub">From acquisition to disposition, we manage every aspect of your property journey with the care and precision that only experience can provide.</p>
+  </div>
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-num">01</div>
+      <div class="service-icon">◈</div>
+      <div class="service-name">Luxury Sales</div>
+      <p class="service-desc">Tailored marketing strategies for high-value residential and commercial properties. We reach qualified buyers globally through our curated network and premium platforms.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-num">02</div>
+      <div class="service-icon">◆</div>
+      <div class="service-name">Private Acquisitions</div>
+      <p class="service-desc">Confidential property sourcing for discerning buyers. We identify and evaluate properties meeting your specific requirements before they reach the open market.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-num">03</div>
+      <div class="service-icon">⌂</div>
+      <div class="service-name">Property Management</div>
+      <p class="service-desc">Comprehensive management of your luxury portfolio. Maintenance, tenant relations, financial reporting and concierge services handled seamlessly on your behalf.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-num">04</div>
+      <div class="service-icon">◇</div>
+      <div class="service-name">Investment Advisory</div>
+      <p class="service-desc">Strategic property investment guidance from seasoned professionals. Portfolio diversification, yield analysis and capital growth projections for sophisticated investors.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-num">05</div>
+      <div class="service-icon">⟡</div>
+      <div class="service-name">Valuations & Reports</div>
+      <p class="service-desc">Accurate, legally compliant property valuations conducted by our registered assessors. Bank submissions, insurance valuations and estate planning reports.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-num">06</div>
+      <div class="service-icon">✦</div>
+      <div class="service-name">International Relocation</div>
+      <p class="service-desc">Seamless transition services for international clients relocating to South Africa. We handle everything from school placements to home setup, ensuring a smooth arrival.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── ALL LISTINGS ── -->
+<section id="listings" style="background:var(--dark);">
+  <div class="section-eyebrow">Current Portfolio</div>
+  <h2 class="section-title">Available <em>Properties</em></h2>
+  <div style="height:28px"></div>
+  <div class="listings-tabs">
+    <button class="tab-btn active" onclick="filterListings('all',this)">All Properties</button>
+    <button class="tab-btn" onclick="filterListings('sale',this)">For Sale</button>
+    <button class="tab-btn" onclick="filterListings('rent',this)">To Let</button>
+    <button class="tab-btn" onclick="filterListings('new',this)">New Listings</button>
+    <button class="tab-btn" onclick="filterListings('exclusive',this)">Exclusive Mandates</button>
+  </div>
+  <div class="listings-grid" id="listingsGrid">
+    <div class="listing-card" data-cat="sale exclusive">
+      <div class="listing-img">
+        <img src="images/7.jpg" class="listing-fake-img" />
+        <span class="listing-img-tag">Exclusive</span>
+      </div>
+      <div class="listing-body">
+        <div class="listing-name">Hyde Park Heritage Home</div>
+        <div class="listing-loc">📍 Hyde Park, Johannesburg</div>
+        <div class="listing-meta">
+          <span class="listing-meta-item">🛏 5 Bed</span>
+          <span class="listing-meta-item">🛁 5 Bath</span>
+          <span class="listing-meta-item">📐 780m²</span>
+          <span class="listing-meta-item">🚗 4 Garage</span>
+        </div>
+        <div class="listing-footer">
+          <div class="listing-price">R 18,900,000</div>
+          <button class="listing-cta" onclick="openPropModal('Hyde Park Heritage Home','Hyde Park, Johannesburg','R 18,900,000','For Sale','5 Bed · 5 Bath · 780m²','A gracious double-storey family home in the heart of Hyde Park. Beautifully maintained with original architectural features, a private garden oasis and superb security.','images/7.jpg')">Enquire</button>
+        </div>
+      </div>
+    </div>
+    <div class="listing-card" data-cat="sale new">
+      <div class="listing-img">
+        <img src="images/8.jpg" class="listing-fake-img" />
+        <span class="listing-img-tag">New Listing</span>
+      </div>
+      <div class="listing-body">
+        <div class="listing-name">Bloubergstrand Beachfront</div>
+        <div class="listing-loc">📍 Blouberg, Cape Town</div>
+        <div class="listing-meta">
+          <span class="listing-meta-item">🛏 4 Bed</span>
+          <span class="listing-meta-item">🛁 4 Bath</span>
+          <span class="listing-meta-item">📐 520m²</span>
+          <span class="listing-meta-item">🌊 Beach Access</span>
+        </div>
+        <div class="listing-footer">
+          <div class="listing-price">R 16,500,000</div>
+          <button class="listing-cta" onclick="openPropModal('Bloubergstrand Beachfront','Blouberg, Cape Town','R 16,500,000','For Sale','4 Bed · 4 Bath · 520m²','A spectacular beach house with direct Table Mountain views and private beach access. Modern open-plan living areas flow to expansive oceanside terraces.','images/8.jpg')">Enquire</button>
+        </div>
+      </div>
+    </div>
+    <div class="listing-card" data-cat="rent">
+      <div class="listing-img">
+        <img src="images/9.jpg" class="listing-fake-img" />
+        <span class="listing-img-tag">To Let</span>
+      </div>
+      <div class="listing-body">
+        <div class="listing-name">Morningside Luxury Apartment</div>
+        <div class="listing-loc">📍 Morningside, Durban</div>
+        <div class="listing-meta">
+          <span class="listing-meta-item">🛏 3 Bed</span>
+          <span class="listing-meta-item">🛁 3 Bath</span>
+          <span class="listing-meta-item">📐 250m²</span>
+          <span class="listing-meta-item">🏊 Pool</span>
+        </div>
+        <div class="listing-footer">
+          <div class="listing-price">R 45,000/mo</div>
+          <button class="listing-cta" onclick="openPropModal('Morningside Luxury Apartment','Morningside, Durban','R 45,000/month','To Let','3 Bed · 3 Bath · 250m²','A premium furnished apartment in sought-after Morningside. Sweeping views of the Berea ridge, modern kitchen, private balcony and access to communal pool and gym.','images/9.jpg')">Enquire</button>
+        </div>
+      </div>
+    </div>
+    <div class="listing-card" data-cat="sale exclusive">
+      <div class="listing-img">
+        <img src="images/10.jpg" class="listing-fake-img" />
+        <span class="listing-img-tag">Exclusive</span>
+      </div>
+      <div class="listing-body">
+        <div class="listing-name">Val de Vie Wine Farm</div>
+        <div class="listing-loc">📍 Paarl, Western Cape</div>
+        <div class="listing-meta">
+          <span class="listing-meta-item">🛏 7 Bed</span>
+          <span class="listing-meta-item">🛁 8 Bath</span>
+          <span class="listing-meta-item">📐 12ha</span>
+          <span class="listing-meta-item">🍷 Cellar</span>
+        </div>
+        <div class="listing-footer">
+          <div class="listing-price">R 62,000,000</div>
+          <button class="listing-cta" onclick="openPropModal('Val de Vie Wine Farm','Paarl, Western Cape','R 62,000,000','For Sale','7 Bed · 8 Bath · 12ha','A world-class wine farm within the prestigious Val de Vie Estate. Includes a state-of-the-art 250-ton cellar, formal Cape Dutch homestead, guest cottage and immaculate vineyards.','images/10.jpg')">Enquire</button>
+        </div>
+      </div>
+    </div>
+    <div class="listing-card" data-cat="rent new">
+      <div class="listing-img">
+        <img src="images/11.jpg" class="listing-fake-img" />
+        <span class="listing-img-tag">New · To Let</span>
+      </div>
+      <div class="listing-body">
+        <div class="listing-name">Sandton Central Penthouse</div>
+        <div class="listing-loc">📍 Sandton, Johannesburg</div>
+        <div class="listing-meta">
+          <span class="listing-meta-item">🛏 2 Bed</span>
+          <span class="listing-meta-item">🛁 2 Bath</span>
+          <span class="listing-meta-item">📐 180m²</span>
+          <span class="listing-meta-item">🌆 City Views</span>
+        </div>
+        <div class="listing-footer">
+          <div class="listing-price">R 38,000/mo</div>
+          <button class="listing-cta" onclick="openPropModal('Sandton Central Penthouse','Sandton, Johannesburg','R 38,000/month','To Let','2 Bed · 2 Bath · 180m²','Fully furnished, ultra-modern penthouse in the heart of Sandton. Private rooftop terrace, chef\'s kitchen, 24-hour concierge and underground parking.','images/11.jpg')">Enquire</button>
+        </div>
+      </div>
+    </div>
+    <div class="listing-card" data-cat="sale new">
+      <div class="listing-img">
+        <img src="images/12.jpg" class="listing-fake-img" />
+        <span class="listing-img-tag">New Listing</span>
+      </div>
+      <div class="listing-body">
+        <div class="listing-name">Knysna Waterfront Retreat</div>
+        <div class="listing-loc">📍 Knysna, Garden Route</div>
+        <div class="listing-meta">
+          <span class="listing-meta-item">🛏 5 Bed</span>
+          <span class="listing-meta-item">🛁 4 Bath</span>
+          <span class="listing-meta-item">📐 680m²</span>
+          <span class="listing-meta-item">⛵ Jetty</span>
+        </div>
+        <div class="listing-footer">
+          <div class="listing-price">R 28,500,000</div>
+          <button class="listing-cta" onclick="openPropModal('Knysna Waterfront Retreat','Knysna, Garden Route','R 28,500,000','For Sale','5 Bed · 4 Bath · 680m²','A rare waterfront property on the Knysna Lagoon with a private jetty. Wrap-around decks, breath-taking lagoon and forest views, an entertainer\'s dream.','images/12.jpg')">Enquire</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:54px">
+    <a href="#book" class="btn-gold"><span>Request Private Viewing</span></a>
+  </div>
+</section>
+
+<!-- ── AREAS ── -->
+<section id="areas">
+  <div class="section-eyebrow">Prime Locations</div>
+  <h2 class="section-title">Explore our <em>Key Areas</em></h2>
+  <div class="areas-grid">
+    <div class="area-card">
+      <img src="images/17.jpg" class="area-fake-img" />
+      <div class="area-overlay">
+        <div class="area-name">Cape Town</div>
+        <div class="area-count">34 Properties</div>
+      </div>
+    </div>
+    <div class="area-card">
+      <img src="images/2.jpg" class="area-fake-img" />
+      <div class="area-overlay">
+        <div class="area-name">Johannesburg</div>
+        <div class="area-count">28 Properties</div>
+      </div>
+    </div>
+    <div class="area-card">
+      <img src="images/3.jpg" class="area-fake-img" />
+      <div class="area-overlay">
+        <div class="area-name">Durban</div>
+        <div class="area-count">19 Properties</div>
+      </div>
+    </div>
+    <div class="area-card">
+      <img src="images/4.jpg" class="area-fake-img" />
+      <div class="area-overlay">
+        <div class="area-name">Garden Route</div>
+        <div class="area-count">12 Properties</div>
+      </div>
+    </div>
+    <div class="area-card">
+      <img src="images/20.jpg" class="area-fake-img" />
+      <div class="area-overlay">
+        <div class="area-name">Winelands</div>
+        <div class="area-count">11 Properties</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── AGENTS ── -->
+<section id="agents">
+  <div class="agents-header">
+    <div>
+      <div class="section-eyebrow">Our People</div>
+      <h2 class="section-title">Meet the <em>Specialists</em></h2>
+    </div>
+    <a href="agents.html" class="view-all-link">Meet the Team →</a>
+  </div>
+  <div class="agents-grid">
+    <div class="agent-card" onclick="openAgentEnquiry('Alexandra van der Berg','Head of Luxury Sales')">
+      <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800" class="agent-fake-img" alt="Alexandra van der Berg" />
+      <div class="agent-overlay">
+        <div class="agent-name">Alexandra van der Berg</div>
+        <div class="agent-title-role">Head of Luxury Sales</div>
+        <div class="agent-stats-row">
+          <span class="agent-stat">R 1.2B sold</span>
+          <span class="agent-stat">14 years</span>
+        </div>
+        <button class="agent-contact-btn" onclick="event.stopPropagation();openAgentEnquiry('Alexandra van der Berg','Head of Luxury Sales')">Book Consultation</button>
+      </div>
+    </div>
+    <div class="agent-card" onclick="openAgentEnquiry('James Khumalo','Private Acquisitions Director')">
+      <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=800" class="agent-fake-img" alt="James Khumalo" />
+      <div class="agent-overlay">
+        <div class="agent-name">James Khumalo</div>
+        <div class="agent-title-role">Private Acquisitions Director</div>
+        <div class="agent-stats-row">
+          <span class="agent-stat">R 890M sold</span>
+          <span class="agent-stat">11 years</span>
+        </div>
+        <button class="agent-contact-btn" onclick="event.stopPropagation();openAgentEnquiry('James Khumalo','Private Acquisitions Director')">Book Consultation</button>
+      </div>
+    </div>
+    <div class="agent-card" onclick="openAgentEnquiry('Nadine Fourie','Cape Town Specialist')">
+      <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=800" class="agent-fake-img" alt="Nadine Fourie" />
+      <div class="agent-overlay">
+        <div class="agent-name">Nadine Fourie</div>
+        <div class="agent-title-role">Cape Town Specialist</div>
+        <div class="agent-stats-row">
+          <span class="agent-stat">R 740M sold</span>
+          <span class="agent-stat">9 years</span>
+        </div>
+        <button class="agent-contact-btn" onclick="event.stopPropagation();openAgentEnquiry('Nadine Fourie','Cape Town Specialist')">Book Consultation</button>
+      </div>
+    </div>
+    <div class="agent-card" onclick="openAgentEnquiry('Michael Dlamini','KwaZulu-Natal Director')">
+      <img src="https://images.unsplash.com/photo-1531384441138-2736e62e0919?auto=format&fit=crop&q=80&w=800" class="agent-fake-img" alt="Michael Dlamini" />
+      <div class="agent-overlay">
+        <div class="agent-name">Michael Dlamini</div>
+        <div class="agent-title-role">KZN Director</div>
+        <div class="agent-stats-row">
+          <span class="agent-stat">R 620M sold</span>
+          <span class="agent-stat">8 years</span>
+        </div>
+        <button class="agent-contact-btn" onclick="event.stopPropagation();openAgentEnquiry('Michael Dlamini','KwaZulu-Natal Director')">Book Consultation</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TESTIMONIALS ── -->
+<section id="testimonials">
+  <div class="testimonials-inner">
+    <div>
+      <div class="section-eyebrow">Client Stories</div>
+      <h2 class="section-title">What Our <em>Clients</em> Say</h2>
+      <div class="divider"></div>
+      <div class="test-cards">
+        <div class="test-card active">
+          <div class="test-stars">★★★★★</div>
+          <div class="test-quote">"PP Group found us our dream home in Clifton within three weeks — a property that wasn't even listed publicly."</div>
+          <div class="test-author">
+            <div class="test-avatar">S</div>
+            <div>
+              <div class="test-name">Sarah & Andrew Lombard</div>
+              <div class="test-role">Clifton, Cape Town</div>
+            </div>
+          </div>
+        </div>
+        <div class="test-card">
+          <div class="test-stars">★★★★★</div>
+          <div class="test-quote">"Discreet, professional and deeply knowledgeable. Exactly what I needed when selling my Sandhurst estate."</div>
+          <div class="test-author">
+            <div class="test-avatar">R</div>
+            <div>
+              <div class="test-name">Richard Motsepe</div>
+              <div class="test-role">Sandhurst, Johannesburg</div>
+            </div>
+          </div>
+        </div>
+        <div class="test-card">
+          <div class="test-stars">★★★★★</div>
+          <div class="test-quote">"The international relocation team made our move from London seamless. We felt looked after every step."</div>
+          <div class="test-author">
+            <div class="test-avatar">E</div>
+            <div>
+              <div class="test-name">Emma & David Clarke</div>
+              <div class="test-role">Relocated to Cape Town</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="test-big">
+      <div class="section-eyebrow">Featured Review</div>
+      <div class="test-big-quote">"Working with Prestige Property Group was unlike any real estate experience I have had. They understood my vision from the first conversation, showed me only properties that were genuinely relevant, and negotiated a price I couldn't have achieved alone. I have recommended them to every one of my colleagues."</div>
+      <div class="test-big-author">
+        <div class="test-big-avatar">T</div>
+        <div>
+          <div class="test-name" style="font-size:0.75rem;letter-spacing:0.1em;color:var(--white);font-family:var(--sans)">Thabo Nkosi</div>
+          <div class="test-role">CEO · TN Capital Group · Purchased R42M Estate, Stellenbosch</div>
+          <div style="margin-top:8px;color:var(--gold);font-size:0.75rem">★★★★★</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── BOOK A CALL ── -->
+<section id="book">
+  <div class="book-info">
+    <div class="section-eyebrow">Get in Touch</div>
+    <h2 class="section-title">Book a <em>Consultation</em></h2>
+    <div class="divider"></div>
+    <p class="section-sub">Whether you're buying, selling or simply exploring your options, our agents are available for confidential, no-obligation consultations at your convenience.</p>
+    <div class="book-contact-items">
+      <div class="book-contact-item">
+        <div class="contact-icon">☎</div>
+        <div>
+          <div class="contact-label">Call Us</div>
+          <a href="tel:+27313001000" class="contact-value">+27 31 300 1000</a>
+        </div>
+      </div>
+      <div class="book-contact-item">
+        <div class="contact-icon">✉</div>
+        <div>
+          <div class="contact-label">Email</div>
+          <a href="mailto:info@ppgroup.co.za" class="contact-value">info@ppgroup.co.za</a>
+        </div>
+      </div>
+      <div class="book-contact-item">
+        <div class="contact-icon">◈</div>
+        <div>
+          <div class="contact-label">Head Office</div>
+          <div class="contact-value" style="font-size:0.85rem">1 Prestige Place, Umhlanga Ridge,<br>Durban, 4319</div>
+        </div>
+      </div>
+      <div class="book-contact-item">
+        <div class="contact-icon">◇</div>
+        <div>
+          <div class="contact-label">Cape Town Office</div>
+          <div class="contact-value" style="font-size:0.85rem">88 Bree Street, De Waterkant,<br>Cape Town, 8001</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="book-form" id="bookForm">
+    <div class="form-title">Book Your Call</div>
+    <div class="form-sub">Complete the form and an agent will confirm your appointment within 2 hours.</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">First Name *</label>
+        <input type="text" class="form-control" id="fName" placeholder="Your first name"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Last Name *</label>
+        <input type="text" class="form-control" id="lName" placeholder="Your last name"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Email Address *</label>
+        <input type="email" class="form-control" id="fEmail" placeholder="your@email.com"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone Number *</label>
+        <input type="tel" class="form-control" id="fPhone" placeholder="+27 xx xxx xxxx"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Enquiry Type</label>
+        <select class="form-control" id="fType">
+          <option>Buying a Property</option>
+          <option>Selling a Property</option>
+          <option>Rental Property</option>
+          <option>Property Valuation</option>
+          <option>Investment Advisory</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Budget / Price Range</label>
+        <select class="form-control" id="fBudget">
+          <option>Prefer not to say</option>
+          <option>Under R5M</option>
+          <option>R5M – R10M</option>
+          <option>R10M – R20M</option>
+          <option>R20M – R50M</option>
+          <option>R50M+</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group full" style="grid-column:span 2">
+      <label class="form-label">Preferred Date</label>
+      <input type="date" class="form-control" id="fDate"/>
+    </div>
+    <div class="form-label" style="margin-bottom:12px">Preferred Time Slot</div>
+    <div class="form-time-slots">
+      <button type="button" class="time-slot" onclick="selectSlot(this)">09:00 – 10:00</button>
+      <button type="button" class="time-slot" onclick="selectSlot(this)">10:00 – 11:00</button>
+      <button type="button" class="time-slot" onclick="selectSlot(this)">11:00 – 12:00</button>
+      <button type="button" class="time-slot" onclick="selectSlot(this)">14:00 – 15:00</button>
+      <button type="button" class="time-slot" onclick="selectSlot(this)">15:00 – 16:00</button>
+      <button type="button" class="time-slot" onclick="selectSlot(this)">16:00 – 17:00</button>
+    </div>
+    <div class="form-group full" style="grid-column:span 2">
+      <label class="form-label">Message / Additional Information</label>
+      <textarea class="form-control" id="fMessage" rows="4" placeholder="Tell us about the property you're looking for, or any specific requirements…"></textarea>
+    </div>
+    <p class="form-note">By submitting this form you agree to our <a href="javascript:void(0)" onclick="showPage('privacy')" style="color:var(--gold);text-decoration:none">Privacy Policy</a> and <a href="javascript:void(0)" onclick="showPage('terms')" style="color:var(--gold);text-decoration:none">Terms & Conditions</a>. Your information will never be shared with third parties.</p>
+    <button type="button" class="form-submit" onclick="submitBooking()"><span>Confirm Appointment Request</span></button>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer id="footerMain">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <span>PP GROUP</span>
+        <span>Prestige Property Group</span>
+      </div>
+      <p class="footer-brand-text">South Africa's most trusted luxury property specialists. Connecting exceptional properties with discerning clients since 2002.</p>
+      <div class="footer-social">
+        <a href="javascript:void(0)" class="social-btn" title="Instagram" onclick="showToast('Instagram','Opening PP Group Instagram profile…')"><i class="fab fa-instagram"></i></a>
+        <a href="javascript:void(0)" class="social-btn" title="LinkedIn" onclick="showToast('LinkedIn','Opening PP Group LinkedIn page…')"><i class="fab fa-linkedin-in"></i></a>
+        <a href="javascript:void(0)" class="social-btn" title="Facebook" onclick="showToast('Facebook','Opening PP Group Facebook page…')"><i class="fab fa-facebook-f"></i></a>
+        <a href="javascript:void(0)" class="social-btn" title="WhatsApp" onclick="showToast('WhatsApp','Starting a WhatsApp conversation with us…')"><i class="fab fa-whatsapp"></i></a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Properties</div>
+      <ul class="footer-links">
+        <li><a href="properties.html">For Sale</a></li>
+        <li><a href="properties.html">To Let</a></li>
+        <li><a href="properties.html">New Listings</a></li>
+        <li><a href="properties.html">Exclusive Mandates</a></li>
+        <li><a href="properties.html">Browse by Area</a></li>
+        <li><a href="contact.html">Request a Valuation</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Company</div>
+      <ul class="footer-links">
+        <li><a href="about.html">About PP Group</a></li>
+        <li><a href="agents.html">Our Agents</a></li>
+        <li><a href="services.html">Our Services</a></li>
+        <li><a href="javascript:void(0)" onclick="showPage('careers')">Careers</a></li>
+        <li><a href="javascript:void(0)" onclick="showPage('news')">News & Insights</a></li>
+        <li><a href="contact.html">Contact Us</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Stay Informed</div>
+      <p style="font-family:var(--sans);font-size:0.68rem;color:rgba(253,250,244,0.4);line-height:1.8;letter-spacing:0.03em;margin-bottom:18px">Subscribe to receive curated new listings and market insights delivered to your inbox.</p>
+      <div class="footer-newsletter">
+        <input type="email" class="footer-newsletter-input" id="newsletterEmail" placeholder="your@email.com"/>
+        <button class="footer-newsletter-btn" onclick="subscribeNewsletter()">Subscribe</button>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2024 Prestige Property Group (Pty) Ltd · PPRE Registered · All rights reserved</div>
+    <div class="footer-legal">
+      <a href="javascript:void(0)" onclick="showPage('terms')">Terms & Conditions</a>
+      <a href="javascript:void(0)" onclick="showPage('privacy')">Privacy Policy</a>
+      <a href="javascript:void(0)" onclick="showPage('paia')">PAIA Manual</a>
+      <a href="javascript:void(0)" onclick="showPage('complaints')">Complaints</a>
+      <a href="javascript:void(0)" onclick="showPage('fais')">FAIS Disclosure</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ── INLINE PAGES ── -->
+<div id="termsPage" class="page-section">
+  <a href="javascript:void(0)" onclick="hidePage('termsPage')" class="back-link">← Back</a>
+  <h2>Terms &amp; <span>Conditions</span></h2>
+  <h3>1. Introduction</h3>
+  <p>These Terms and Conditions govern your use of the Prestige Property Group website and our property services. By engaging with PP Group you agree to be bound by these terms.</p>
+  <h3>2. Services</h3>
+  <p>PP Group offers property sales, letting, management, advisory and valuation services. All mandates, agreements and instructions are subject to separate written agreements between the client and PP Group.</p>
+  <h3>3. Listings &amp; Accuracy</h3>
+  <p>All property information is sourced from sellers and registered valuers. While we take every care to ensure accuracy, PP Group cannot guarantee the completeness or currency of listing data and recommends independent verification prior to any transaction.</p>
+  <h3>4. Privacy</h3>
+  <p>Your personal information is handled in accordance with the Protection of Personal Information Act (POPIA) and our Privacy Policy. We will never sell or share your data with third parties without your explicit consent.</p>
+  <h3>5. Commission &amp; Fees</h3>
+  <p>Commission structures are agreed in writing prior to mandate. PP Group's standard commission is payable upon the successful registration of transfer or execution of a lease agreement.</p>
+  <h3>6. Limitation of Liability</h3>
+  <p>PP Group shall not be liable for any loss or damage arising from reliance on information presented on this website or in marketing material. All transactions are concluded subject to due diligence by the buyer or tenant.</p>
+  <h3>7. Governing Law</h3>
+  <p>These terms are governed by the laws of the Republic of South Africa. All disputes shall be subject to the jurisdiction of the South African courts.</p>
+  <h3>8. Amendments</h3>
+  <p>PP Group reserves the right to amend these terms at any time. Continued use of our services constitutes acceptance of any amended terms.</p>
+  <p>For queries regarding these terms, please contact: <a href="mailto:legal@ppgroup.co.za" style="color:var(--gold)">legal@ppgroup.co.za</a></p>
+</div>
+
+<div id="privacyPage" class="page-section">
+  <a href="javascript:void(0)" onclick="hidePage('privacyPage')" class="back-link">← Back</a>
+  <h2>Privacy <span>Policy</span></h2>
+  <h3>Information We Collect</h3>
+  <p>We collect personal information that you voluntarily provide, including your name, contact details, financial parameters and property preferences. We also collect usage data through analytics tools to improve our services.</p>
+  <h3>How We Use Your Information</h3>
+  <ul>
+    <li>To respond to your enquiries and booking requests</li>
+    <li>To match you with suitable properties in our portfolio</li>
+    <li>To send you relevant property listings and market updates (with your consent)</li>
+    <li>To comply with legal and regulatory obligations</li>
+  </ul>
+  <h3>POPIA Compliance</h3>
+  <p>PP Group processes personal information in compliance with the Protection of Personal Information Act 4 of 2013 (POPIA). Your data is stored securely and you have the right to access, correct or request deletion of your information at any time.</p>
+  <h3>Data Sharing</h3>
+  <p>We do not sell your personal information. We may share data with trusted service providers (conveyancers, bond originators) only as necessary to complete a transaction, and only with your knowledge.</p>
+  <h3>Cookies</h3>
+  <p>Our website uses cookies to enhance your browsing experience. You may disable cookies in your browser settings, though this may affect site functionality.</p>
+  <h3>Contact our Information Officer</h3>
+  <p><a href="mailto:privacy@ppgroup.co.za" style="color:var(--gold)">privacy@ppgroup.co.za</a> · +27 31 300 1000</p>
+</div>
+
+<div id="paiaPage" class="page-section">
+  <a href="javascript:void(0)" onclick="hidePage('paiaPage')" class="back-link">← Back</a>
+  <h2>PAIA <span>Manual</span></h2>
+  <p>This manual is published in accordance with Section 51 of the Promotion of Access to Information Act 2 of 2000 (PAIA).</p>
+  <h3>Company Details</h3>
+  <p>Prestige Property Group (Pty) Ltd · Registration No: 2002/014782/07 · Registered Office: 1 Prestige Place, Umhlanga Ridge, Durban, 4319</p>
+  <h3>Information Officer</h3>
+  <p>All requests for access to information held by PP Group must be directed to our Information Officer: <a href="mailto:paia@ppgroup.co.za" style="color:var(--gold)">paia@ppgroup.co.za</a></p>
+  <h3>Records Available</h3>
+  <ul>
+    <li>Company registration documents</li>
+    <li>PPRE/FIC registration certificates</li>
+    <li>Mandate and commission agreements (party to agreement only)</li>
+    <li>Personal information held about the requester</li>
+  </ul>
+  <h3>How to Request</h3>
+  <p>Submit a written request on the prescribed Form C to our Information Officer. A request fee of R50 may apply. Processing time is 30 days from receipt of a complete request.</p>
+</div>
+
+<div id="complaintsPage" class="page-section">
+  <a href="javascript:void(0)" onclick="hidePage('complaintsPage')" class="back-link">← Back</a>
+  <h2>Complaints <span>Procedure</span></h2>
+  <p>PP Group is committed to resolving all complaints promptly, fairly and transparently. We take client feedback seriously and use it to continually improve our service.</p>
+  <h3>Step 1 – Contact Us Directly</h3>
+  <p>In the first instance, please contact your agent or our client services team: <a href="mailto:complaints@ppgroup.co.za" style="color:var(--gold)">complaints@ppgroup.co.za</a> · +27 31 300 1002</p>
+  <h3>Step 2 – Formal Complaint</h3>
+  <p>If your issue is not resolved within 5 business days, submit a formal written complaint to our Compliance Officer. We will acknowledge receipt within 24 hours and provide a full response within 15 business days.</p>
+  <h3>Step 3 – External Resolution</h3>
+  <p>If you remain unsatisfied, you may refer the matter to the Estate Agency Affairs Board (EAAB) or the relevant Ombud. PP Group cooperates fully with all regulatory investigations.</p>
+  <h3>EAAB Contact</h3>
+  <p>Estate Agency Affairs Board · 63 Wierda Road East, Wierda Valley, Sandton · Tel: 087 285 3222 · <a href="mailto:info@eaab.org.za" style="color:var(--gold)">info@eaab.org.za</a></p>
+</div>
+
+<div id="faisPage" class="page-section">
+  <a href="javascript:void(0)" onclick="hidePage('faisPage')" class="back-link">← Back</a>
+  <h2>FAIS <span>Disclosure</span></h2>
+  <p>Prestige Property Group (Pty) Ltd is an authorised Financial Services Provider in terms of the Financial Advisory and Intermediary Services Act, 37 of 2002 (FAIS).</p>
+  <h3>FSP Licence Details</h3>
+  <p>FSP Number: 48421 · Category: I · Authorised by the Financial Sector Conduct Authority (FSCA)</p>
+  <h3>Compliance Officer</h3>
+  <p><a href="mailto:compliance@ppgroup.co.za" style="color:var(--gold)">compliance@ppgroup.co.za</a></p>
+  <h3>Professional Indemnity</h3>
+  <p>PP Group holds professional indemnity insurance as required under FAIS regulations. Details are available on request.</p>
+  <h3>Conflict of Interest Policy</h3>
+  <p>We maintain and implement a Conflict of Interest Management Policy. Where conflicts arise, they will be disclosed to you in writing before any advice is rendered.</p>
+</div>
+
+<div id="careersPage" class="page-section">
+  <a href="javascript:void(0)" onclick="hidePage('careersPage')" class="back-link">← Back</a>
+  <h2>Join <span>PP Group</span></h2>
+  <p>We are always looking for exceptional individuals who share our passion for luxury property and our commitment to outstanding client service.</p>
+  <h3>Current Openings</h3>
+  <ul>
+    <li>Senior Luxury Property Consultant – Cape Town</li>
+    <li>KwaZulu-Natal Residential Sales Agent – Umhlanga</li>
+    <li>Property Management Coordinator – Johannesburg</li>
+    <li>Digital Marketing Manager – Durban (Head Office)</li>
+    <li>International Relocation Consultant – Cape Town</li>
+  </ul>
+  <h3>How to Apply</h3>
+  <p>Send your CV and a cover letter explaining why you would be a great fit for PP Group to <a href="mailto:careers@ppgroup.co.za" style="color:var(--gold)">careers@ppgroup.co.za</a>. We review all applications personally and will be in touch within 10 business days.</p>
+</div>
+
+<div id="newsPage" class="page-section">
+  <a href="javascript:void(0)" onclick="hidePage('newsPage')" class="back-link">← Back</a>
+  <h2>News &amp; <span>Insights</span></h2>
+  <h3>Q4 2024: Luxury Market Update</h3>
+  <p>The South African luxury residential market demonstrated continued resilience in Q4 2024, with the R10M+ segment recording a 12% increase in transaction volumes year-on-year. The Western Cape remains the most sought-after province, driven by semigration trends and foreign buyer interest.</p>
+  <h3>Semigration to the Cape: A Sustained Trend</h3>
+  <p>Internal migration from Johannesburg and Durban to the Western Cape and Garden Route continues to reshape the luxury market. PP Group's data shows that 38% of our Cape Town buyers in 2024 relocated from other provinces, prioritising lifestyle, safety and schooling.</p>
+  <h3>Interest Rate Outlook for 2025</h3>
+  <p>With the SARB expected to continue a cautious rate-cutting cycle in 2025, bond-financed buyers are returning to the luxury market with renewed confidence. PP Group advisors recommend buyers lock in current rates where possible.</p>
+  <h3>International Buyer Activity</h3>
+  <p>Enquiries from international buyers — particularly from the UK, Germany and the United States — have increased significantly, attracted by South Africa's relative value proposition and lifestyle offering. PP Group's international desk handled 47 cross-border transactions in 2024.</p>
+</div>
+
+<!-- ── CONFIRMATION MODAL ── -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('confirmModal')">✕</button>
+    <div class="modal-icon">✓</div>
+    <div class="modal-title">Appointment Confirmed</div>
+    <p class="modal-body">Thank you for reaching out to Prestige Property Group. Your consultation request has been received and an agent will confirm your appointment within 2 hours.</p>
+    <div class="modal-ref" id="modalRef">REF: PP-0000</div>
+    <p class="modal-body">A confirmation email will be sent to the address you provided.</p>
+    <button class="modal-btn" onclick="closeModal('confirmModal')">Done</button>
+  </div>
+</div>
+
+<!-- ── PROPERTY DETAIL MODAL ── -->
+<div class="prop-modal-overlay" id="propModal">
+  <div class="prop-modal">
+    <button class="prop-modal-close" onclick="closeModal('propModal')">✕</button>
+    <div class="prop-modal-img">
+      <img src="" id="pmImg" alt="Property Image" />
+      <span class="prop-modal-tag" id="pmTag">For Sale</span>
+    </div>
+    <div class="prop-modal-body">
+      <div class="prop-modal-header">
+        <div>
+          <div class="prop-modal-title" id="pmTitle">Property Name</div>
+          <div class="prop-location" id="pmLoc" style="margin-bottom:0">📍 Location</div>
+        </div>
+        <div class="prop-modal-price" id="pmPrice">R 0</div>
+      </div>
+      <div class="prop-modal-specs">
+        <div class="prop-spec">
+          <div class="prop-spec-val" id="pmSpecs">—</div>
+          <div class="prop-spec-key">Property Details</div>
+        </div>
+      </div>
+      <p class="prop-modal-desc" id="pmDesc">Description loading…</p>
+      <div class="prop-modal-actions">
+        <button class="btn-gold" onclick="bookFromProp()" style="cursor:none"><span>Book a Viewing</span></button>
+        <a href="#book" class="btn-outline" onclick="closeModal('propModal')">Speak to an Agent</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="toast" id="toastEl">
+  <div class="toast-title" id="toastTitle">Notification</div>
+  <div class="toast-msg" id="toastMsg">Message here</div>
+</div>
+
+<script>
+  // ─── CURSOR ───
+  const cur = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+  
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX;
+    my = e.clientY;
+    
+    // Show cursor on first movement
+    if (!cur.classList.contains('active')) {
+      cur.classList.add('active');
+      ring.classList.add('active');
+    }
+    
+    cur.style.left = mx + 'px';
+    cur.style.top = my + 'px';
+    
+    // Hover effects
+    const target = e.target;
+    const isHoverable = target.closest('a, button, .prop-card, .service-card, .listing-card, .agent-card, .area-card, .time-slot, select, input, textarea');
+    
+    if (isHoverable) {
+      cur.classList.add('hover');
+      ring.classList.add('hover');
+    } else {
+      cur.classList.remove('hover');
+      ring.classList.remove('hover');
+    }
+  });
+
+  // Smooth ring movement
+  (function animRing() {
+    rx += (mx - rx) * 0.15;
+    ry += (my - ry) * 0.15;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animRing);
+  })();
+
+  // Hide cursor when leaving window
+  document.addEventListener('mouseleave', () => {
+    cur.classList.remove('active');
+    ring.classList.remove('active');
+  });
+
+  // ─── NAV SCROLL ───
+  window.addEventListener('scroll', ()=>{
+    document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // ─── SEARCH ───
+  function handleSearch(){
+    const q = document.getElementById('searchInput').value.trim();
+    if(q){ showToast('Searching…', `Finding luxury properties matching "${q}"…`); }
+    else { showToast('Search', 'Please enter a location or property name.'); }
+  }
+
+  // ─── TIME SLOTS ───
+  let selectedSlot = '';
+  function selectSlot(el){
+    document.querySelectorAll('.time-slot').forEach(b=>b.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedSlot = el.textContent;
+  }
+
+  // ─── BOOKING FORM ───
+  function openBookForm(){
+    document.getElementById('book').scrollIntoView({behavior:'smooth'});
+    setTimeout(()=>document.getElementById('fName').focus(), 800);
+  }
+  function submitBooking(){
+    const fn=document.getElementById('fName').value.trim();
+    const ln=document.getElementById('lName').value.trim();
+    const em=document.getElementById('fEmail').value.trim();
+    const ph=document.getElementById('fPhone').value.trim();
+    const dt=document.getElementById('fDate').value;
+    if(!fn||!ln||!em||!ph){
+      showToast('Missing Information','Please complete all required fields marked with *');
+      return;
+    }
+    if(!dt){ showToast('Select a Date','Please choose your preferred appointment date.'); return; }
+    if(!selectedSlot){ showToast('Select a Time','Please choose a preferred time slot.'); return; }
+    const ref = 'PP-' + Math.floor(10000+Math.random()*90000);
+    document.getElementById('modalRef').textContent = 'REF: ' + ref;
+    document.getElementById('confirmModal').classList.add('open');
+    // Reset form
+    ['fName','fEmail','fPhone','lName','fMessage'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('fDate').value='';
+    document.querySelectorAll('.time-slot').forEach(b=>b.classList.remove('selected'));
+    selectedSlot='';
+  }
+
+  // ─── PROPERTY MODAL ───
+  function openPropModal(title,loc,price,tag,specs,desc,imgSrc){
+    document.getElementById('pmTitle').textContent=title;
+    document.getElementById('pmLoc').textContent='📍 '+loc;
+    document.getElementById('pmPrice').textContent=price;
+    document.getElementById('pmTag').textContent=tag;
+    document.getElementById('pmSpecs').textContent=specs;
+    document.getElementById('pmDesc').textContent=desc;
+    if(imgSrc) document.getElementById('pmImg').src=imgSrc;
+    document.getElementById('propModal').classList.add('open');
+  }
+  function bookFromProp(){
+    closeModal('propModal');
+    setTimeout(()=>openBookForm(), 300);
+  }
+
+  // ─── AGENT ENQUIRY ───
+  function openAgentEnquiry(name,role){
+    document.getElementById('fMessage').value='I would like to book a consultation with '+name+' ('+role+').';
+    document.getElementById('book').scrollIntoView({behavior:'smooth'});
+    setTimeout(()=>document.getElementById('fName').focus(), 800);
+  }
+
+  // ─── CLOSE MODAL ───
+  function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+  // Click outside to close
+  document.addEventListener('click', e=>{
+    if(e.target.id==='confirmModal') closeModal('confirmModal');
+    if(e.target.id==='propModal') closeModal('propModal');
+  });
+  document.addEventListener('keydown', e=>{
+    if(e.key==='Escape'){
+      closeModal('confirmModal');
+      closeModal('propModal');
+    }
+  });
+
+  // ─── LISTINGS FILTER ───
+  function filterListings(cat, btn){
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('#listingsGrid .listing-card').forEach(card=>{
+      if(cat==='all'){ card.style.display=''; return; }
+      const cats = card.dataset.cat||'';
+      card.style.display = cats.includes(cat) ? '' : 'none';
+    });
+  }
+
+  // ─── TOAST ───
+  let toastTimer;
+  function showToast(title, msg){
+    clearTimeout(toastTimer);
+    document.getElementById('toastTitle').textContent=title;
+    document.getElementById('toastMsg').textContent=msg;
+    const t=document.getElementById('toastEl');
+    t.classList.add('show');
+    toastTimer=setTimeout(()=>t.classList.remove('show'),4000);
+  }
+
+  // ─── NEWSLETTER ───
+  function subscribeNewsletter(){
+    const e=document.getElementById('newsletterEmail').value.trim();
+    if(!e||!e.includes('@')){ showToast('Invalid Email','Please enter a valid email address.'); return; }
+    showToast('Subscribed!','Welcome to PP Group insights. You will receive our next curated edition shortly.');
+    document.getElementById('newsletterEmail').value='';
+  }
+
+  // ─── INLINE PAGES ───
+  const pageMap = {
+    terms:'termsPage', privacy:'privacyPage', paia:'paiaPage',
+    complaints:'complaintsPage', fais:'faisPage', careers:'careersPage', news:'newsPage'
+  };
+  function showPage(key){
+    const id=pageMap[key];
+    if(!id) return;
+    // Hide all pages
+    Object.values(pageMap).forEach(pid=>{ const el=document.getElementById(pid); if(el) el.classList.remove('visible'); });
+    const el=document.getElementById(id);
+    if(el){ el.classList.add('visible'); el.scrollIntoView({behavior:'smooth'}); }
+  }
+  function hidePage(id){
+    const el=document.getElementById(id);
+    if(el) el.classList.remove('visible');
+    document.getElementById('footerMain').scrollIntoView({behavior:'smooth'});
+  }
+
+  // ─── ENTRANCE ANIMATION ───
+  const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.style.opacity='1';
+        e.target.style.transform='translateY(0)';
+      }
+    });
+  }, {threshold:0.1});
+  document.querySelectorAll('.service-card, .listing-card, .agent-card, .area-card, .test-card, .feature-item').forEach(el=>{
+    el.style.opacity='0';
+    el.style.transform='translateY(28px)';
+    el.style.transition='opacity 0.7s ease, transform 0.7s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
