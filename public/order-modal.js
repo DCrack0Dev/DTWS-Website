@@ -145,7 +145,7 @@ function updateTotalDisplay() {
 
 async function handleOrderSubmit(e) {
     e.preventDefault();
-    const user = await Auth.getUser();
+    const user = await window.getFirebaseUser();
     if (!user) {
         alert('Please login to place an order.');
         window.location.href = 'login.html';
@@ -159,7 +159,7 @@ async function handleOrderSubmit(e) {
 
     const formData = new FormData(e.target);
     const data = {
-        userId: user.$id,
+        userId: user.uid,
         service: currentOrder.serviceName,
         totalZar: currentOrder.total,
         paidAmount: Math.round(currentOrder.total / 2), // 50% initial
@@ -174,21 +174,16 @@ async function handleOrderSubmit(e) {
     };
 
     try {
-        // 1. Create order record in Appwrite
-        const orderDoc = await databases.createDocument(
-            APPWRITE_CONFIG.databaseId,
-            APPWRITE_CONFIG.collections.orders,
-            Appwrite.ID.unique(),
-            data
-        );
+        // 1. Create order record in Firestore
+        const orderRef = await window.db.collection('orders').add(data);
 
         // 2. Redirect to PayFast for 50% deposit
         if (window.redirectToPayFast) {
             const description = `${data.service} (50% Deposit)`;
-            window.redirectToPayFast(description, data.paid_amount, {
+            window.redirectToPayFast(description, data.paidAmount, {
                 name: data.customer_name,
                 email: data.customer_email,
-                m_payment_id: orderDoc.$id // Use Appwrite ID for tracking
+                m_payment_id: orderRef.id // Use Firestore ID for tracking
             });
         }
     } catch (err) {

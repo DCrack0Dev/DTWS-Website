@@ -22,10 +22,13 @@
         <li><a href="contact.html">Contact</a></li>
         <li id="nav-auth-link"><a href="login.html" class="nav-cta">Login</a></li>
       </ul>
-      <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
-      <script src="appwrite-config.js"></script>
-      <script src="nav-auth.js" defer></script>
-      <script src="currency.js" defer></script>
+      <!-- Firebase SDKs -->
+      <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+      <script src="/firebase-config.js"></script>
+      <script src="/nav-auth.js" defer></script>
+      <script src="/currency.js" defer></script>
       <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle theme" aria-pressed="false">
         <span class="theme-toggle-track" aria-hidden="true"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-label" data-theme-toggle-label>Light</span>
@@ -49,6 +52,7 @@
       <li><a href="pricing.html">Pricing</a></li>
       <li><a href="portfolio.html" class="active">Portfolio</a></li>
       <li><a href="contact.html">Contact</a></li>
+      <li id="mobile-nav-auth-link"><a href="login.html">Login</a></li>
       <li><a href="contact.html" class="mobile-cta">Get a Quote</a></li>
     </ul>
   </div>
@@ -75,9 +79,8 @@
 
       <!-- Card 1 -->
       <div class="project-card fade-up d1">
-        <div class="project-thumb" style="background:linear-gradient(135deg,#1a0e00,#3a1e00);">
-          🍽️
-          <span class="cs-badge">Coming Soon</span>
+        <div class="project-thumb" style="background: url('https://images.unsplash.com/photo-1516714435131-44d6b64dc6a2?auto=format&fit=crop&w=800&q=80') center/cover;">
+          <a href="SRK/index.html" class="view-project-overlay">View Website</a>
         </div>
         <div class="project-body">
           <div class="project-niche">Restaurant</div>
@@ -88,24 +91,25 @@
             <span class="ptag">Reservations</span>
             <span class="ptag">WhatsApp</span>
           </div>
+          <a href="SRK/index.html" class="project-link">View Project →</a>
         </div>
       </div>
 
       <!-- Card 2 -->
       <div class="project-card fade-up d2">
-        <div class="project-thumb" style="background:linear-gradient(135deg,#100020,#200040);">
-          💅
-          <span class="cs-badge">Coming Soon</span>
+        <div class="project-thumb" style="background: url('CTB/images/hero-bg.jpg') center/cover;">
+          <a href="CTB/index.html" class="view-project-overlay">View Website</a>
         </div>
         <div class="project-body">
           <div class="project-niche">Beauty & Salon</div>
-          <h3>Luxe Beauty Studio</h3>
-          <p>Elegant salon website with online appointment booking, service gallery, pricing menu, and Google Reviews integration.</p>
+          <h3>Crown The Barb</h3>
+          <p>Luxury barber studio website with artisan profiles, service gallery, and premium booking experience.</p>
           <div class="project-tags">
-            <span class="ptag">Booking System</span>
+            <span class="ptag">Luxury Branding</span>
             <span class="ptag">Gallery</span>
-            <span class="ptag">SEO</span>
+            <span class="ptag">Booking</span>
           </div>
+          <a href="CTB/index.html" class="project-link">View Project →</a>
         </div>
       </div>
 
@@ -129,9 +133,8 @@
 
       <!-- Card 4 -->
       <div class="project-card fade-up d1">
-        <div class="project-thumb" style="background:linear-gradient(135deg,#1a1200,#332400);">
-          🛍️
-          <span class="cs-badge">Coming Soon</span>
+        <div class="project-thumb" style="background: url('https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=800&q=80') center/cover;">
+          <a href="UT Clothing/index.html" class="view-project-overlay">View Website</a>
         </div>
         <div class="project-body">
           <div class="project-niche">Retail / E-commerce</div>
@@ -142,14 +145,14 @@
             <span class="ptag">PayFast</span>
             <span class="ptag">Inventory</span>
           </div>
+          <a href="UT Clothing/index.html" class="project-link">View Project →</a>
         </div>
       </div>
 
       <!-- Card 5 -->
       <div class="project-card fade-up d2">
-        <div class="project-thumb" style="background:linear-gradient(135deg,#0e1a00,#1c3400);">
-          🏠
-          <span class="cs-badge">Coming Soon</span>
+        <div class="project-thumb" style="background: url('PP Group/images/1.jpg') center/cover;">
+          <a href="PP Group/index.html" class="view-project-overlay">View Website</a>
         </div>
         <div class="project-body">
           <div class="project-niche">Real Estate</div>
@@ -160,6 +163,7 @@
             <span class="ptag">Google Maps</span>
             <span class="ptag">Search Filter</span>
           </div>
+          <a href="PP Group/index.html" class="project-link">View Project →</a>
         </div>
       </div>
 

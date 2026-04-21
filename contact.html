@@ -22,10 +22,13 @@
         <li><a href="contact.html" class="active">Contact</a></li>
         <li id="nav-auth-link"><a href="login.html" class="nav-cta">Login</a></li>
       </ul>
-      <script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
-      <script src="appwrite-config.js"></script>
-      <script src="nav-auth.js" defer></script>
-      <script src="currency.js" defer></script>
+      <!-- Firebase SDKs -->
+      <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+      <script src="/firebase-config.js"></script>
+      <script src="/nav-auth.js" defer></script>
+      <script src="/currency.js" defer></script>
       <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle theme" aria-pressed="false">
         <span class="theme-toggle-track" aria-hidden="true"><span class="theme-toggle-thumb"></span></span>
         <span class="theme-toggle-label" data-theme-toggle-label>Light</span>
@@ -49,6 +52,7 @@
       <li><a href="pricing.html">Pricing</a></li>
       <li><a href="portfolio.html">Portfolio</a></li>
       <li><a href="contact.html" class="active">Contact</a></li>
+      <li id="mobile-nav-auth-link"><a href="login.html">Login</a></li>
       <li><a href="contact.html" class="mobile-cta">Get a Quote</a></li>
     </ul>
   </div>
@@ -137,28 +141,28 @@
           <label for="service">Service Needed</label>
           <select id="service" name="service" required>
             <option value="">Select a service...</option>
-            <option data-price-min="1500" data-price-max="5000">Landing Page (R1,500 – R5,000)</option>
-            <option data-price-min="5000" data-price-max="15000">Business Website (R5,000 – R15,000)</option>
-            <option data-price-min="10000" data-price-max="40000">E-commerce Store (R10,000 – R40,000)</option>
-            <option data-price-min="10000" data-price-max="100000">Web App (R10,000 – R100,000)</option>
-            <option data-price-min="25000" data-price-max="250000">Mobile App (R25,000+)</option>
-            <option>SEO Services</option>
-            <option>Logo & Branding / UI Design</option>
-            <option>Digital Marketing / Social Media</option>
-            <option>Maintenance & Support</option>
-            <option>Not Sure — I Need Advice</option>
+            <option value="Landing Page">Landing Page</option>
+            <option value="Business Website">Business Website</option>
+            <option value="E-commerce Store">E-commerce Store</option>
+            <option value="Web Application">Web Application</option>
+            <option value="Mobile App">Mobile App</option>
+            <option value="SEO Services">SEO Services</option>
+            <option value="Logo & Branding">Logo & Branding / UI Design</option>
+            <option value="Digital Marketing">Digital Marketing / Social Media</option>
+            <option value="Maintenance">Maintenance & Support</option>
+            <option value="Consultation">Not Sure — I Need Advice</option>
           </select>
         </div>
         <div class="form-group">
           <label for="budget">Approximate Budget</label>
           <select id="budget" name="budget" required>
             <option value="">Select a budget range...</option>
-            <option data-budget-min="5000">Under R5,000</option>
-            <option data-budget-min="5000" data-budget-max="15000">R5,000 – R15,000</option>
-            <option data-budget-min="15000" data-budget-max="40000">R15,000 – R40,000</option>
-            <option data-budget-min="40000" data-budget-max="100000">R40,000 – R100,000</option>
-            <option data-budget-max="100000">R100,000+</option>
-            <option value="">Not Sure Yet</option>
+            <option value="Under R5,000">Under R5,000</option>
+            <option value="R5,000 – R15,000">R5,000 – R15,000</option>
+            <option value="R15,000 – R40,000">R15,000 – R40,000</option>
+            <option value="R40,000 – R100,000">R40,000 – R100,000</option>
+            <option value="Over R100,000">R100,000+</option>
+            <option value="Not Sure">Not Sure Yet</option>
           </select>
         </div>
         <div class="form-group">
@@ -338,21 +342,52 @@
     // WhatsApp link
     const waUrl = `https://wa.me/27650241517?text=${encodeURIComponent(receipt)}`;
     
+    // Save to Firestore for Admin Dashboard
+    const saveToFirestore = async () => {
+        if (window.db) {
+            try {
+                await window.db.collection('support_tickets').add({
+                    name,
+                    phone,
+                    email,
+                    service,
+                    budget,
+                    message,
+                    status: 'new',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                console.log("Ticket saved to Firestore");
+                return true;
+            } catch (e) {
+                console.error("Firestore save failed:", e);
+                return false;
+            }
+        } else {
+            console.error("Firestore database not initialized");
+            return false;
+        }
+    };
+
     // Show feedback state
     btn.textContent = '⌛ Sending...';
     btn.disabled = true;
   
-    // Submit to Formspree via AJAX (Works on Vercel)
-    fetch(this.action, {
-      method: "POST",
-      body: formData,
-      headers: {
-        'Accept': 'application/json'
-      }
-    })
-    .then(response => {
-      console.log('Formspree response:', response);
-      if (response.ok) {
+    // Submit to Formspree and Firestore
+    const firestorePromise = saveToFirestore();
+    const formspreePromise = fetch(this.action, {
+        method: "POST",
+        body: formData,
+        headers: { 'Accept': 'application/json' }
+    });
+
+    Promise.allSettled([formspreePromise, firestorePromise])
+    .then(results => {
+      const formspreeResult = results[0];
+      const firestoreResult = results[1];
+
+      console.log('Submission results:', { formspreeResult, firestoreResult });
+
+      if (formspreeResult.status === 'fulfilled' && formspreeResult.value.ok) {
         // Success
         btn.textContent = '✅ Request Sent!';
         btn.style.background = '#2a7a2a';
@@ -369,16 +404,16 @@
           this.reset();
         }, 5000);
       } else {
-        // Formspree error - fallback to WhatsApp only
-        console.error('Formspree error:', response.statusText);
+        // Fallback to WhatsApp only if Formspree fails
+        console.warn('Formspree failed, falling back to WhatsApp');
         window.open(waUrl, '_blank');
         btn.textContent = '✅ WhatsApp Opened!';
         btn.disabled = false;
       }
     })
     .catch((error) => {
-      // Network error - fallback to WhatsApp only
-      console.error('Fetch error:', error);
+      // General error fallback
+      console.error('Submission error:', error);
       window.open(waUrl, '_blank');
       btn.textContent = '✅ WhatsApp Opened!';
       btn.disabled = false;

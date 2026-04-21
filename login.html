@@ -5,8 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Login – DemiTech Web Services</title>
 <link rel="stylesheet" href="style.css"/>
-<script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
-<script src="appwrite-config.js" defer></script>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="/firebase-config.js"></script>
+<style>
+    /* Mobile Responsive Fixes */
+    @media (max-width: 768px) {
+      .auth-container {
+        padding: 2rem;
+        margin: 1rem;
+        width: calc(100% - 2rem);
+      }
+      .section-title {
+        font-size: 2rem;
+      }
+      .btn-full {
+        padding: 12px;
+      }
+    }
+  </style>
 </head>
 <body class="auth-page">
 
@@ -35,7 +54,7 @@
     <h1 class="section-title">Client <span class="gold">Portal</span></h1>
     <div class="divider"></div>
     
-    <form id="loginForm" class="auth-form">
+    <form id="loginForm" class="auth-form" method="POST">
       <div class="form-group">
         <label for="login-email">Email Address</label>
         <input type="email" id="login-email" name="email" placeholder="you@example.com" required/>
@@ -53,9 +72,22 @@
 </section>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const loginForm = document.getElementById('loginForm');
     const errorMsg = document.getElementById('login-error');
+
+    // Use global Firebase from firebase-config.js
+    if (typeof firebase === 'undefined') {
+        console.error("Firebase SDK failed to load or firebase-config.js is missing.");
+        return;
+    }
+
+    // Redirect if already logged in
+    const user = await window.getFirebaseUser();
+    if (user) {
+        window.location.href = user.role === 'admin' ? 'admin.html' : 'dashboard.html';
+        return;
+    }
 
     loginForm.onsubmit = async (e) => {
         e.preventDefault();
@@ -63,15 +95,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = loginForm.password.value;
         
         try {
-            await Auth.login(email, password);
-            const user = await Auth.getUser();
-            if (user.role === 'admin') {
-                window.location.href = 'admin.html';
+            // Verify initialization
+            if (!window.auth) throw new Error("Authentication service unavailable.");
+
+            // Login using Firebase Auth
+            await window.auth.signInWithEmailAndPassword(email, password);
+            const currentUser = await window.getFirebaseUser();
+            
+            if (currentUser) {
+                if (currentUser.role === 'admin') {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
             } else {
-                window.location.href = 'dashboard.html';
+                throw new Error("Could not retrieve account details.");
             }
         } catch (error) {
             errorMsg.style.display = 'block';
+            errorMsg.textContent = "Invalid email or password. Please try again.";
             console.error('Login error:', error);
         }
     };

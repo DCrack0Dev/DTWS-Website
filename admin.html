@@ -5,139 +5,658 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Admin Dashboard – DemiTech Web Services</title>
 <link rel="stylesheet" href="style.css"/>
-<script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
-<script src="appwrite-config.js"></script>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="/firebase-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root {
+    --bg-dark: #0a0a0a;
+    --card-bg: #141414;
+    --gold: #D4A017;
+    --gold-dim: #a67c12;
+    --text-main: #ffffff;
+    --text-muted: #888888;
+    --border: rgba(255, 255, 255, 0.1);
+  }
+
+  body.admin-dashboard {
+    background: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+  }
+
+  .dash-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+  }
+
+  /* Mobile Responsive Styles */
+  @media (max-width: 992px) {
+    .dash-layout {
+      grid-template-columns: 1fr;
+    }
+    
+    .dash-sidebar {
+      height: auto;
+      position: relative;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem;
+    }
+
+    .sidebar-nav ul {
+      margin-top: 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .sidebar-nav li {
+      margin-bottom: 0;
+    }
+
+    .sidebar-nav a {
+      padding: 8px 12px;
+      font-size: 0.85rem;
+    }
+
+    .dash-main {
+      padding: 1.5rem;
+    }
+
+    .dash-stat-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dash-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .admin-table thead {
+      display: none;
+    }
+
+    .admin-table td {
+      display: block;
+      padding: 0.5rem 0;
+      border-bottom: none;
+    }
+
+    .admin-table td::before {
+      content: attr(data-label);
+      font-weight: 600;
+      color: var(--text-muted);
+      display: block;
+      font-size: 0.75rem;
+      margin-bottom: 2px;
+    }
+
+    .admin-table tr {
+      display: block;
+      padding: 1.5rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .dash-stat-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .sidebar-nav ul {
+      justify-content: center;
+    }
+  }
+
+  /* Sidebar Styles */
+  .dash-sidebar {
+    background: #000;
+    border-right: 1px solid var(--border);
+    padding: 2rem;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    box-sizing: border-box;
+  }
+
+  .sidebar-nav ul {
+    padding: 0;
+    margin-top: 3rem;
+  }
+
+  .sidebar-nav li {
+    margin-bottom: 0.5rem;
+  }
+
+  .sidebar-nav a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: 0.2s;
+  }
+
+  .sidebar-nav a:hover, .sidebar-nav a.active {
+    background: rgba(212, 160, 23, 0.1);
+    color: var(--gold);
+  }
+
+  /* Main Content */
+  .dash-main {
+    padding: 3rem;
+  }
+
+  .dash-header h2 {
+    font-size: 2rem;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+  }
+
+  /* Stats Grid */
+  .dash-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .stat-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    border-radius: 12px;
+  }
+
+  .stat-card h5 {
+    color: var(--text-muted);
+    margin: 0 0 10px 0;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .stat-card .val {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  /* Tables & Cards */
+  .dash-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+  }
+
+  .dash-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+  }
+
+  .dash-card h4 {
+    margin: 0 0 2rem 0;
+    font-size: 1.2rem;
+  }
+
+  /* Custom Table */
+  .admin-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .admin-table th {
+    text-align: left;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .admin-table td {
+    padding: 1.2rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+  }
+
+  .status-pill {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+  }
+
+  .status-pending { background: rgba(212, 160, 23, 0.15); color: #D4A017; }
+  .status-active { background: rgba(0, 150, 255, 0.15); color: #0096ff; }
+  .status-completed { background: rgba(0, 255, 100, 0.15); color: #00ff64; }
+
+  .action-btn {
+    background: none;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 4px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: 0.2s;
+  }
+
+  .action-btn:hover {
+    background: var(--gold);
+    color: #000;
+  }
+
+  /* Tabs */
+  .view-section { display: none; }
+  .view-section.active { display: block; }
+
+  /* ORDER DETAIL MODAL */
+  #orderModal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  #orderModal .dash-card {
+    max-width: 600px;
+    width: 100%;
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  @media (max-width: 600px) {
+    #orderModal {
+      padding: 10px;
+    }
+    #orderModal .dash-card {
+      padding: 1.5rem;
+    }
+  }
+
+  #orderModal button.close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+</style>
 </head>
 <body class="dashboard-page admin-dashboard">
 
 <div class="dash-layout">
   <aside class="dash-sidebar">
     <div class="sidebar-header">
-      <img src="demitech-logo.svg" alt="DemiTech Logo" style="height:40px; margin-bottom:2rem;"/>
+      <h3 style="color:var(--gold); margin:0;">DemiTech<span style="color:#fff;">Admin</span></h3>
     </div>
     <nav class="sidebar-nav">
       <ul style="list-style:none;">
-        <li style="margin-bottom:1rem;"><a href="#" class="active" style="color:var(--gold);">📈 Admin Stats</a></li>
-        <li style="margin-bottom:1rem;"><a href="#" style="color:var(--muted);">📁 All Orders</a></li>
-        <li style="margin-bottom:1rem;"><a href="#" style="color:var(--muted);">👤 Customers</a></li>
-        <li style="margin-top:4rem;"><a href="#" onclick="Auth.logout()" style="color:#ff6b6b;">🚪 Logout</a></li>
+        <li><a href="#" onclick="showSection('stats')" class="nav-item active" id="nav-stats">📊 Dashboard</a></li>
+        <li><a href="#" onclick="showSection('orders')" class="nav-item" id="nav-orders">📁 Order Management</a></li>
+        <li><a href="#" onclick="showSection('inbox')" class="nav-item" id="nav-inbox">📬 Support Inbox</a></li>
+        <li><a href="#" onclick="showSection('customers')" class="nav-item" id="nav-customers">👤 Customer List</a></li>
+        <li style="margin-top:4rem;"><a href="#" onclick="window.logoutFirebaseUser()" style="color:#ff6b6b;">🚪 Logout</a></li>
       </ul>
     </nav>
   </aside>
 
   <main class="dash-main">
-    <header class="dash-header">
-      <h2>Admin Control Panel</h2>
-      <p style="color:var(--muted);">Manage your business performance and client projects.</p>
-    </header>
+    <!-- STATS SECTION -->
+    <section id="section-stats" class="view-section active">
+      <header class="dash-header">
+        <h2>Business Insights</h2>
+        <p style="color:var(--text-muted);">Overview of revenue and platform growth.</p>
+      </header>
 
-    <div class="dash-stat-grid" style="margin-top:2rem;">
-      <div class="stat-card">
-        <h5>Total Revenue</h5>
-        <div class="val" id="total-revenue">R0</div>
-      </div>
-      <div class="stat-card">
-        <h5>Pending Orders</h5>
-        <div class="val" id="pending-orders">0</div>
-      </div>
-      <div class="stat-card">
-        <h5>Conversion Rate</h5>
-        <div class="val" id="conv-rate">0%</div>
-      </div>
-    </div>
-
-    <div class="dash-grid">
-      <div class="dash-card">
-        <h4 style="font-family:var(--font-head); margin-bottom:1.5rem;">Revenue Overview</h4>
-        <canvas id="revenueChart" height="150"></canvas>
-      </div>
-      <div class="dash-card">
-        <h4 style="font-family:var(--font-head); margin-bottom:1.5rem;">Recent Orders</h4>
-        <div id="admin-order-list" class="order-list">
-          <!-- Orders loaded via JS -->
+      <div class="dash-stat-grid" style="margin-top:2.5rem;">
+        <div class="stat-card">
+          <h5>Total Revenue</h5>
+          <div class="val" id="stat-total-revenue">R0</div>
+        </div>
+        <div class="stat-card">
+          <h5>Active Orders</h5>
+          <div class="val" id="stat-active-orders">0</div>
+        </div>
+        <div class="stat-card">
+          <h5>Unread Tickets</h5>
+          <div class="val" id="stat-unread-tickets">0</div>
+        </div>
+        <div class="stat-card">
+          <h5>Total Clients</h5>
+          <div class="val" id="stat-total-clients">0</div>
         </div>
       </div>
-    </div>
+
+      <div class="dash-grid">
+        <div class="dash-card">
+          <h4>Revenue Growth</h4>
+          <canvas id="revenueChart" height="120"></canvas>
+        </div>
+        <div class="dash-card">
+          <h4>Quick Actions</h4>
+          <div style="display:grid; gap:10px;">
+            <button class="action-btn" style="width:100%; padding:12px;" onclick="showSection('orders')">Manage Recent Orders</button>
+            <button class="action-btn" style="width:100%; padding:12px;" onclick="showSection('inbox')">Check Support Inbox</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ORDERS SECTION -->
+    <section id="section-orders" class="view-section">
+      <header class="dash-header">
+        <h2>Order Management</h2>
+        <p style="color:var(--text-muted);">Track and update client project statuses.</p>
+      </header>
+      
+      <div class="dash-card" style="margin-top:2.5rem;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>CLIENT</th>
+              <th>SERVICE</th>
+              <th>MILESTONE</th>
+              <th>STATUS</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody id="admin-orders-body">
+            <!-- Loaded via JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- INBOX SECTION -->
+    <section id="section-inbox" class="view-section">
+      <header class="dash-header">
+        <h2>Support Inbox</h2>
+        <p style="color:var(--text-muted);">View messages from the contact form.</p>
+      </header>
+      
+      <div class="dash-card" style="margin-top:2.5rem;">
+        <div id="inbox-list" style="display:grid; gap:1.5rem;">
+          <!-- Loaded via JS -->
+          <p style="color:var(--text-muted); text-align:center;">No messages in inbox.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CUSTOMERS SECTION -->
+    <section id="section-customers" class="view-section">
+      <header class="dash-header">
+        <h2>Client Base</h2>
+        <p style="color:var(--text-muted);">View all registered users on the platform.</p>
+      </header>
+      
+      <div class="dash-card" style="margin-top:2.5rem;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>NAME</th>
+              <th>EMAIL</th>
+              <th>JOINED</th>
+              <th>ROLE</th>
+            </tr>
+          </thead>
+          <tbody id="admin-customers-body">
+            <!-- Loaded via JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
   </main>
 </div>
 
+<!-- ORDER DETAIL MODAL -->
+<div id="orderModal">
+  <div class="dash-card">
+    <button onclick="closeOrderModal()" class="close-btn">&times;</button>
+    <h3 id="modal-service-name" class="gold">Project Details</h3>
+    <div id="modal-content" style="margin-top:1.5rem; line-height:1.6;">
+      <!-- Filled by JS -->
+    </div>
+    <div style="margin-top:2rem; border-top:1px solid var(--border); padding-top:1.5rem;">
+      <label style="display:block; margin-bottom:8px; font-size:0.85rem; color:var(--text-muted);">Update Milestone</label>
+      <div style="display:flex; gap:10px;">
+        <select id="update-milestone-val" class="action-btn" style="background:#000; color:#fff; flex:1;">
+          <option value="1">Milestone 1 (50% Paid)</option>
+          <option value="2">Milestone 2 (Development)</option>
+          <option value="3">Milestone 3 (Review)</option>
+          <option value="4">Milestone 4 (Completed)</option>
+        </select>
+        <button id="save-milestone-btn" class="action-btn" style="background:var(--gold); color:#000;">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
+let revenueChart = null;
+let currentViewingOrderId = null;
+
+function showSection(sectionId) {
+    document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    
+    document.getElementById(`section-${sectionId}`).classList.add('active');
+    document.getElementById(`nav-${sectionId}`).classList.add('active');
+}
+
+function openOrderModal(id, service, details) {
+    currentViewingOrderId = id;
+    document.getElementById('modal-service-name').textContent = service;
+    document.getElementById('modal-content').innerHTML = details;
+    document.getElementById('orderModal').style.display = 'flex';
+}
+
+function closeOrderModal() {
+    document.getElementById('orderModal').style.display = 'none';
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
-    const user = await Auth.getUser();
+    const user = await window.getFirebaseUser();
     if (!user || user.role !== 'admin') {
         window.location.href = 'login.html';
         return;
     }
 
-    // Load Admin Stats & Chart
-    loadAdminData();
+    // Modal save button
+    document.getElementById('save-milestone-btn').onclick = async () => {
+        const val = parseInt(document.getElementById('update-milestone-val').value);
+        if (currentViewingOrderId) {
+            await updateMilestone(currentViewingOrderId, val);
+            closeOrderModal();
+        }
+    };
+
+    // Load initial data
+    loadAllAdminData();
 });
 
-async function loadAdminData() {
+async function loadAllAdminData() {
     try {
-        const response = await databases.listDocuments(
-            APPWRITE_CONFIG.databaseId,
-            APPWRITE_CONFIG.collections.orders,
-            [ Appwrite.Query.limit(10), Appwrite.Query.orderDesc('$createdAt') ]
-        );
-
-        const list = document.getElementById('admin-order-list');
-        list.innerHTML = '';
+        // 1. Fetch Orders
+        const ordersSnapshot = await window.db.collection('orders').orderBy('orderDate', 'desc').get();
+        const ordersBody = document.getElementById('admin-orders-body');
+        ordersBody.innerHTML = '';
         
-        let revenue = 0;
-        let pendingCount = 0;
+        let totalRevenue = 0;
+        let activeOrders = 0;
 
-        response.documents.forEach(doc => {
-            if (doc.orderStatus === 'pending') pendingCount++;
-            revenue += doc.paidAmount || 0;
+        ordersSnapshot.forEach(doc => {
+            const data = doc.data();
+            totalRevenue += data.paidAmount || 0;
+            if (data.orderStatus === 'active') activeOrders++;
 
-            const card = document.createElement('div');
-            card.className = 'order-card';
-            card.innerHTML = `
-                <div class="order-info">
-                    <h4>${doc.service}</h4>
-                    <p>${doc.customer_name} · ${new Date(doc.orderDate || doc.$createdAt).toLocaleDateString()}</p>
-                </div>
-                <div style="text-align:right;">
-                    <span class="order-status status-pending">${doc.orderStatus}</span>
-                    <button onclick="updateOrderStatus('${doc.$id}', 'active')" class="btn btn-gold" style="padding:0.2rem 0.6rem; font-size:0.6rem; margin-top:0.4rem; display:block;">Activate</button>
-                </div>
+            const details = `
+                <p><strong>Customer:</strong> ${data.customer_name}</p>
+                <p><strong>Email:</strong> ${data.customer_email}</p>
+                <p><strong>Business:</strong> ${data.business_name || 'N/A'}</p>
+                <p><strong>Description:</strong> ${data.business_desc || 'No description provided.'}</p>
+                <p><strong>Options:</strong> ${data.options || 'None'}</p>
+                <p><strong>Total Price:</strong> R${(data.totalZar || 0).toLocaleString()}</p>
+                <p><strong>Paid Amount:</strong> R${(data.paidAmount || 0).toLocaleString()}</p>
             `;
-            list.appendChild(card);
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td data-label="CLIENT">
+                  <div style="font-weight:600;">${data.customer_name}</div>
+                  <div style="font-size:0.75rem; color:var(--text-muted);">${data.business_name || ''}</div>
+                </td>
+                <td data-label="SERVICE">${data.service}</td>
+                <td data-label="MILESTONE"><span class="gold">Phase ${data.milestone || 1}</span></td>
+                <td data-label="STATUS"><span class="status-pill status-${data.orderStatus}">${data.orderStatus}</span></td>
+                <td data-label="ACTIONS">
+                  <button onclick="openOrderModal('${doc.id}', '${data.service}', \`${details.replace(/"/g, '&quot;')}\`)" class="action-btn">Details</button>
+                  ${data.orderStatus === 'pending' ? `<button onclick="updateStatus('${doc.id}', 'active')" class="action-btn" style="border-color:#00ff64; color:#00ff64;">Activate</button>` : ''}
+                </td>
+            `;
+            ordersBody.appendChild(tr);
         });
 
-        document.getElementById('total-revenue').textContent = `R${revenue.toLocaleString()}`;
-        document.getElementById('pending-orders').textContent = pendingCount;
+        // 2. Fetch Support Tickets
+        const ticketsSnapshot = await window.db.collection('support_tickets').orderBy('createdAt', 'desc').limit(20).get();
+        const inboxList = document.getElementById('inbox-list');
+        inboxList.innerHTML = '';
+        let unreadCount = 0;
 
-        // Simple Chart.js implementation
-        const ctx = document.getElementById('revenueChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                datasets: [{
-                    label: 'Monthly Revenue',
-                    data: [12000, 19000, 3000, 5000, 20000, 30000],
-                    borderColor: '#D4A017',
-                    tension: 0.4,
-                    fill: false
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
-                    x: { grid: { display: false } }
-                },
-                plugins: { legend: { display: false } }
-            }
+        if (ticketsSnapshot.empty) {
+            inboxList.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding:2rem;">No messages in inbox.</p>';
+        } else {
+            ticketsSnapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.status === 'new') unreadCount++;
+                
+                const card = document.createElement('div');
+                card.style = "background:rgba(255,255,255,0.03); padding:1.5rem; border-radius:8px; margin-bottom:1rem; border-left:4px solid " + (data.status === 'new' ? 'var(--gold)' : 'rgba(255,255,255,0.1)');
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px; flex-wrap:wrap; gap:10px;">
+                        <span style="font-weight:600;">${data.name} <small style="color:var(--text-muted); font-weight:400;">(${data.email})</small></span>
+                        <span style="font-size:0.7rem; color:var(--text-muted);">${data.createdAt ? data.createdAt.toDate().toLocaleString() : 'Just now'}</span>
+                    </div>
+                    <div style="font-size:0.85rem; color:var(--gold); margin-bottom:8px;">Subject: ${data.service} | Budget: ${data.budget}</div>
+                    <p style="font-size:0.9rem; margin:0; color:#ddd; line-height:1.5;">${data.message}</p>
+                    <div style="margin-top:1.5rem; text-align:right; display:flex; gap:10px; justify-content:flex-end;">
+                        ${data.status === 'new' ? `<button onclick="updateTicketStatus('${doc.id}', 'read')" class="action-btn" style="font-size:0.7rem; border-color:#00ff64; color:#00ff64;">Mark as Read</button>` : '<span style="font-size:0.7rem; color:var(--text-muted); align-self:center;">Seen</span>'}
+                        <a href="mailto:${data.email}?subject=Re: DemiTech Quote Request - ${data.service}" class="action-btn" style="font-size:0.7rem; text-decoration:none;">Reply via Email</a>
+                    </div>
+                `;
+                inboxList.appendChild(card);
+            });
+        }
+
+        // 3. Fetch Customers
+        const usersSnapshot = await window.db.collection('profiles').get();
+        const customersBody = document.getElementById('admin-customers-body');
+        customersBody.innerHTML = '';
+        
+        usersSnapshot.forEach(doc => {
+            const data = doc.data();
+            const tr = document.createElement('tr');
+            const joinedDate = data.createdAt ? data.createdAt.toDate().toLocaleDateString() : 'N/A';
+            
+            tr.innerHTML = `
+                <td data-label="NAME">${data.nickname || 'Unknown'}</td>
+                <td data-label="EMAIL">${data.email || 'N/A'}</td>
+                <td data-label="JOINED">${joinedDate}</td>
+                <td data-label="ROLE" style="color:var(--gold);">${data.role}</td>
+            `;
+            customersBody.appendChild(tr);
         });
+
+        // Update Stats
+        document.getElementById('stat-total-revenue').textContent = `R${totalRevenue.toLocaleString()}`;
+        document.getElementById('stat-active-orders').textContent = activeOrders;
+        document.getElementById('stat-unread-tickets').textContent = unreadCount;
+        document.getElementById('stat-total-clients').textContent = usersSnapshot.size;
+
+        initRevenueChart();
+
     } catch (error) {
-        console.error('Admin data failed:', error);
+        console.error("Admin data load failed:", error);
     }
 }
-</script>
 
+async function updateStatus(orderId, newStatus) {
+    try {
+        await window.db.collection('orders').doc(orderId).update({ orderStatus: newStatus });
+        loadAllAdminData();
+    } catch (error) {
+        alert("Failed to update status: " + error.message);
+    }
+}
+
+async function updateMilestone(orderId, milestone) {
+    try {
+        const updateData = { milestone: milestone };
+        if (milestone === 4) updateData.orderStatus = 'completed';
+        
+        await window.db.collection('orders').doc(orderId).update(updateData);
+        loadAllAdminData();
+    } catch (error) {
+        alert("Failed to update milestone: " + error.message);
+    }
+}
+
+async function updateTicketStatus(ticketId, status) {
+    try {
+        await window.db.collection('support_tickets').doc(ticketId).update({ status: status });
+        loadAllAdminData();
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+function initRevenueChart() {
+    if (revenueChart) revenueChart.destroy();
+    
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    revenueChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'],
+            datasets: [{
+                label: 'Revenue (ZAR)',
+                data: [5000, 12000, 8500, 24000, 32000],
+                borderColor: '#D4A017',
+                backgroundColor: 'rgba(212, 160, 23, 0.1)',
+                borderWidth: 3,
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888' } },
+                x: { grid: { display: false }, ticks: { color: '#888' } }
+            }
+        }
+    });
+}
+</script>
 </body>
 </html>

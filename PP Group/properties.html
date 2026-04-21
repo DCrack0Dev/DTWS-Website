@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Properties | PP GROUP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+<style>
+  :root {
+    --gold: #c9a84c; --gold-light: #e8c97a; --gold-dark: #9a7530;
+    --black: #080808; --dark: #0f0f0f; --dark2: #161616; --dark3: #1e1e1e;
+    --mid: #2a2a2a; --light: #f5f0e8; --white: #fdfaf4; --muted: #888;
+    --serif: 'Cormorant Garamond', serif; --sans: 'Montserrat', sans-serif; --display: 'Playfair Display', serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; font-size: 16px; }
+  body { background: var(--black); color: var(--white); font-family: var(--sans); font-weight: 300; overflow-x: hidden; }
+
+  /* Shared UI Elements */
+  .cursor { position: fixed; width: 8px; height: 8px; background: var(--gold); border-radius: 50%; pointer-events: none; z-index: 100000; transform: translate(-50%,-50%); transition: width 0.3s, height 0.3s, background 0.3s; opacity: 0; }
+  .cursor-ring { position: fixed; width: 40px; height: 40px; border: 1.5px solid var(--gold); border-radius: 50%; pointer-events: none; z-index: 99999; transform: translate(-50%,-50%); transition: width 0.3s, height 0.3s, border-color 0.3s, opacity 0.3s; opacity: 0; }
+  .cursor.active, .cursor-ring.active { opacity: 1; }
+  .cursor.hover { width: 12px; height: 12px; background: var(--white); }
+  .cursor-ring.hover { width: 60px; height: 60px; border-color: var(--white); opacity: 0.8; }
+  @media (pointer: fine) { body, a, button, select, .listing-card, .area-card { cursor: none; } }
+
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 22px 60px; background: rgba(8,8,8,0.97); border-bottom: 1px solid rgba(201,168,76,0.1); backdrop-filter: blur(20px); }
+  .logo-with-icon {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    perspective: 1000px;
+  }
+  .logo-icon-container {
+    width: 40px;
+    height: 40px;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: logoPulse 3s ease-in-out infinite;
+  }
+  .house-svg {
+    width: 32px;
+    height: 32px;
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .door-path {
+    fill: var(--gold);
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: left;
+  }
+  .logo-with-icon:hover .door-path {
+    transform: rotateY(-110deg);
+  }
+  @keyframes logoPulse {
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(201,168,76,0)); }
+    50% { transform: scale(1.05); filter: drop-shadow(0 0 8px rgba(201,168,76,0.3)); }
+  }
+  .nav-logo { display: flex; flex-direction: column; line-height: 1; }
+  .nav-logo span:first-child { font-family: var(--serif); font-size: 1.6rem; font-weight: 600; letter-spacing: 0.12em; color: var(--gold); }
+  .nav-logo span:last-child { font-family: var(--sans); font-size: 0.55rem; letter-spacing: 0.35em; color: var(--muted); text-transform: uppercase; margin-top: 3px; }
+  .nav-links { display: flex; gap: 38px; list-style: none; }
+  .nav-links a { font-family: var(--sans); font-size: 0.7rem; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(253,250,244,0.75); text-decoration: none; position: relative; transition: color 0.3s; }
+  .nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px; background: var(--gold); transition: width 0.3s; }
+  .nav-links a:hover, .nav-links a.active { color: var(--gold); }
+  .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+  .nav-cta { font-family: var(--sans); font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--black); background: var(--gold); border: none; padding: 11px 26px; font-weight: 500; text-decoration: none; }
+
+  /* Properties Content */
+  section { padding: 140px 60px 100px; }
+  .section-eyebrow { font-family: var(--sans); font-size: 0.6rem; letter-spacing: 0.38em; text-transform: uppercase; color: var(--gold); display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+  .section-eyebrow::before { content: ''; width: 30px; height: 1px; background: var(--gold); }
+  .section-title { font-family: var(--display); font-size: clamp(2rem, 4vw, 3.4rem); font-weight: 400; line-height: 1.15; color: var(--white); margin-bottom: 20px; }
+  .section-title em { font-style: italic; color: var(--gold); }
+
+  /* Search bar */
+  .search-section { background: var(--dark2); border-top: 1px solid rgba(201,168,76,0.15); border-bottom: 1px solid rgba(201,168,76,0.15); padding: 36px 60px; display: flex; align-items: center; gap: 0; margin-top: -40px; }
+  .search-label { font-family: var(--serif); font-size: 0.85rem; letter-spacing: 0.18em; color: var(--gold); white-space: nowrap; margin-right: 40px; text-transform: uppercase; }
+  .search-input-wrap { flex: 1; display: flex; align-items: center; border-bottom: 1px solid rgba(201,168,76,0.3); padding-bottom: 10px; gap: 14px; }
+  .search-input { flex: 1; background: none; border: none; font-family: var(--sans); font-size: 0.8rem; color: var(--white); outline: none; }
+  .filter-select { background: none; border: none; border-left: 1px solid rgba(201,168,76,0.2); color: rgba(253,250,244,0.65); font-family: var(--sans); font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; padding: 0 22px; appearance: none; outline: none; }
+  .search-btn { background: var(--gold); border: none; color: var(--black); font-family: var(--sans); font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase; padding: 14px 32px; font-weight: 500; transition: background 0.3s; }
+  .search-btn:hover { background: var(--gold-light); }
+
+  /* Listings Grid */
+  .listings-tabs { display: flex; gap: 0; border-bottom: 1px solid rgba(201,168,76,0.15); margin-bottom: 50px; }
+  .tab-btn { font-family: var(--sans); font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); background: none; border: none; padding: 16px 32px; transition: color 0.3s; position: relative; }
+  .tab-btn::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background: var(--gold); transform: scaleX(0); transition: transform 0.3s; }
+  .tab-btn.active { color: var(--gold); }
+  .tab-btn.active::after { transform: scaleX(1); }
+  .listings-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .listing-card { background: var(--dark2); overflow: hidden; border: 1px solid rgba(201,168,76,0.07); transition: transform 0.4s; }
+  .listing-card:hover { transform: translateY(-6px); box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+  .listing-img { height: 220px; overflow: hidden; position: relative; }
+  .listing-fake-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s; }
+  .listing-card:hover .listing-fake-img { transform: scale(1.05); }
+  .listing-img-tag { position: absolute; top: 14px; left: 14px; font-family: var(--sans); font-size: 0.52rem; letter-spacing: 0.22em; text-transform: uppercase; background: var(--gold); color: var(--black); padding: 4px 10px; font-weight: 500; }
+  .listing-body { padding: 24px; }
+  .listing-name { font-family: var(--serif); font-size: 1.15rem; font-weight: 400; color: var(--white); margin-bottom: 6px; }
+  .listing-loc { font-family: var(--sans); font-size: 0.6rem; color: var(--muted); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 16px; }
+  .listing-meta { display: flex; gap: 16px; border-top: 1px solid rgba(201,168,76,0.1); padding-top: 16px; margin-bottom: 16px; }
+  .listing-meta-item { font-family: var(--sans); font-size: 0.62rem; color: rgba(253,250,244,0.55); }
+  .listing-footer { display: flex; justify-content: space-between; align-items: center; }
+  .listing-price { font-family: var(--serif); font-size: 1.4rem; color: var(--gold); font-weight: 300; }
+  .listing-cta { font-family: var(--sans); font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--black); background: var(--gold); border: none; padding: 10px 20px; font-weight: 500; }
+
+  /* Areas */
+  #areas { background: var(--dark); padding-top: 80px; }
+  .areas-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; margin-top: 50px; }
+  .area-card { position: relative; overflow: hidden; aspect-ratio: 3/4; background: var(--dark2); }
+  .area-fake-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s; }
+  .area-card:hover .area-fake-img { transform: scale(1.08); }
+  .area-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(8,8,8,0.85) 0%, transparent 60%); display: flex; flex-direction: column; justify-content: flex-end; padding: 22px; }
+  .area-name { font-family: var(--serif); font-size: 1.1rem; color: var(--white); margin-bottom: 4px; }
+  .area-count { font-family: var(--sans); font-size: 0.58rem; color: var(--gold); letter-spacing: 0.18em; text-transform: uppercase; }
+
+  /* Modals & Shared */
+  .prop-modal-overlay { position: fixed; inset: 0; background: rgba(8,8,8,0.95); z-index: 9000; display: none; overflow-y: auto; padding: 40px 20px; }
+  .prop-modal-overlay.open { display: block; }
+  .prop-modal { background: var(--dark2); border: 1px solid rgba(201,168,76,0.15); max-width: 900px; margin: 0 auto; position: relative; }
+  .prop-modal-close { position: absolute; top: 20px; right: 24px; background: none; border: none; color: var(--muted); font-size: 1.2rem; }
+  .prop-modal-img { width: 100%; height: 360px; position: relative; overflow: hidden; }
+  .prop-modal-img img { width: 100%; height: 100%; object-fit: cover; }
+  .prop-modal-tag { position: absolute; top: 24px; left: 24px; font-family: var(--sans); font-size: 0.58rem; letter-spacing: 0.22em; text-transform: uppercase; background: var(--gold); color: var(--black); padding: 6px 16px; font-weight: 500; }
+  .prop-modal-body { padding: 44px 50px; }
+  .prop-modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; }
+  .prop-modal-title { font-family: var(--display); font-size: 2rem; color: var(--white); }
+  .prop-modal-price { font-family: var(--serif); font-size: 2.2rem; color: var(--gold); font-weight: 300; }
+  .prop-modal-specs { display: flex; gap: 30px; border-top: 1px solid rgba(201,168,76,0.12); border-bottom: 1px solid rgba(201,168,76,0.12); padding: 22px 0; margin-bottom: 28px; }
+  .prop-spec-val { font-family: var(--serif); font-size: 1.4rem; color: var(--white); }
+  .prop-spec-key { font-family: var(--sans); font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+  .prop-modal-desc { font-family: var(--sans); font-size: 0.78rem; line-height: 1.9; color: rgba(253,250,244,0.6); margin-bottom: 36px; }
+
+  footer { background: #050505; padding: 80px 60px 20px; border-top: 1px solid rgba(201,168,76,0.12); }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 60px; padding-bottom: 60px; border-bottom: 1px solid rgba(201,168,76,0.08); }
+  .footer-logo span:first-child { font-family: var(--serif); font-size: 2rem; font-weight: 600; color: var(--gold); }
+  .footer-logo span:last-child { display: block; font-family: var(--sans); font-size: 0.52rem; letter-spacing: 0.35em; color: var(--muted); text-transform: uppercase; margin: 4px 0 22px; }
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .footer-links a { font-family: var(--sans); font-size: 0.7rem; color: rgba(253,250,244,0.45); text-decoration: none; }
+  .footer-links a:hover { color: var(--gold); }
+  .toast { position: fixed; bottom: 40px; right: 40px; background: var(--dark2); border: 1px solid var(--gold); padding: 18px 28px; z-index: 9999; display: none; }
+  .toast.show { display: block; }
+
+  @media (max-width: 1100px) { section, .search-section, footer { padding-left: 36px; padding-right: 36px; } .footer-grid { grid-template-columns: 1fr 1fr; } .listings-grid { grid-template-columns: 1fr 1fr; } .areas-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 800px) { .nav-links { display: none; } .search-section { flex-direction: column; gap: 16px; } .listings-grid, .areas-grid, .footer-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<nav id="mainNav">
+  <a href="index.html" class="logo-with-icon">
+    <div class="logo-icon-container">
+      <svg class="house-svg" viewBox="0 0 24 24">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        <!-- Door that will animate -->
+        <rect class="door-path" x="9" y="12" width="6" height="10"></rect>
+      </svg>
+    </div>
+    <div class="nav-logo"><span>PP GROUP</span><span>Prestige Property Group</span></div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="properties.html" class="active">Properties</a></li>
+    <li><a href="services.html">Services</a></li>
+    <li><a href="agents.html">Our Agents</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <a href="contact.html" class="nav-cta">Book a Consultation</a>
+</nav>
+
+<section>
+  <div class="section-eyebrow">Current Portfolio</div>
+  <h2 class="section-title">Available <em>Properties</em></h2>
+</section>
+
+<div class="search-section">
+  <div class="search-label">Find your Estate</div>
+  <div class="search-input-wrap">
+    <span class="search-icon">⌕</span>
+    <input type="text" class="search-input" placeholder="Location, suburb or estate name…" id="searchInput" />
+  </div>
+  <div class="search-filters">
+    <select class="filter-select"><option>Residential</option><option>Commercial</option></select>
+    <select class="filter-select"><option>Buy</option><option>Rent</option></select>
+    <select class="filter-select"><option>Any Price</option><option>R10M+</option></select>
+  </div>
+  <button class="search-btn" onclick="handleSearch()">Search</button>
+</div>
+
+<section id="listings" style="padding-top:60px">
+  <div class="listings-tabs">
+    <button class="tab-btn active" onclick="filterListings('all',this)">All Properties</button>
+    <button class="tab-btn" onclick="filterListings('sale',this)">For Sale</button>
+    <button class="tab-btn" onclick="filterListings('rent',this)">To Let</button>
+    <button class="tab-btn" onclick="filterListings('exclusive',this)">Exclusive</button>
+  </div>
+  <div class="listings-grid" id="listingsGrid">
+    <div class="listing-card" data-cat="sale exclusive">
+      <div class="listing-img"><img src="images/7.jpg" class="listing-fake-img" /><span class="listing-img-tag">Exclusive</span></div>
+      <div class="listing-body">
+        <div class="listing-name">Hyde Park Heritage Home</div>
+        <div class="listing-loc">📍 Hyde Park, Johannesburg</div>
+        <div class="listing-meta"><span class="listing-meta-item">🛏 5 Bed</span><span class="listing-meta-item">🛁 5 Bath</span></div>
+        <div class="listing-footer"><div class="listing-price">R 18,900,000</div><button class="listing-cta" onclick="openPropModal('Hyde Park Heritage Home','Hyde Park','R 18.9M','For Sale','5 Bed · 5 Bath','Luxury heritage home.','images/7.jpg')">Enquire</button></div>
+      </div>
+    </div>
+    <div class="listing-card" data-cat="sale new">
+      <div class="listing-img"><img src="images/8.jpg" class="listing-fake-img" /><span class="listing-img-tag">New</span></div>
+      <div class="listing-body">
+        <div class="listing-name">Bloubergstrand Beachfront</div>
+        <div class="listing-loc">📍 Blouberg, Cape Town</div>
+        <div class="listing-meta"><span class="listing-meta-item">🛏 4 Bed</span><span class="listing-meta-item">🛁 4 Bath</span></div>
+        <div class="listing-footer"><div class="listing-price">R 16,500,000</div><button class="listing-cta" onclick="openPropModal('Bloubergstrand Beachfront','Blouberg','R 16.5M','For Sale','4 Bed · 4 Bath','Spectacular beachfront views.','images/8.jpg')">Enquire</button></div>
+      </div>
+    </div>
+    <div class="listing-card" data-cat="rent">
+      <div class="listing-img"><img src="images/9.jpg" class="listing-fake-img" /><span class="listing-img-tag">To Let</span></div>
+      <div class="listing-body">
+        <div class="listing-name">Morningside Luxury Apartment</div>
+        <div class="listing-loc">📍 Morningside, Durban</div>
+        <div class="listing-meta"><span class="listing-meta-item">🛏 3 Bed</span><span class="listing-meta-item">🛁 3 Bath</span></div>
+        <div class="listing-footer"><div class="listing-price">R 45,000/mo</div><button class="listing-cta" onclick="openPropModal('Morningside Luxury Apartment','Morningside','R 45k/mo','To Let','3 Bed · 3 Bath','Premium furnished apartment.','images/9.jpg')">Enquire</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="areas">
+  <div class="section-eyebrow">Prime Locations</div>
+  <h2 class="section-title">Explore our <em>Key Areas</em></h2>
+  <div class="areas-grid">
+    <div class="area-card"><img src="images/17.jpg" class="area-fake-img" /><div class="area-overlay"><div class="area-name">Cape Town</div><div class="area-count">34 Properties</div></div></div>
+    <div class="area-card"><img src="images/2.jpg" class="area-fake-img" /><div class="area-overlay"><div class="area-name">Johannesburg</div><div class="area-count">28 Properties</div></div></div>
+    <div class="area-card"><img src="images/3.jpg" class="area-fake-img" /><div class="area-overlay"><div class="area-name">Durban</div><div class="area-count">19 Properties</div></div></div>
+  </div>
+</section>
+
+<footer id="footerMain">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="footer-logo"><span>PP GROUP</span><span>Prestige Property Group</span></div>
+      <p class="footer-brand-text">South Africa's most trusted luxury property specialists.</p>
+    </div>
+    <div><div class="footer-col-title">Links</div><ul class="footer-links"><li><a href="about.html">About</a></li><li><a href="agents.html">Agents</a></li><li><a href="services.html">Services</a></li></ul></div>
+    <div><div class="footer-col-title">Support</div><ul class="footer-links"><li><a href="contact.html">Contact</a></li><li><a href="#">Privacy</a></li></ul></div>
+  </div>
+</footer>
+
+<div class="prop-modal-overlay" id="propModal">
+  <div class="prop-modal">
+    <button class="prop-modal-close" onclick="closeModal('propModal')">✕</button>
+    <div class="prop-modal-img"><img src="" id="pmImg" /><span class="prop-modal-tag" id="pmTag">For Sale</span></div>
+    <div class="prop-modal-body">
+      <div class="prop-modal-header"><div><div class="prop-modal-title" id="pmTitle">Name</div><div id="pmLoc">Location</div></div><div class="prop-modal-price" id="pmPrice">Price</div></div>
+      <div class="prop-modal-specs"><div class="prop-spec"><div class="prop-spec-val" id="pmSpecs">—</div><div class="prop-spec-key">Details</div></div></div>
+      <p class="prop-modal-desc" id="pmDesc">Description...</p>
+      <a href="contact.html" class="btn-gold"><span>Enquire Now</span></a>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toastEl"><div class="toast-title" id="toastTitle">Notification</div><div class="toast-msg" id="toastMsg"></div></div>
+
+<script>
+  const cur = document.getElementById('cursor'); const ring = document.getElementById('cursorRing');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    if (!cur.classList.contains('active')) { cur.classList.add('active'); ring.classList.add('active'); }
+    cur.style.left = mx + 'px'; cur.style.top = my + 'px';
+    const isHoverable = e.target.closest('a, button, .listing-card, .area-card');
+    if (isHoverable) { cur.classList.add('hover'); ring.classList.add('hover'); } else { cur.classList.remove('hover'); ring.classList.remove('hover'); }
+  });
+  (function animRing() { rx += (mx - rx) * 0.15; ry += (my - ry) * 0.15; ring.style.left = rx + 'px'; ring.style.top = ry + 'px'; requestAnimationFrame(animRing); })();
+  function handleSearch(){ showToast('Search', 'Finding matching properties...'); }
+  function openPropModal(title,loc,price,tag,specs,desc,imgSrc){
+    document.getElementById('pmTitle').textContent=title; document.getElementById('pmLoc').textContent=loc;
+    document.getElementById('pmPrice').textContent=price; document.getElementById('pmTag').textContent=tag;
+    document.getElementById('pmSpecs').textContent=specs; document.getElementById('pmDesc').textContent=desc;
+    document.getElementById('pmImg').src=imgSrc; document.getElementById('propModal').classList.add('open');
+  }
+  function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+  function filterListings(cat, btn){
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active');
+    document.querySelectorAll('.listing-card').forEach(card=>{ if(cat==='all' || card.dataset.cat.includes(cat)) card.style.display=''; else card.style.display='none'; });
+  }
+  function showToast(title, msg){
+    document.getElementById('toastTitle').textContent=title; document.getElementById('toastMsg').textContent=msg;
+    const t=document.getElementById('toastEl'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000);
+  }
+</script>
+</body>
+</html>

@@ -2,100 +2,443 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title>Client Dashboard – DemiTech Web Services</title>
 <link rel="stylesheet" href="style.css"/>
-<script src="https://cdn.jsdelivr.net/npm/appwrite@14.0.0"></script>
-<script src="appwrite-config.js"></script>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script src="/firebase-config.js"></script>
+<style>
+  :root {
+    --dash-bg: #0a0a0a;
+    --dash-sidebar: #000000;
+    --dash-card: #0a0a0a;
+    --dash-border: rgba(255, 255, 255, 0.08);
+    --dash-gold: #D4A017;
+    --dash-text: #ffffff;
+    --dash-muted: #888888;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    background: var(--dash-bg);
+    color: var(--dash-text);
+    font-family: 'Inter', sans-serif;
+  }
+
+  .dash-layout {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  /* SIDEBAR (Flexible Icons Only) */
+  .dash-sidebar {
+    width: 0;
+    background: var(--dash-sidebar);
+    border-right: 0px solid var(--dash-border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+    transition: width 0.3s ease, border-right 0.3s ease, padding 0.3s ease;
+    z-index: 1000;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .dash-sidebar.open {
+    width: 80px;
+    padding: 1.5rem 0;
+    border-right: 1px solid var(--dash-border);
+  }
+
+  .sidebar-logo {
+    width: 30px;
+    margin-bottom: 3rem;
+    opacity: 0;
+    flex-shrink: 0;
+    transition: 0.3s;
+  }
+
+  .dash-sidebar.open .sidebar-logo {
+    opacity: 1;
+  }
+
+  .sidebar-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    opacity: 0;
+    transition: 0.3s;
+  }
+
+  .dash-sidebar.open .sidebar-nav ul {
+    opacity: 1;
+  }
+
+  .sidebar-nav a {
+    font-size: 1.4rem;
+    color: var(--dash-muted);
+    text-decoration: none;
+    transition: 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+
+  .sidebar-nav a:hover, .sidebar-nav a.active {
+    background: rgba(212, 160, 23, 0.1);
+    color: var(--dash-gold);
+  }
+
+  /* MAIN CONTENT Area */
+  .dash-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    width: 100%;
+    min-width: 0; /* Critical for flex items not to overflow */
+  }
+
+  /* TOP HORIZONTAL NAVIGATION */
+  .dash-top-nav {
+    padding: 1rem 2rem;
+    border-bottom: 1px solid var(--dash-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--dash-sidebar);
+    flex-shrink: 0;
+  }
+
+  .nav-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .horizontal-menu {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    gap: 1rem;
+    overflow-x: auto;
+    scrollbar-width: none; /* Hide scrollbar for cleaner look */
+  }
+
+  .horizontal-menu::-webkit-scrollbar { display: none; }
+
+  .horizontal-menu a {
+    color: var(--dash-muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: 0.2s;
+    padding: 8px 12px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+
+  .horizontal-menu a:hover, .horizontal-menu a.active {
+    color: var(--dash-gold);
+    background: rgba(212, 160, 23, 0.05);
+  }
+
+  .hamburger {
+    background: none;
+    border: none;
+    color: var(--dash-gold);
+    font-size: 1.4rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    flex-shrink: 0;
+  }
+
+  .dash-main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  /* Unified Sections */
+  .dash-section {
+    background: var(--dash-card);
+    border: 1px solid var(--dash-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+  }
+
+  .dash-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .stat-card {
+    padding: 1.2rem;
+    border-left: 2px solid var(--dash-gold);
+    background: rgba(255,255,255,0.01);
+  }
+
+  .stat-card h5 {
+    margin: 0 0 6px 0;
+    color: var(--dash-muted);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .stat-card .val {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dash-gold);
+  }
+
+  /* Project List */
+  .order-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--dash-border);
+  }
+
+  .order-card:last-child { border-bottom: none; }
+
+  .order-info h4 { margin: 0 0 2px 0; font-size: 0.95rem; }
+  .order-info p { margin: 0; font-size: 0.75rem; color: var(--dash-muted); }
+
+  .status-pill {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .status-active { background: rgba(212, 160, 23, 0.1); color: var(--dash-gold); }
+  .status-completed { background: rgba(0, 255, 100, 0.1); color: #00ff64; }
+
+  /* MOBILE RESPONSIVE Fixes */
+  @media (max-width: 768px) {
+    .dash-sidebar {
+      position: fixed;
+      height: 100vh;
+      left: 0;
+      width: 0;
+    }
+
+    .dash-sidebar.open {
+      width: 70px;
+      padding: 1rem 0;
+      box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+    }
+
+    .dash-sidebar.open + .sidebar-overlay {
+      display: block;
+    }
+
+    .dash-top-nav {
+      padding: 0.6rem 0.8rem;
+    }
+
+    .nav-left {
+      gap: 0.5rem;
+    }
+
+    .horizontal-menu {
+      gap: 0.3rem;
+    }
+
+    .horizontal-menu a {
+      font-size: 0.7rem;
+      padding: 5px 6px;
+    }
+
+    .dash-main {
+      padding: 1rem;
+    }
+
+    .order-card {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.8rem;
+    }
+  }
+
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(2px);
+    z-index: 999;
+  }
+</style>
 </head>
 <body class="dashboard-page">
 
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
 <div class="dash-layout">
-  <aside class="dash-sidebar">
-    <div class="sidebar-header">
-      <img src="demitech-logo.svg" alt="DemiTech Logo" style="height:40px; margin-bottom:2rem;"/>
+  <!-- SIDEBAR (Flexible Icons Only) -->
+  <aside class="dash-sidebar" id="sidebar">
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center;">
+      <img src="demitech-logo.svg" alt="D" class="sidebar-logo"/>
+      <nav class="sidebar-nav">
+        <ul>
+          <li><a href="#" class="active" title="Overview">📊</a></li>
+          <li><a href="pricing.html" title="New Order">🛍️</a></li>
+          <li><a href="contact.html" title="Support">💬</a></li>
+        </ul>
+      </nav>
     </div>
-    <nav class="sidebar-nav">
-      <ul style="list-style:none;">
-        <li style="margin-bottom:1rem;"><a href="#" class="active" style="color:var(--gold);">📊 Overview</a></li>
-        <li style="margin-bottom:1rem;"><a href="pricing.html" style="color:var(--muted);">🛍️ New Order</a></li>
-        <li style="margin-bottom:1rem;"><a href="contact.html" style="color:var(--muted);">💬 Support</a></li>
-        <li style="margin-top:4rem;"><a href="#" onclick="Auth.logout()" style="color:#ff6b6b;">🚪 Logout</a></li>
+    <div class="sidebar-nav" style="margin-bottom: 1.5rem;">
+      <ul>
+        <li><a href="#" onclick="window.logoutFirebaseUser()" title="Logout" style="color:#ff6b6b;">🚪</a></li>
       </ul>
-    </nav>
+    </div>
   </aside>
 
-  <main class="dash-main">
-    <header class="dash-header">
-      <h2 id="welcome-user">Welcome back!</h2>
-      <p style="color:var(--muted);">Track your project milestones and payments below.</p>
+  <!-- MAIN CONTAINER -->
+  <div class="dash-container">
+    <!-- TOP NAVIGATION -->
+    <header class="dash-top-nav">
+      <div class="nav-left">
+        <button class="hamburger" id="menuToggle">☰</button>
+        <ul class="horizontal-menu">
+          <li><a href="#" class="active">Overview</a></li>
+          <li><a href="pricing.html">New Order</a></li>
+          <li><a href="contact.html">Support</a></li>
+        </ul>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span id="user-display-name" style="font-size:0.8rem; color:var(--dash-muted); display: none;">Client</span>
+        <div style="width:30px; height:30px; background:var(--dash-gold); border-radius:8px; display:flex; align-items:center; justify-content:center; color:#000; font-weight:700; font-size:0.75rem;" id="user-initials">C</div>
+      </div>
     </header>
 
-    <div class="dash-stat-grid" style="margin-top:2rem;">
-      <div class="stat-card">
-        <h5>Active Projects</h5>
-        <div class="val" id="active-projects-count">0</div>
-      </div>
-      <div class="stat-card">
-        <h5>Total Invested</h5>
-        <div class="val" id="total-invested">R0</div>
-      </div>
-    </div>
+    <!-- CONTENT AREA -->
+    <main class="dash-main">
+      <header>
+        <h2 id="welcome-user">Welcome!</h2>
+        <p style="color:var(--dash-muted); font-size:0.9rem;">Here is what's happening with your projects.</p>
+      </header>
 
-    <div class="dash-grid">
-      <div class="dash-card">
-        <h4 style="font-family:var(--font-head); margin-bottom:1.5rem;">My Projects</h4>
-        <div id="project-list" class="order-list">
-          <p style="color:var(--muted); text-align:center; padding:2rem;">No active projects yet. <a href="pricing.html" class="gold">Start one here!</a></p>
+      <div class="dash-stat-grid">
+        <div class="dash-section stat-card">
+          <h5>Active Projects</h5>
+          <div class="val" id="active-projects-count">0</div>
+        </div>
+        <div class="dash-section stat-card">
+          <h5>Total Invested</h5>
+          <div class="val" id="total-invested">R0</div>
         </div>
       </div>
-    </div>
-  </main>
+
+      <div class="dash-section" style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
+        <h4 style="margin:0 0 1.5rem 0; font-family:var(--font-head); font-size:1.1rem;">Active Roadmap</h4>
+        <div id="project-list" style="overflow-y:auto; flex:1;">
+          <p style="color:var(--dash-muted); text-align:center; padding:3rem;">No active projects yet. <a href="pricing.html" style="color:var(--dash-gold); text-decoration:none;">Start one here!</a></p>
+        </div>
+      </div>
+    </main>
+  </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', async () => {
-    const user = await Auth.getUser();
+    const user = await window.getFirebaseUser();
     if (!user) {
         window.location.href = 'login.html';
         return;
     }
 
-    document.getElementById('welcome-user').textContent = `Welcome back, ${user.nickname || user.name}!`;
+    // UI Updates
+    const name = user.nickname || user.displayName || 'Client';
+    document.getElementById('welcome-user').textContent = `Welcome, ${name}!`;
+    document.getElementById('user-display-name').textContent = name;
+    document.getElementById('user-initials').textContent = name.charAt(0).toUpperCase();
+
+    // Hamburger Toggle
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    const toggleSidebar = () => {
+        sidebar.classList.toggle('open');
+    };
+
+    menuToggle.onclick = toggleSidebar;
+    overlay.onclick = toggleSidebar;
 
     // Load projects
     try {
-        const response = await databases.listDocuments(
-            APPWRITE_CONFIG.databaseId,
-            APPWRITE_CONFIG.collections.orders,
-            [ Appwrite.Query.equal('userId', user.$id) ]
-        );
+        if (!user.uid) throw new Error("User ID is missing.");
+        
+        const snapshot = await window.db.collection('orders')
+            .where('userId', '==', user.uid)
+            .get();
 
-        if (response.documents.length > 0) {
+        if (!snapshot.empty) {
             const list = document.getElementById('project-list');
             list.innerHTML = '';
             
             let activeCount = 0;
             let totalInvested = 0;
 
-            response.documents.forEach(doc => {
-                if (doc.orderStatus !== 'archived') activeCount++;
-                totalInvested += doc.paidAmount || 0;
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.orderStatus !== 'archived') activeCount++;
+                totalInvested += data.paidAmount || 0;
 
                 const card = document.createElement('div');
                 card.className = 'order-card';
                 
-                const milestoneProgress = doc.milestone === 1 ? '50% Initial Paid' : '100% Completed';
-                const statusClass = doc.orderStatus === 'completed' ? 'status-completed' : 'status-active';
+                const milestoneProgress = data.milestone === 1 ? 'Phase 1: Deposit' : 
+                                        data.milestone === 2 ? 'Phase 2: Build' :
+                                        data.milestone === 3 ? 'Phase 3: Review' : 'Phase 4: Live';
+                
+                const statusClass = data.orderStatus === 'completed' ? 'status-completed' : 'status-active';
 
                 card.innerHTML = `
                     <div class="order-info">
-                        <h4>${doc.service}</h4>
-                        <p>${milestoneProgress} · Ref: ${doc.$id.slice(0,8)}</p>
+                        <h4>${data.service}</h4>
+                        <p>${milestoneProgress} · Ref: ${doc.id.slice(0,6)}</p>
                     </div>
                     <div style="text-align:right;">
-                        <span class="order-status ${statusClass}">${doc.orderStatus}</span>
-                        ${doc.milestone === 1 ? `<button class="btn btn-gold" style="padding:0.3rem 0.8rem; font-size:0.7rem; margin-top:0.5rem; display:block;">Pay Final 50%</button>` : ''}
+                        <span class="status-pill ${statusClass}">${data.orderStatus}</span>
                     </div>
                 `;
                 list.appendChild(card);
@@ -105,7 +448,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('total-invested').textContent = `R${totalInvested.toLocaleString()}`;
         }
     } catch (error) {
-        console.error('Error loading projects:', error);
+        console.error('Dashboard failed:', error);
     }
 });
 </script>

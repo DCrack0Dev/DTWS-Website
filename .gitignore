@@ -4,4 +4,8 @@ Thumbs.db
 .vscode/
 .trae/
 .vercel
+.env
 .env*.local
+node_modules/
+dist/
+*.local
