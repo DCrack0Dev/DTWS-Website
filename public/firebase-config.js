@@ -5,7 +5,7 @@
 
 // Firebase project configuration using provided values
 const firebaseConfig = {
-    apiKey: "AIzaSyBx9m6RjBnt7dzbs4WJXtEzMFDsxfMWdpY",
+    apiKey: "AIzaSyA8S83S7AZWqy-OVmdUFBvjaCaLcTe-3Ac",
     authDomain: "dtws-web.firebaseapp.com",
     projectId: "dtws-web",
     storageBucket: "dtws-web.firebasestorage.app",
