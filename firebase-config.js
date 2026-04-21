@@ -3,15 +3,17 @@
  * Initializes Firebase Auth and Firestore.
  */
 
-// Firebase project configuration using provided values
+// Firebase project configuration using placeholders
+// IMPORTANT: For production, these are typically injected via environment variables or handled by your CI/CD.
+// DO NOT commit your real API Key to public repositories.
 const firebaseConfig = {
-    apiKey: "AIzaSyA8S83S7AZWqy-OVmdUFBvjaCaLcTe-3Ac",
-    authDomain: "dtws-web.firebaseapp.com",
-    projectId: "dtws-web",
-    storageBucket: "dtws-web.firebasestorage.app",
-    messagingSenderId: "652254765397",
-    appId: "1:652254765397:web:d4e335aecd7fe69e588fdc",
-    measurementId: "G-EFXEJVRJVX"
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase
