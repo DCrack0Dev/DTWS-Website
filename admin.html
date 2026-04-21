@@ -334,20 +334,37 @@
           <div class="val" id="stat-total-revenue">R0</div>
         </div>
         <div class="stat-card">
-          <h5>Active Orders</h5>
-          <div class="val" id="stat-active-orders">0</div>
+          <h5>Daily Visitors</h5>
+          <div class="val" id="stat-daily-visitors">0</div>
         </div>
         <div class="stat-card">
-          <h5>Unread Tickets</h5>
-          <div class="val" id="stat-unread-tickets">0</div>
+          <h5>Direct Traffic</h5>
+          <div class="val" id="stat-direct-traffic">0</div>
         </div>
         <div class="stat-card">
-          <h5>Total Clients</h5>
-          <div class="val" id="stat-total-clients">0</div>
+          <h5>Google Traffic</h5>
+          <div class="val" id="stat-google-traffic">0</div>
         </div>
       </div>
 
       <div class="dash-grid">
+        <div class="dash-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
+            <h4 style="margin:0;">Traffic Overview</h4>
+            <select id="chartPeriod" class="action-btn" style="background:transparent; border:1px solid var(--border);">
+              <option value="7">Last 7 Days</option>
+              <option value="30">Last 30 Days</option>
+            </select>
+          </div>
+          <canvas id="trafficChart" height="150"></canvas>
+        </div>
+        <div class="dash-card">
+          <h4>Traffic Sources</h4>
+          <canvas id="sourcesChart" height="250"></canvas>
+        </div>
+      </div>
+
+      <div class="dash-grid" style="margin-top:2rem;">
         <div class="dash-card">
           <h4>Revenue Growth</h4>
           <canvas id="revenueChart" height="120"></canvas>
@@ -453,6 +470,8 @@
 
 <script>
 let revenueChart = null;
+let trafficChart = null;
+let sourcesChart = null;
 let currentViewingOrderId = null;
 
 function showSection(sectionId) {
@@ -490,9 +509,105 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
+    // Period selector
+    document.getElementById('chartPeriod').onchange = () => {
+        loadTrafficStats(parseInt(document.getElementById('chartPeriod').value));
+    };
+
     // Load initial data
     loadAllAdminData();
+    loadTrafficStats(7);
 });
+
+async function loadTrafficStats(days = 7) {
+    try {
+        const now = new Date();
+        const startDate = new Date();
+        startDate.setDate(now.getDate() - days);
+        
+        const visitsSnapshot = await window.db.collection('site_visits')
+            .where('timestamp', '>=', startDate)
+            .orderBy('timestamp', 'asc')
+            .get();
+
+        const dailyStats = {};
+        const sources = { direct: 0, google: 0, referral: 0 };
+        
+        // Initialize daily stats for chart
+        for (let i = days - 1; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(now.getDate() - i);
+            dailyStats[d.toISOString().split('T')[0]] = 0;
+        }
+
+        visitsSnapshot.forEach(doc => {
+            const data = doc.data();
+            const date = data.date;
+            if (dailyStats[date] !== undefined) dailyStats[date]++;
+            if (sources[data.source] !== undefined) sources[data.source]++;
+        });
+
+        // Update stat cards
+        const todayStr = now.toISOString().split('T')[0];
+        document.getElementById('stat-daily-visitors').textContent = dailyStats[todayStr] || 0;
+        document.getElementById('stat-direct-traffic').textContent = sources.direct;
+        document.getElementById('stat-google-traffic').textContent = sources.google;
+
+        updateTrafficCharts(dailyStats, sources);
+    } catch (e) {
+        console.warn("Failed to load traffic stats:", e);
+    }
+}
+
+function updateTrafficCharts(dailyStats, sources) {
+    // 1. Traffic Line Chart
+    if (trafficChart) trafficChart.destroy();
+    const ctxTraffic = document.getElementById('trafficChart').getContext('2d');
+    trafficChart = new Chart(ctxTraffic, {
+        type: 'line',
+        data: {
+            labels: Object.keys(dailyStats).map(d => d.split('-').slice(1).join('/')),
+            datasets: [{
+                label: 'Visitors',
+                data: Object.values(dailyStats),
+                borderColor: '#D4A017',
+                backgroundColor: 'rgba(212, 160, 23, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // 2. Sources Pie Chart
+    if (sourcesChart) sourcesChart.destroy();
+    const ctxSources = document.getElementById('sourcesChart').getContext('2d');
+    sourcesChart = new Chart(ctxSources, {
+        type: 'doughnut',
+        data: {
+            labels: ['Direct', 'Google', 'Referral'],
+            datasets: [{
+                data: [sources.direct, sources.google, sources.referral],
+                backgroundColor: ['#D4A017', '#4285F4', '#34A853'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            cutout: '70%',
+            plugins: {
+                legend: { position: 'bottom', labels: { color: '#888', usePointStyle: true } }
+            }
+        }
+    });
+}
 
 async function loadAllAdminData() {
     try {
