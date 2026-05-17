@@ -820,6 +820,9 @@ async function loadTransactions() {
                     ${data.type === 'deposit_completed' && data.pf_payment_id ? 
                         `<button onclick="window.initiatePayFastRefund('${doc.id}', ${data.amount}, '${data.userId}', '${data.pf_payment_id}')" class="action-btn" style="border-color:var(--gold); color:var(--gold);">PayFast Refund</button>` 
                         : ''}
+                    ${data.type === 'deposit_pending' ? 
+                        `<button onclick="window.manualApproveDeposit('${doc.id}', ${data.amount}, '${data.userId}')" class="action-btn" style="border-color:#00ff64; color:#00ff64;">Force Approve</button>` 
+                        : ''}
                 </td>
             `;
             fragment.appendChild(tr);
@@ -831,6 +834,44 @@ async function loadTransactions() {
         console.error("Error loading transactions:", e);
     }
 }
+
+window.manualApproveDeposit = async function(txId, amount, userId) {
+    if (!confirm(`Are you sure you want to MANUALLY approve this R${amount.toLocaleString()} deposit? \n\nOnly do this if you have verified the money is in your PayFast account. This will credit the user's wallet immediately.`)) return;
+
+    const btn = event.target;
+    btn.disabled = true;
+    btn.textContent = 'Approving...';
+
+    try {
+        const walletRef = window.db.collection('wallets').doc(userId);
+        
+        await window.db.runTransaction(async (transaction) => {
+            const walletDoc = await transaction.get(walletRef);
+            const currentBalance = walletDoc.exists ? (walletDoc.data().balance || 0) : 0;
+            
+            // 1. Credit the wallet
+            transaction.set(walletRef, {
+                balance: currentBalance + amount,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+
+            // 2. Mark transaction as completed
+            transaction.update(window.db.collection('transactions').doc(txId), {
+                type: 'deposit_completed',
+                completedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                processedBy: 'admin_manual'
+            });
+        });
+
+        alert("Deposit approved successfully! The user's wallet has been credited.");
+        loadTransactions();
+    } catch (e) {
+        console.error("Manual approval failed:", e);
+        alert("Approval failed: " + e.message);
+        btn.disabled = false;
+        btn.textContent = 'Force Approve';
+    }
+};
 
 window.initiatePayFastRefund = async function(txId, amount, userId, pfPaymentId) {
     if (!confirm(`Are you sure you want to refund R${amount.toLocaleString()} back to the customer's bank/card via PayFast? This will also deduct the amount from their website wallet.`)) return;
