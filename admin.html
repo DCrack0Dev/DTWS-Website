@@ -545,6 +545,8 @@ let currentViewingOrderId = null;
 // Expose functions to window for inline onclick handlers
 window.showSection = function(sectionId) {
     console.log("Switching to section:", sectionId);
+    
+    // 1. Immediate UI Feedback (CSS Switch)
     document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     
@@ -552,17 +554,29 @@ window.showSection = function(sectionId) {
     const nav = document.getElementById(`nav-${sectionId}`);
     if (section) section.classList.add('active');
     if (nav) nav.classList.add('active');
+
+    // 2. Heavy Data Loading (Asynchronous/Deferred)
+    if (sectionId === 'withdrawals') {
+        loadWithdrawals();
+    }
 }
 
+// Global cache for profiles to prevent redundant fetches
+const profileCache = new Map();
+
 async function loadWithdrawals() {
+    const body = document.getElementById('admin-withdrawals-body');
+    if (!body) return;
+
     try {
+        // Yield to main thread to allow UI update first
+        await new Promise(resolve => requestAnimationFrame(resolve));
+
         const snapshot = await window.db.collection('transactions')
             .where('type', '==', 'withdrawal_pending')
             .orderBy('date', 'desc')
             .get();
 
-        const body = document.getElementById('admin-withdrawals-body');
-        if (!body) return;
         body.innerHTML = '';
 
         if (snapshot.empty) {
@@ -570,16 +584,36 @@ async function loadWithdrawals() {
             return;
         }
 
-        for (const doc of snapshot.docs) {
+        // Parallelize profile fetching
+        const withdrawalItems = [];
+        const profilePromises = [];
+
+        snapshot.forEach(doc => {
             const data = doc.data();
-            const date = data.date ? (data.date.toDate ? data.date.toDate().toLocaleDateString() : new Date(data.date).toLocaleDateString()) : 'N/A';
+            const userId = data.userId;
             
-            // Get user profile for name
-            let userName = 'Loading...';
-            try {
-                const profile = await window.db.collection('profiles').doc(data.userId).get();
-                userName = profile.exists ? (profile.data().nickname || profile.data().displayName || 'User') : 'Unknown';
-            } catch (e) { userName = 'Unknown'; }
+            withdrawalItems.push({ id: doc.id, ...data });
+            
+            if (!profileCache.has(userId)) {
+                profilePromises.push(
+                    window.db.collection('profiles').doc(userId).get().then(pDoc => {
+                        const pData = pDoc.exists ? pDoc.data() : { nickname: 'User' };
+                        profileCache.set(userId, pData);
+                    }).catch(() => profileCache.set(userId, { nickname: 'Unknown' }))
+                );
+            }
+        });
+
+        // Wait for all missing profiles in parallel
+        await Promise.all(profilePromises);
+
+        // Render everything at once
+        const fragment = document.createDocumentFragment();
+        
+        withdrawalItems.forEach(data => {
+            const date = data.date ? (data.date.toDate ? data.date.toDate().toLocaleDateString() : new Date(data.date).toLocaleDateString()) : 'N/A';
+            const profile = profileCache.get(data.userId);
+            const userName = profile.nickname || profile.displayName || 'User';
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -593,14 +627,17 @@ async function loadWithdrawals() {
                 </td>
                 <td data-label="DATE">${date}</td>
                 <td data-label="ACTIONS">
-                    <button onclick="window.processWithdrawal('${doc.id}', 'completed', ${data.amount}, '${data.userId}', \`${data.bankDetails || ''}\`)" class="action-btn" style="border-color:#00ff64; color:#00ff64; margin-right:5px;">Approve</button>
-                    <button onclick="window.processWithdrawal('${doc.id}', 'rejected', ${data.amount}, '${data.userId}')" class="action-btn" style="border-color:#ff4b4b; color:#ff4b4b;">Reject</button>
+                    <button onclick="window.processWithdrawal('${data.id}', 'completed', ${data.amount}, '${data.userId}', \`${data.bankDetails || ''}\`)" class="action-btn" style="border-color:#00ff64; color:#00ff64; margin-right:5px;">Approve</button>
+                    <button onclick="window.processWithdrawal('${data.id}', 'rejected', ${data.amount}, '${data.userId}')" class="action-btn" style="border-color:#ff4b4b; color:#ff4b4b;">Reject</button>
                 </td>
             `;
-            body.appendChild(tr);
-        }
+            fragment.appendChild(tr);
+        });
+
+        body.appendChild(fragment);
     } catch (e) {
         console.error("Error loading withdrawals:", e);
+        body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:2rem; color:#ff4b4b;">Failed to load withdrawals.</td></tr>';
     }
 }
 
@@ -990,41 +1027,22 @@ async function loadAllAdminData() {
             ordersBody.innerHTML = '';
             console.log(`Found ${ordersSnapshot.size} orders`);
 
+            const ordersFragment = document.createDocumentFragment();
             ordersSnapshot.forEach(doc => {
                 const data = doc.data();
                 const amount = parseFloat(data.paidAmount) || 0;
                 totalRevenue += amount;
                 
-                // For revenue chart - more robust date parsing
+                // ... (date logic)
                 let dateStr = '';
                 if (data.orderDate) {
-                    if (data.orderDate.toDate) {
-                        dateStr = data.orderDate.toDate().toISOString().split('T')[0];
-                    } else if (typeof data.orderDate === 'string') {
-                        dateStr = data.orderDate.split('T')[0];
-                    } else if (typeof data.orderDate === 'number') {
-                        dateStr = new Date(data.orderDate).toISOString().split('T')[0];
-                    } else if (data.orderDate.seconds) {
-                        dateStr = new Date(data.orderDate.seconds * 1000).toISOString().split('T')[0];
-                    }
+                    if (data.orderDate.toDate) dateStr = data.orderDate.toDate().toISOString().split('T')[0];
+                    else if (typeof data.orderDate === 'string') dateStr = data.orderDate.split('T')[0];
+                    else if (typeof data.orderDate === 'number') dateStr = new Date(data.orderDate).toISOString().split('T')[0];
+                    else if (data.orderDate.seconds) dateStr = new Date(data.orderDate.seconds * 1000).toISOString().split('T')[0];
                 }
                 
-                if (dateStr) {
-                    revenueByDate[dateStr] = (revenueByDate[dateStr] || 0) + amount;
-                }
-
-                // Create a safe HTML details string
-                const detailsHtml = `
-                    <div style="display:grid; gap:10px;">
-                        <p><strong>Customer:</strong> ${data.customer_name || 'N/A'}</p>
-                        <p><strong>Email:</strong> ${data.customer_email || 'N/A'}</p>
-                        <p><strong>Business:</strong> ${data.business_name || 'N/A'}</p>
-                        <p><strong>Description:</strong> ${data.business_desc || 'No description.'}</p>
-                        <p><strong>Options:</strong> ${data.options || 'None'}</p>
-                        <p><strong>Total:</strong> R${(data.totalZar || 0).toLocaleString()}</p>
-                        <p><strong>Paid:</strong> R${amount.toLocaleString()}</p>
-                    </div>
-                `;
+                if (dateStr) revenueByDate[dateStr] = (revenueByDate[dateStr] || 0) + amount;
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -1037,87 +1055,84 @@ async function loadAllAdminData() {
                     <td data-label="STATUS"><span class="status-pill status-${data.orderStatus || 'pending'}">${data.orderStatus || 'pending'}</span></td>
                     <td data-label="ACTIONS">
                       <button class="action-btn details-btn">Details</button>
-                      ${data.orderStatus === 'pending' ? `<button onclick="window.updateStatus('${doc.id}', 'active')" class="action-btn" style="border-color:#00ff64; color:#00ff64;">Activate</button>` : ''}
                     </td>
                 `;
-                
-                const detBtn = tr.querySelector('.details-btn');
-                if (detBtn) {
-                    detBtn.onclick = () => {
-                        window.openOrderModal(doc.id, data.service || 'Project Details', detailsHtml);
-                    };
-                }
-                
-                ordersBody.appendChild(tr);
+                ordersFragment.appendChild(tr);
             });
+            ordersBody.appendChild(ordersFragment);
         }
 
-        // 2. Fetch Support Tickets
-        let ticketsSnapshot;
-        try {
-            ticketsSnapshot = await window.db.collection('support_tickets').orderBy('createdAt', 'desc').limit(20).get();
-        } catch (err) {
-            console.warn("Tickets ordered query failed, falling back to unordered:", err);
-            ticketsSnapshot = await window.db.collection('support_tickets').limit(20).get();
-        }
-        
-        // 3. Fetch Withdrawals
-        await loadWithdrawals();
+        // Deferred loading of other sections to prevent blocking
+        setTimeout(() => {
+            loadWithdrawals();
+            loadTickets();
+            loadCustomers();
+        }, 100);
 
+    } catch (e) {
+        console.error("Critical error loading admin data:", e);
+    }
+}
+async function loadTickets() {
+    try {
         const inboxList = document.getElementById('inbox-list');
-        if (inboxList) {
-            inboxList.innerHTML = '';
-            if (ticketsSnapshot.empty) {
-                inboxList.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding:2rem;">No messages in inbox.</p>';
-            } else {
-                ticketsSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    const card = document.createElement('div');
-                    card.style = "background:rgba(255,255,255,0.03); padding:1.5rem; border-radius:8px; margin-bottom:1rem; border-left:4px solid " + (data.status === 'new' ? 'var(--gold)' : 'rgba(255,255,255,0.1)');
-                    card.innerHTML = `
-                        <div style="display:flex; justify-content:space-between; margin-bottom:10px; flex-wrap:wrap; gap:10px;">
-                            <span style="font-weight:600;">${data.name} <small style="color:var(--text-muted); font-weight:400;">(${data.email})</small></span>
-                            <span style="font-size:0.7rem; color:var(--text-muted);">${data.createdAt ? (data.createdAt.toDate ? data.createdAt.toDate().toLocaleString() : data.createdAt) : 'Just now'}</span>
-                        </div>
-                        <div style="font-size:0.85rem; color:var(--gold); margin-bottom:8px;">Subject: ${data.service} | Budget: ${data.budget}</div>
-                        <p style="font-size:0.9rem; margin:0; color:#ddd; line-height:1.5;">${data.message}</p>
-                        <div style="margin-top:1.5rem; text-align:right; display:flex; gap:10px; justify-content:flex-end;">
-                            ${data.status === 'new' ? `<button onclick="window.updateTicketStatus('${doc.id}', 'read')" class="action-btn" style="font-size:0.7rem; border-color:#00ff64; color:#00ff64;">Mark as Read</button>` : '<span style="font-size:0.7rem; color:var(--text-muted); align-self:center;">Seen</span>'}
-                            <a href="mailto:${data.email}?subject=Re: DemiTech Quote Request - ${data.service}" class="action-btn" style="font-size:0.7rem; text-decoration:none;">Reply via Email</a>
-                        </div>
-                    `;
-                    inboxList.appendChild(card);
-                });
-            }
-        }
+        if (!inboxList) return;
 
-        // 3. Fetch Customers
-        const usersSnapshot = await window.db.collection('profiles').get();
-        const customersBody = document.getElementById('admin-customers-body');
-        if (customersBody) {
-            customersBody.innerHTML = '';
-            usersSnapshot.forEach(doc => {
-                const data = doc.data();
-                const tr = document.createElement('tr');
-                const joinedDate = data.createdAt ? (data.createdAt.toDate ? data.createdAt.toDate().toLocaleDateString() : data.createdAt) : 'N/A';
-                tr.innerHTML = `
-                    <td data-label="NAME">${data.nickname || 'Unknown'}</td>
-                    <td data-label="EMAIL">${data.email || 'N/A'}</td>
-                    <td data-label="JOINED">${joinedDate}</td>
-                    <td data-label="ROLE" style="color:var(--gold);">${data.role || 'client'}</td>
-                `;
-                customersBody.appendChild(tr);
-            });
-        }
-
-        // Update Stats
-        const revEl = document.getElementById('stat-total-revenue');
-        if (revEl) revEl.textContent = `R${totalRevenue.toLocaleString()}`;
+        const ticketsSnapshot = await window.db.collection('support_tickets').orderBy('createdAt', 'desc').limit(20).get();
+        inboxList.innerHTML = '';
         
-        initRevenueChart(revenueByDate);
+        if (ticketsSnapshot.empty) {
+            inboxList.innerHTML = '<p style="color:var(--text-muted); text-align:center;">No messages in inbox.</p>';
+            return;
+        }
 
-    } catch (error) {
-        console.error("Admin data load failed:", error);
+        ticketsSnapshot.forEach(doc => {
+            const data = doc.data();
+            const date = data.createdAt ? (data.createdAt.toDate ? data.createdAt.toDate().toLocaleString() : new Date(data.createdAt).toLocaleString()) : 'N/A';
+            
+            const card = document.createElement('div');
+            card.className = 'dash-card';
+            card.style.padding = '1rem';
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+                    <span style="font-weight:600; color:var(--gold);">${data.name || 'Anonymous'}</span>
+                    <span style="font-size:0.75rem; color:var(--text-muted);">${date}</span>
+                </div>
+                <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.8rem;">${data.email || ''}</div>
+                <p style="margin:0; font-size:0.9rem;">${data.message || ''}</p>
+            `;
+            inboxList.appendChild(card);
+        });
+    } catch (e) {
+        console.error("Error loading tickets:", e);
+    }
+}
+
+async function loadCustomers() {
+    try {
+        const body = document.getElementById('admin-customers-body');
+        if (!body) return;
+
+        const snapshot = await window.db.collection('profiles').orderBy('createdAt', 'desc').limit(50).get();
+        body.innerHTML = '';
+
+        const fragment = document.createDocumentFragment();
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            const date = data.createdAt ? (data.createdAt.toDate ? data.createdAt.toDate().toLocaleDateString() : new Date(data.createdAt).toLocaleDateString()) : 'N/A';
+            
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td data-label="NAME">${data.nickname || data.displayName || 'Unnamed'}</td>
+                <td data-label="EMAIL">${data.email || 'N/A'}</td>
+                <td data-label="JOINED">${date}</td>
+                <td data-label="ROLE"><span class="status-pill ${data.role === 'admin' ? 'status-active' : ''}" style="font-size:0.6rem;">${data.role || 'client'}</span></td>
+            `;
+            fragment.appendChild(tr);
+        });
+        body.appendChild(fragment);
+    } catch (e) {
+        console.error("Error loading customers:", e);
     }
 }
 
