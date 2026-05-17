@@ -35,6 +35,10 @@
     min-height: 100vh;
   }
 
+  .mobile-header {
+    display: none;
+  }
+
   /* Mobile Responsive Styles */
   @media (max-width: 992px) {
     .dash-layout {
@@ -43,14 +47,15 @@
     
     .dash-sidebar {
       position: fixed;
-      left: -260px;
+      left: -280px;
       top: 0;
       bottom: 0;
-      width: 260px;
+      width: 280px;
       z-index: 2000;
-      transition: left 0.3s ease;
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       height: 100vh;
-      box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+      box-shadow: 15px 0 50px rgba(0,0,0,0.8);
+      padding-top: 4rem; /* Space for close button */
     }
 
     .dash-sidebar.open {
@@ -61,60 +66,98 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 1rem 1.5rem;
+      padding: 0.8rem 1.2rem;
       background: #000;
       border-bottom: 1px solid var(--border);
       position: sticky;
       top: 0;
       z-index: 1000;
+      height: 60px;
+      box-sizing: border-box;
     }
 
     .hamburger {
       background: none;
       border: none;
       color: var(--gold);
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       cursor: pointer;
       display: flex;
       align-items: center;
       padding: 5px;
     }
 
+    .sidebar-close {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: block !important;
+    }
+
     .dash-main {
-      padding: 1.5rem;
+      padding: 1.2rem;
     }
 
     .dash-stat-grid {
       grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
     }
 
     .dash-grid {
       grid-template-columns: 1fr;
+      gap: 1.5rem;
     }
 
     .admin-table thead {
       display: none;
     }
 
-    .admin-table td {
+    .admin-table tr {
       display: block;
-      padding: 0.5rem 0;
+      padding: 1.5rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+    }
+
+    .admin-table td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      text-align: right;
+    }
+
+    .admin-table td:last-child {
       border-bottom: none;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+      padding-top: 1.2rem;
     }
 
     .admin-table td::before {
       content: attr(data-label);
       font-weight: 600;
       color: var(--text-muted);
-      display: block;
       font-size: 0.75rem;
-      margin-bottom: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-right: 15px;
+      text-align: left;
     }
 
-    .admin-table tr {
-      display: block;
-      padding: 1.5rem 0;
-      border-bottom: 1px solid var(--border);
+    .action-btn {
+      width: 100%;
+      padding: 10px !important;
+      font-size: 0.9rem !important;
     }
   }
 
@@ -131,13 +174,19 @@
     display: block;
   }
 
+  .sidebar-close { display: none; }
+
   @media (max-width: 480px) {
     .dash-stat-grid {
       grid-template-columns: 1fr;
     }
     
     .sidebar-nav ul {
-      justify-content: center;
+      justify-content: flex-start;
+    }
+
+    .stat-card .val {
+      font-size: 1.5rem;
     }
   }
 
@@ -334,13 +383,14 @@
 
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-<header class="mobile-header" style="display:none;" id="mobileHeader">
+<header class="mobile-header" id="mobileHeader">
   <h3 style="color:var(--gold); margin:0; font-size:1.1rem;">DemiTech<span style="color:#fff;">Admin</span></h3>
   <button class="hamburger" id="menuToggle">☰</button>
 </header>
 
 <div class="dash-layout">
   <aside class="dash-sidebar">
+    <button class="sidebar-close" id="sidebarClose">&times;</button>
     <div class="sidebar-header">
       <h3 style="color:var(--gold); margin:0;">DemiTech<span style="color:#fff;">Admin</span></h3>
     </div>
@@ -605,29 +655,35 @@ window.showSection = function(sectionId) {
 // Mobile Menu Toggle
 document.addEventListener('DOMContentLoaded', () => {
     const menuToggle = document.getElementById('menuToggle');
+    const sidebarClose = document.getElementById('sidebarClose');
     const sidebar = document.querySelector('.dash-sidebar');
     const overlay = document.getElementById('sidebarOverlay');
     const mobileHeader = document.getElementById('mobileHeader');
+
+    const toggleSidebar = (show) => {
+        if (show) {
+            sidebar.classList.add('open');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent scroll
+        } else {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    };
 
     if (window.innerWidth <= 992) {
         mobileHeader.style.display = 'flex';
     }
 
-    menuToggle.onclick = () => {
-        sidebar.classList.toggle('open');
-        overlay.classList.toggle('active');
-    };
-
-    overlay.onclick = () => {
-        sidebar.classList.remove('open');
-        overlay.classList.remove('active');
-    };
+    menuToggle.onclick = () => toggleSidebar(true);
+    sidebarClose.onclick = () => toggleSidebar(false);
+    overlay.onclick = () => toggleSidebar(false);
 
     window.onresize = () => {
         if (window.innerWidth > 992) {
             mobileHeader.style.display = 'none';
-            sidebar.classList.remove('open');
-            overlay.classList.remove('active');
+            toggleSidebar(false);
         } else {
             mobileHeader.style.display = 'flex';
         }
@@ -642,7 +698,14 @@ async function loadWithdrawals() {
     if (!body) return;
 
     try {
-        // Yield to main thread to allow UI update first
+        // Ensure database is ready
+        if (!window.db) {
+            console.log("Database not ready, waiting...");
+            setTimeout(loadWithdrawals, 500);
+            return;
+        }
+
+        // Yield to main thread
         await new Promise(resolve => requestAnimationFrame(resolve));
 
         const snapshot = await window.db.collection('transactions')
@@ -650,10 +713,8 @@ async function loadWithdrawals() {
             .orderBy('date', 'desc')
             .get();
 
-        body.innerHTML = '';
-
         if (snapshot.empty) {
-            body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--text-muted);">No pending withdrawal requests.</td></tr>';
+            body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:3rem; color:var(--text-muted);">No pending withdrawal requests.</td></tr>';
             return;
         }
 
@@ -677,15 +738,16 @@ async function loadWithdrawals() {
             }
         });
 
-        // Wait for all missing profiles in parallel
-        await Promise.all(profilePromises);
+        // Wait for profiles
+        if (profilePromises.length > 0) {
+            await Promise.all(profilePromises);
+        }
 
-        // Render everything at once
+        // Render
         const fragment = document.createDocumentFragment();
-        
         withdrawalItems.forEach(data => {
             const date = data.date ? (data.date.toDate ? data.date.toDate().toLocaleDateString() : new Date(data.date).toLocaleDateString()) : 'N/A';
-            const profile = profileCache.get(data.userId);
+            const profile = profileCache.get(data.userId) || { nickname: 'User' };
             const userName = profile.nickname || profile.displayName || 'User';
 
             const tr = document.createElement('tr');
@@ -700,17 +762,18 @@ async function loadWithdrawals() {
                 </td>
                 <td data-label="DATE">${date}</td>
                 <td data-label="ACTIONS">
-                    <button onclick="window.processWithdrawal('${data.id}', 'completed', ${data.amount}, '${data.userId}', \`${data.bankDetails || ''}\`)" class="action-btn" style="border-color:#00ff64; color:#00ff64; margin-right:5px;">Approve</button>
+                    <button onclick="window.processWithdrawal('${data.id}', 'completed', ${data.amount}, '${data.userId}', \`${data.bankDetails || ''}\`)" class="action-btn" style="border-color:#00ff64; color:#00ff64;">Approve</button>
                     <button onclick="window.processWithdrawal('${data.id}', 'rejected', ${data.amount}, '${data.userId}')" class="action-btn" style="border-color:#ff4b4b; color:#ff4b4b;">Reject</button>
                 </td>
             `;
             fragment.appendChild(tr);
         });
 
+        body.innerHTML = '';
         body.appendChild(fragment);
     } catch (e) {
         console.error("Error loading withdrawals:", e);
-        body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:2rem; color:#ff4b4b;">Failed to load withdrawals.</td></tr>';
+        body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:2rem; color:#ff4b4b;">Failed to load withdrawals. Please refresh.</td></tr>';
     }
 }
 
@@ -1079,9 +1142,12 @@ function updateTrafficCharts(dailyStats, sources) {
 }
 
 async function loadAllAdminData() {
-    console.log("Loading all admin data (orders, tickets, customers)...");
+    console.log("Loading all admin data...");
     try {
-        if (!window.db) return;
+        if (!window.db) {
+            setTimeout(loadAllAdminData, 500);
+            return;
+        }
         
         // 1. Fetch Orders
         let ordersSnapshot;
@@ -1097,49 +1163,71 @@ async function loadAllAdminData() {
         const revenueByDate = {};
         
         if (ordersBody) {
-            ordersBody.innerHTML = '';
-            console.log(`Found ${ordersSnapshot.size} orders`);
+            if (ordersSnapshot.empty) {
+                ordersBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:3rem; color:var(--text-muted);">No orders found.</td></tr>';
+            } else {
+                const ordersFragment = document.createDocumentFragment();
+                ordersSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    const amount = parseFloat(data.paidAmount) || 0;
+                    totalRevenue += amount;
+                    
+                    let dateStr = '';
+                    if (data.orderDate) {
+                        if (data.orderDate.toDate) dateStr = data.orderDate.toDate().toISOString().split('T')[0];
+                        else if (typeof data.orderDate === 'string') dateStr = data.orderDate.split('T')[0];
+                        else if (typeof data.orderDate === 'number') dateStr = new Date(data.orderDate).toISOString().split('T')[0];
+                        else if (data.orderDate.seconds) dateStr = new Date(data.orderDate.seconds * 1000).toISOString().split('T')[0];
+                    }
+                    
+                    if (dateStr) revenueByDate[dateStr] = (revenueByDate[dateStr] || 0) + amount;
 
-            const ordersFragment = document.createDocumentFragment();
-            ordersSnapshot.forEach(doc => {
-                const data = doc.data();
-                const amount = parseFloat(data.paidAmount) || 0;
-                totalRevenue += amount;
-                
-                // ... (date logic)
-                let dateStr = '';
-                if (data.orderDate) {
-                    if (data.orderDate.toDate) dateStr = data.orderDate.toDate().toISOString().split('T')[0];
-                    else if (typeof data.orderDate === 'string') dateStr = data.orderDate.split('T')[0];
-                    else if (typeof data.orderDate === 'number') dateStr = new Date(data.orderDate).toISOString().split('T')[0];
-                    else if (data.orderDate.seconds) dateStr = new Date(data.orderDate.seconds * 1000).toISOString().split('T')[0];
-                }
-                
-                if (dateStr) revenueByDate[dateStr] = (revenueByDate[dateStr] || 0) + amount;
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td data-label="CLIENT">
+                          <div style="font-weight:600;">${data.customer_name || 'Unknown'}</div>
+                          <div style="font-size:0.75rem; color:var(--text-muted);">${data.business_name || ''}</div>
+                        </td>
+                        <td data-label="SERVICE">${data.service || 'Unknown'}</td>
+                        <td data-label="MILESTONE"><span class="gold">Phase ${data.milestone || 1}</span></td>
+                        <td data-label="STATUS"><span class="status-pill status-${data.orderStatus || 'pending'}">${data.orderStatus || 'pending'}</span></td>
+                        <td data-label="ACTIONS">
+                          <button class="action-btn details-btn">Details</button>
+                        </td>
+                    `;
+                    
+                    tr.querySelector('.details-btn').onclick = () => {
+                        const detailsHtml = `
+                            <div style="display:grid; gap:12px;">
+                                <p><strong>Customer:</strong> ${data.customer_name || 'N/A'}</p>
+                                <p><strong>Email:</strong> ${data.customer_email || 'N/A'}</p>
+                                <p><strong>Business:</strong> ${data.business_name || 'N/A'}</p>
+                                <p><strong>Description:</strong> ${data.business_desc || 'No description.'}</p>
+                                <p><strong>Options:</strong> ${data.options || 'None'}</p>
+                                <p><strong>Total:</strong> R${(data.totalZar || 0).toLocaleString()}</p>
+                                <p><strong>Paid:</strong> R${amount.toLocaleString()}</p>
+                            </div>
+                        `;
+                        window.openOrderModal(doc.id, data.service || 'Project Details', detailsHtml);
+                    };
 
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td data-label="CLIENT">
-                      <div style="font-weight:600;">${data.customer_name || 'Unknown'}</div>
-                      <div style="font-size:0.75rem; color:var(--text-muted);">${data.business_name || ''}</div>
-                    </td>
-                    <td data-label="SERVICE">${data.service || 'Unknown'}</td>
-                    <td data-label="MILESTONE"><span class="gold">Phase ${data.milestone || 1}</span></td>
-                    <td data-label="STATUS"><span class="status-pill status-${data.orderStatus || 'pending'}">${data.orderStatus || 'pending'}</span></td>
-                    <td data-label="ACTIONS">
-                      <button class="action-btn details-btn">Details</button>
-                    </td>
-                `;
-                ordersFragment.appendChild(tr);
-            });
-            ordersBody.appendChild(ordersFragment);
+                    ordersFragment.appendChild(tr);
+                });
+                ordersBody.innerHTML = '';
+                ordersBody.appendChild(ordersFragment);
+            }
         }
 
-        // Deferred loading of other sections to prevent blocking
+        // Update Stat Card
+        const revEl = document.getElementById('stat-total-revenue');
+        if (revEl) revEl.textContent = `R${totalRevenue.toLocaleString()}`;
+
+        // Deferred loading of other sections
         setTimeout(() => {
             loadWithdrawals();
             loadTickets();
             loadCustomers();
+            loadTrafficStats();
         }, 100);
 
     } catch (e) {
@@ -1151,31 +1239,40 @@ async function loadTickets() {
         const inboxList = document.getElementById('inbox-list');
         if (!inboxList) return;
 
-        const ticketsSnapshot = await window.db.collection('support_tickets').orderBy('createdAt', 'desc').limit(20).get();
-        inboxList.innerHTML = '';
-        
-        if (ticketsSnapshot.empty) {
-            inboxList.innerHTML = '<p style="color:var(--text-muted); text-align:center;">No messages in inbox.</p>';
+        if (!window.db) {
+            setTimeout(loadTickets, 500);
             return;
         }
 
+        const ticketsSnapshot = await window.db.collection('support_tickets').orderBy('createdAt', 'desc').limit(20).get();
+        
+        if (ticketsSnapshot.empty) {
+            inboxList.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding:3rem;">No messages in inbox.</p>';
+            return;
+        }
+
+        const fragment = document.createDocumentFragment();
         ticketsSnapshot.forEach(doc => {
             const data = doc.data();
             const date = data.createdAt ? (data.createdAt.toDate ? data.createdAt.toDate().toLocaleString() : new Date(data.createdAt).toLocaleString()) : 'N/A';
             
             const card = document.createElement('div');
             card.className = 'dash-card';
-            card.style.padding = '1rem';
+            card.style.padding = '1.5rem';
+            card.style.marginBottom = '1rem';
             card.innerHTML = `
-                <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.8rem; flex-wrap:wrap; gap:10px;">
                     <span style="font-weight:600; color:var(--gold);">${data.name || 'Anonymous'}</span>
                     <span style="font-size:0.75rem; color:var(--text-muted);">${date}</span>
                 </div>
-                <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.8rem;">${data.email || ''}</div>
-                <p style="margin:0; font-size:0.9rem;">${data.message || ''}</p>
+                <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:0.5rem;">${data.email || ''}</div>
+                <p style="margin:0; font-size:0.95rem; line-height:1.6; color:#eee;">${data.message || ''}</p>
             `;
-            inboxList.appendChild(card);
+            fragment.appendChild(card);
         });
+
+        inboxList.innerHTML = '';
+        inboxList.appendChild(fragment);
     } catch (e) {
         console.error("Error loading tickets:", e);
     }
@@ -1186,8 +1283,17 @@ async function loadCustomers() {
         const body = document.getElementById('admin-customers-body');
         if (!body) return;
 
+        if (!window.db) {
+            setTimeout(loadCustomers, 500);
+            return;
+        }
+
         const snapshot = await window.db.collection('profiles').orderBy('createdAt', 'desc').limit(50).get();
-        body.innerHTML = '';
+        
+        if (snapshot.empty) {
+            body.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:3rem; color:var(--text-muted);">No customers found.</td></tr>';
+            return;
+        }
 
         const fragment = document.createDocumentFragment();
         snapshot.forEach(doc => {
@@ -1203,6 +1309,8 @@ async function loadCustomers() {
             `;
             fragment.appendChild(tr);
         });
+        
+        body.innerHTML = '';
         body.appendChild(fragment);
     } catch (e) {
         console.error("Error loading customers:", e);
