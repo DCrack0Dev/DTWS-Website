@@ -915,7 +915,14 @@ window.processWithdrawal = async function(id, status, amount = 0, userId = '', b
                     })
                 });
 
-                const result = await response.json();
+                const responseText = await response.text();
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (e) {
+                    throw new Error(`Server returned non-JSON response: ${responseText.substring(0, 100)}...`);
+                }
+
                 if (!response.ok) throw new Error(result.details || result.error || 'Payout failed');
 
                 // 2. If payout successful, update Firestore
