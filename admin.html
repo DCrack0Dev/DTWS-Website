@@ -796,20 +796,27 @@ async function loadWithdrawals() {
     if (!body) return;
 
     try {
-        // Ensure database is ready
         if (!window.db) {
-            console.log("Database not ready, waiting...");
             setTimeout(loadWithdrawals, 500);
             return;
         }
 
-        // Yield to main thread
         await new Promise(resolve => requestAnimationFrame(resolve));
 
-        const snapshot = await window.db.collection('transactions')
-            .where('type', '==', 'withdrawal_pending')
-            .orderBy('date', 'desc')
-            .get();
+        // Attempt ordered query
+        let snapshot;
+        try {
+            snapshot = await window.db.collection('transactions')
+                .where('type', '==', 'withdrawal_pending')
+                .orderBy('date', 'desc')
+                .get();
+        } catch (indexError) {
+            console.warn("Ordered query failed (likely missing index), falling back to unordered:", indexError);
+            // Fallback to unordered query so the user can still see data
+            snapshot = await window.db.collection('transactions')
+                .where('type', '==', 'withdrawal_pending')
+                .get();
+        }
 
         if (snapshot.empty) {
             body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:3rem; color:var(--text-muted);">No pending withdrawal requests.</td></tr>';
