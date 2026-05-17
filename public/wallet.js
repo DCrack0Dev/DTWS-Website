@@ -107,7 +107,7 @@ async function initiateDeposit(amount) {
 async function handlePaymentResponse() {
     const urlParams = new URLSearchParams(window.location.search);
     const status = urlParams.get('pay_status');
-    const paymentId = urlParams.get('m_payment_id'); 
+    const pfPaymentId = urlParams.get('pf_payment_id'); // PayFast return ID
 
     if (status === 'success') {
         try {
@@ -139,10 +139,11 @@ async function handlePaymentResponse() {
                         lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
                     }, { merge: true });
 
-                    // 2. Mark transaction as completed
+                    // 2. Mark transaction as completed and store PayFast ID
                     transaction.update(txDoc.ref, {
                         type: 'deposit_completed',
-                        completedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        completedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        pf_payment_id: pfPaymentId || 'unknown'
                     });
                 });
 
@@ -200,9 +201,41 @@ async function initiateWithdrawal(amount, bankDetails) {
                 date: firebase.firestore.FieldValue.serverTimestamp(),
                 description: 'Wallet Withdrawal'
             });
+            
+            // Store the ref for the API call update
+            withdrawalId = withdrawalRef.id;
         });
 
-        alert(`Withdrawal request for R${amountNum.toLocaleString()} submitted successfully! It will be processed within 24-48 hours.`);
+        // 3. Trigger Instant Payout via Vercel API
+        try {
+            const response = await fetch('/api/payfast-api', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'payout',
+                    amount: amountNum,
+                    bank_details: bankDetails
+                })
+            });
+
+            const result = await response.json();
+            
+            if (response.ok) {
+                // Update record to completed
+                await db.collection(WALLET_CONFIG.transactions).doc(withdrawalId).update({
+                    type: 'withdrawal_completed',
+                    processedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    payfast_payout_id: result.data ? result.data.payout_id : 'automated'
+                });
+                alert(`Instant Payout Successful! R${amountNum.toLocaleString()} has been sent to your bank account.`);
+            } else {
+                throw new Error(result.details || result.error || 'Instant payout failed');
+            }
+        } catch (apiErr) {
+            console.warn('Instant Payout API failed, falling back to manual approval:', apiErr);
+            alert(`Your withdrawal request for R${amountNum.toLocaleString()} has been submitted. Automatic payout was unavailable (${apiErr.message}), so an admin will process it manually within 24 hours.`);
+        }
+
         if (window.updateWalletUI) window.updateWalletUI();
         return true;
     } catch (error) {
