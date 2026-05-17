@@ -121,8 +121,64 @@ async function handlePaymentResponse() {
     }
 }
 
+/**
+ * Handle a withdrawal request
+ */
+async function initiateWithdrawal(amount, bankDetails) {
+    const user = await window.getFirebaseUser();
+    if (!user) {
+        alert('Please login to withdraw.');
+        return;
+    }
+
+    const amountNum = parseFloat(amount);
+    if (isNaN(amountNum) || amountNum <= 0) {
+        alert('Please enter a valid amount.');
+        return;
+    }
+
+    const walletRef = window.db.collection(WALLET_CONFIG.collection).doc(user.uid);
+    
+    try {
+        await window.db.runTransaction(async (transaction) => {
+            const walletDoc = await transaction.get(walletRef);
+            if (!walletDoc.exists || walletDoc.data().balance < amountNum) {
+                throw new Error('Insufficient balance.');
+            }
+
+            const currentBalance = walletDoc.data().balance;
+
+            // 1. Deduct from balance
+            transaction.update(walletRef, {
+                balance: currentBalance - amountNum,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            // 2. Create withdrawal request record
+            const withdrawalRef = window.db.collection(WALLET_CONFIG.transactions).doc();
+            transaction.set(withdrawalRef, {
+                userId: user.uid,
+                amount: amountNum,
+                type: 'withdrawal_pending',
+                bankDetails: bankDetails,
+                date: firebase.firestore.FieldValue.serverTimestamp(),
+                description: 'Wallet Withdrawal'
+            });
+        });
+
+        alert(`Withdrawal request for R${amountNum.toLocaleString()} submitted successfully! It will be processed within 24-48 hours.`);
+        if (window.updateWalletUI) window.updateWalletUI();
+        return true;
+    } catch (error) {
+        console.error('Withdrawal failed:', error);
+        alert(error.message || 'Withdrawal failed. Please try again.');
+        return false;
+    }
+}
+
 // Export functions to window
 window.initiateDeposit = initiateDeposit;
+window.initiateWithdrawal = initiateWithdrawal;
 window.getWallet = getWallet;
 window.handlePaymentResponse = handlePaymentResponse;
 
