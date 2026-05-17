@@ -30,7 +30,8 @@
       <script src="/nav-auth.js"></script>
       <script src="/currency.js"></script>
       <script src="/payfast.js"></script>
-  <script src="/tracker.js" defer></script>
+      <script src="/wallet.js"></script>
+      <script src="/tracker.js" defer></script>
       <script src="/order-modal.js"></script>
       <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle theme" aria-pressed="false">
         <span class="theme-toggle-track" aria-hidden="true"><span class="theme-toggle-thumb"></span></span>
@@ -402,7 +403,16 @@
           </div>
         </div>
 
-        <button type="submit" class="btn-order-final">🚀 Proceed to Secure Checkout</button>
+        <div id="wallet-payment-section" style="display:none; margin-bottom:1.5rem; padding:1.2rem; background:rgba(212, 160, 23, 0.05); border:1px solid rgba(212, 160, 23, 0.2); border-radius:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <span style="font-size:0.85rem; color:var(--text-muted);">Wallet Balance:</span>
+            <span id="modal-wallet-balance" style="font-weight:700; color:var(--gold);">R0.00</span>
+          </div>
+          <button type="submit" id="btn-pay-wallet" data-type="wallet" class="btn btn-outline" style="width:100%; border-color:var(--gold); color:var(--gold); padding:10px; font-weight:600;">Pay 50% Deposit from Wallet</button>
+          <p style="font-size:0.65rem; color:var(--muted); margin-top:8px; text-align:center;">Instant activation. No redirection required.</p>
+        </div>
+
+        <button type="submit" class="btn-order-final">🚀 Pay 50% Deposit via PayFast</button>
         <p class="checkout-note sa-only-text">Checkout is handled securely via PayFast. Prices are in ZAR.</p>
       </form>
     </div>
