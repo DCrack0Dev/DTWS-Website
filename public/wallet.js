@@ -9,60 +9,95 @@ const WALLET_CONFIG = {
 };
 
 /**
+ * Helper to ensure Firebase is initialized
+ */
+async function ensureDbReady() {
+    if (window.db) return window.db;
+    
+    // Wait for up to 5 seconds for window.db to be set by firebase-config.js
+    return new Promise((resolve, reject) => {
+        let attempts = 0;
+        const interval = setInterval(() => {
+            if (window.db) {
+                clearInterval(interval);
+                resolve(window.db);
+            }
+            attempts++;
+            if (attempts > 50) { // 5 seconds
+                clearInterval(interval);
+                reject(new Error('Firebase initialization timed out. Please refresh the page.'));
+            }
+        }, 100);
+    });
+}
+
+/**
  * Get or initialize the user's wallet
  */
 async function getWallet(userId) {
     if (!userId) return null;
     
-    const walletRef = window.db.collection(WALLET_CONFIG.collection).doc(userId);
-    const doc = await walletRef.get();
-    
-    if (!doc.exists) {
-        const initialData = {
-            balance: 0,
-            userId: userId,
-            lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-        };
-        await walletRef.set(initialData);
-        return initialData;
+    try {
+        const db = await ensureDbReady();
+        const walletRef = db.collection(WALLET_CONFIG.collection).doc(userId);
+        const doc = await walletRef.get();
+        
+        if (!doc.exists) {
+            const initialData = {
+                balance: 0,
+                userId: userId,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            await walletRef.set(initialData);
+            return initialData;
+        }
+        
+        return doc.data();
+    } catch (error) {
+        console.error('getWallet failed:', error);
+        return null;
     }
-    
-    return doc.data();
 }
 
 /**
  * Handle a deposit request
  */
 async function initiateDeposit(amount) {
-    const user = await window.getFirebaseUser();
-    if (!user) {
-        alert('Please login to deposit.');
-        return;
-    }
+    try {
+        const db = await ensureDbReady();
+        const user = await window.getFirebaseUser();
+        if (!user) {
+            alert('Please login to deposit.');
+            return;
+        }
 
-    if (amount < 10) {
-        alert('Minimum deposit is R10.');
-        return;
-    }
+        if (amount < 10) {
+            alert('Minimum deposit is R10.');
+            return;
+        }
 
-    if (window.redirectToPayFast) {
-        // Create a temporary transaction record
-        const txRef = await window.db.collection(WALLET_CONFIG.transactions).add({
-            userId: user.uid,
-            amount: parseFloat(amount),
-            type: 'deposit_pending',
-            date: firebase.firestore.FieldValue.serverTimestamp(),
-            description: 'Wallet Deposit'
-        });
+        if (window.redirectToPayFast) {
+            // Create a temporary transaction record
+            const txRef = await db.collection(WALLET_CONFIG.transactions).add({
+                userId: user.uid,
+                amount: parseFloat(amount),
+                type: 'deposit_pending',
+                date: firebase.firestore.FieldValue.serverTimestamp(),
+                description: 'Wallet Deposit'
+            });
 
-        // Redirect to PayFast
-        window.redirectToPayFast('Wallet Deposit', amount, {
-            name: user.nickname || 'Customer',
-            email: user.email,
-            m_payment_id: `WALLET-${txRef.id}`,
-            return_url: window.location.origin + '/dashboard.html?pay_status=success&type=wallet',
-            cancel_url: window.location.origin + '/dashboard.html?pay_status=cancel'
-        });
+            // Redirect to PayFast
+            window.redirectToPayFast('Wallet Deposit', amount, {
+                name: user.nickname || 'Customer',
+                email: user.email,
+                m_payment_id: `WALLET-${txRef.id}`,
+                return_url: window.location.origin + '/dashboard.html?pay_status=success&type=wallet',
+                cancel_url: window.location.origin + '/dashboard.html?pay_status=cancel'
+            });
+        }
+    } catch (error) {
+        console.error('Deposit initiation failed:', error);
+        alert('Deposit failed: ' + error.message);
     }
 }
 
@@ -72,52 +107,51 @@ async function initiateDeposit(amount) {
 async function handlePaymentResponse() {
     const urlParams = new URLSearchParams(window.location.search);
     const status = urlParams.get('pay_status');
-    const paymentId = urlParams.get('m_payment_id'); // PayFast might not return this in return_url unless configured, but we can check success
+    const paymentId = urlParams.get('m_payment_id'); 
 
     if (status === 'success') {
-        const user = await window.getFirebaseUser();
-        if (!user) return;
+        try {
+            const db = await ensureDbReady();
+            const user = await window.getFirebaseUser();
+            if (!user) return;
 
-        // In a real app, this should be handled by a secure backend/webhook.
-        // For this implementation, we check if this specific payment was already processed.
-        // We'll use the 'pay_status' in the URL as a trigger to check for 'deposit_pending' transactions.
-        
-        const pendingTxs = await window.db.collection(WALLET_CONFIG.transactions)
-            .where('userId', '==', user.uid)
-            .where('type', '==', 'deposit_pending')
-            .orderBy('date', 'desc')
-            .limit(1)
-            .get();
+            const pendingTxs = await db.collection(WALLET_CONFIG.transactions)
+                .where('userId', '==', user.uid)
+                .where('type', '==', 'deposit_pending')
+                .orderBy('date', 'desc')
+                .limit(1)
+                .get();
 
-        if (!pendingTxs.empty) {
-            const txDoc = pendingTxs.docs[0];
-            const txData = txDoc.data();
-            const amount = txData.amount;
+            if (!pendingTxs.empty) {
+                const txDoc = pendingTxs.docs[0];
+                const txData = txDoc.data();
+                const amount = txData.amount;
 
-            // 1. Update wallet balance (Atomic operation)
-            const walletRef = window.db.collection(WALLET_CONFIG.collection).doc(user.uid);
-            
-            await window.db.runTransaction(async (transaction) => {
-                const walletDoc = await transaction.get(walletRef);
-                const currentBalance = walletDoc.exists ? (walletDoc.data().balance || 0) : 0;
+                // 1. Update wallet balance (Atomic operation)
+                const walletRef = db.collection(WALLET_CONFIG.collection).doc(user.uid);
                 
-                transaction.set(walletRef, {
-                    balance: currentBalance + amount,
-                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
+                await db.runTransaction(async (transaction) => {
+                    const walletDoc = await transaction.get(walletRef);
+                    const currentBalance = walletDoc.exists ? (walletDoc.data().balance || 0) : 0;
+                    
+                    transaction.set(walletRef, {
+                        balance: currentBalance + amount,
+                        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
 
-                // 2. Mark transaction as completed
-                transaction.update(txDoc.ref, {
-                    type: 'deposit_completed',
-                    completedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    // 2. Mark transaction as completed
+                    transaction.update(txDoc.ref, {
+                        type: 'deposit_completed',
+                        completedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
                 });
-            });
 
-            alert(`Successfully deposited R${amount.toLocaleString()} to your wallet!`);
-            // Clean URL
-            window.history.replaceState({}, document.title, window.location.pathname);
-            // Refresh UI if function exists
-            if (window.updateWalletUI) window.updateWalletUI();
+                alert(`Successfully deposited R${amount.toLocaleString()} to your wallet!`);
+                window.history.replaceState({}, document.title, window.location.pathname);
+                if (window.updateWalletUI) window.updateWalletUI();
+            }
+        } catch (error) {
+            console.error('handlePaymentResponse failed:', error);
         }
     }
 }
@@ -126,22 +160,23 @@ async function handlePaymentResponse() {
  * Handle a withdrawal request
  */
 async function initiateWithdrawal(amount, bankDetails) {
-    const user = await window.getFirebaseUser();
-    if (!user) {
-        alert('Please login to withdraw.');
-        return;
-    }
-
-    const amountNum = parseFloat(amount);
-    if (isNaN(amountNum) || amountNum <= 0) {
-        alert('Please enter a valid amount.');
-        return;
-    }
-
-    const walletRef = window.db.collection(WALLET_CONFIG.collection).doc(user.uid);
-    
     try {
-        await window.db.runTransaction(async (transaction) => {
+        const db = await ensureDbReady();
+        const user = await window.getFirebaseUser();
+        if (!user) {
+            alert('Please login to withdraw.');
+            return;
+        }
+
+        const amountNum = parseFloat(amount);
+        if (isNaN(amountNum) || amountNum <= 0) {
+            alert('Please enter a valid amount.');
+            return;
+        }
+
+        const walletRef = db.collection(WALLET_CONFIG.collection).doc(user.uid);
+        
+        await db.runTransaction(async (transaction) => {
             const walletDoc = await transaction.get(walletRef);
             if (!walletDoc.exists || walletDoc.data().balance < amountNum) {
                 throw new Error('Insufficient balance.');
@@ -156,7 +191,7 @@ async function initiateWithdrawal(amount, bankDetails) {
             });
 
             // 2. Create withdrawal request record
-            const withdrawalRef = window.db.collection(WALLET_CONFIG.transactions).doc();
+            const withdrawalRef = db.collection(WALLET_CONFIG.transactions).doc();
             transaction.set(withdrawalRef, {
                 userId: user.uid,
                 amount: amountNum,
