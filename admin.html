@@ -315,6 +315,7 @@
         <li><a href="#" onclick="showSection('orders')" class="nav-item" id="nav-orders">📁 Order Management</a></li>
         <li><a href="#" onclick="showSection('inbox')" class="nav-item" id="nav-inbox">📬 Support Inbox</a></li>
         <li><a href="#" onclick="showSection('customers')" class="nav-item" id="nav-customers">👤 Customer List</a></li>
+        <li><a href="#" onclick="showSection('tools')" class="nav-item" id="nav-tools">🛠️ System Tools</a></li>
         <li style="margin-top:4rem;"><a href="#" onclick="window.logoutFirebaseUser()" style="color:#ff6b6b;">🚪 Logout</a></li>
       </ul>
     </nav>
@@ -442,6 +443,46 @@
         </table>
       </div>
     </section>
+
+    <!-- SYSTEM TOOLS SECTION -->
+    <section id="section-tools" class="view-section">
+      <header class="dash-header">
+        <h2>System Tools</h2>
+        <p style="color:var(--text-muted);">Administrative actions and platform maintenance.</p>
+      </header>
+      
+      <div class="dash-grid" style="margin-top:2.5rem;">
+        <div class="dash-card">
+          <h4>Financial Tools</h4>
+          <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">Perform bulk financial operations across the platform.</p>
+          <div style="display:grid; gap:1rem;">
+            <div style="padding:1rem; background:rgba(212, 160, 23, 0.05); border:1px solid rgba(212, 160, 23, 0.2); border-radius:12px;">
+              <h5 style="margin:0 0 10px 0; color:var(--gold);">Bulk Credit Distribution</h5>
+              <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">Add a specified amount of credit to EVERY registered user's wallet.</p>
+              <div style="display:flex; gap:10px;">
+                <input type="number" id="bulkCreditAmount" value="3000" style="background:var(--bg-dark); border:1px solid var(--border); color:white; padding:8px 12px; border-radius:6px; width:120px;">
+                <button onclick="window.distributeBulkCredit()" id="btnDistributeCredit" class="action-btn" style="flex:1; padding:8px;">Distribute Credit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="dash-card">
+          <h4>Platform Health</h4>
+          <p style="color:var(--text-muted); font-size:0.85rem;">System status: <span style="color:#00ff64;">Online</span></p>
+          <div style="font-size:0.8rem; margin-top:1rem;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+              <span>Database Sync</span>
+              <span style="color:#00ff64;">Active</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+              <span>Auth Service</span>
+              <span style="color:#00ff64;">Operational</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 </div>
 
@@ -492,6 +533,75 @@ window.openOrderModal = function(id, service, detailsHtml) {
     document.getElementById('modal-content').innerHTML = detailsHtml;
     document.getElementById('orderModal').style.display = 'flex';
 }
+
+window.distributeBulkCredit = async function() {
+    if (!window.db) {
+        alert("Database not initialized. Please wait or refresh.");
+        return;
+    }
+
+    const amount = parseFloat(document.getElementById('bulkCreditAmount').value);
+    const btn = document.getElementById('btnDistributeCredit');
+    
+    if (isNaN(amount) || amount <= 0) {
+        alert("Please enter a valid amount.");
+        return;
+    }
+
+    if (!confirm(`Are you sure you want to add R${amount.toLocaleString()} to EVERY registered user's wallet? This action cannot be undone.`)) {
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Processing...";
+
+    try {
+        // 1. Get all users from profiles
+        const profilesSnapshot = await window.db.collection('profiles').get();
+        const totalUsers = profilesSnapshot.size;
+        console.log(`Starting bulk credit distribution for ${totalUsers} users...`);
+        let processed = 0;
+
+        // 2. Use Batch Write for efficiency (max 500 per batch)
+        let batch = window.db.batch();
+        let count = 0;
+
+        for (const profileDoc of profilesSnapshot.docs) {
+            const userId = profileDoc.id;
+            const walletRef = window.db.collection('wallets').doc(userId);
+            
+            // Use FieldValue.increment to update balance
+            batch.set(walletRef, {
+                balance: firebase.firestore.FieldValue.increment(amount),
+                userId: userId,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+
+            count++;
+            processed++;
+
+            // Commit batch every 500 operations
+            if (count === 500) {
+                await batch.commit();
+                batch = window.db.batch();
+                count = 0;
+            }
+        }
+
+        // Commit remaining
+        if (count > 0) {
+            await batch.commit();
+        }
+
+        alert(`Success! R${amount.toLocaleString()} has been added to ${processed} wallets.`);
+    } catch (error) {
+        console.error("Bulk credit failed:", error);
+        alert("Error distributing credit: " + error.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = "Distribute Credit";
+    }
+};
 
 window.closeOrderModal = function() {
     document.getElementById('orderModal').style.display = 'none';
