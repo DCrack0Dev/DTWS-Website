@@ -363,7 +363,10 @@
         <div class="dash-section stat-card">
           <h5>Wallet Balance</h5>
           <div class="val" id="wallet-balance">R0.00</div>
-          <button onclick="openDepositModal()" style="margin-top: 10px; background: var(--dash-gold); border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; cursor: pointer; color: #000;">+ Deposit</button>
+          <div style="display:flex; gap:10px; margin-top:10px;">
+            <button onclick="openDepositModal()" style="flex:1; background: var(--dash-gold); border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; cursor: pointer; color: #000;">+ Deposit</button>
+            <button onclick="openWithdrawModal()" style="flex:1; background: transparent; border: 1px solid var(--dash-gold); padding: 5px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; cursor: pointer; color: var(--dash-gold);">↑ Withdraw</button>
+          </div>
         </div>
         <div class="dash-section stat-card">
           <h5>Active Projects</h5>
@@ -399,6 +402,27 @@
     </div>
 </div>
 
+<!-- Withdraw Modal -->
+<div id="withdrawModal" class="sidebar-overlay" style="display:none; justify-content:center; align-items:center; z-index:2000;">
+    <div class="dash-section" style="width:350px; background:var(--dash-sidebar); position:relative;">
+        <button onclick="closeWithdrawModal()" style="position:absolute; top:10px; right:10px; background:none; border:none; color:var(--dash-muted); cursor:pointer;">✕</button>
+        <h4 style="margin-top:0;">Withdraw Funds</h4>
+        <p style="font-size:0.8rem; color:var(--dash-muted);">Submit a request to withdraw your balance.</p>
+        
+        <div style="margin: 1rem 0;">
+            <label style="font-size:0.7rem; color:var(--dash-muted); display:block; margin-bottom:5px;">Amount (ZAR)</label>
+            <input type="number" id="withdrawAmount" placeholder="0.00" style="width:100%; padding:10px; background:var(--dash-bg); border:1px solid var(--dash-border); color:white; border-radius:8px;">
+        </div>
+
+        <div style="margin: 1rem 0;">
+            <label style="font-size:0.7rem; color:var(--dash-muted); display:block; margin-bottom:5px;">Bank Details (Account Name, Number, Bank, Branch Code)</label>
+            <textarea id="bankDetails" rows="4" style="width:100%; padding:10px; background:var(--dash-bg); border:1px solid var(--dash-border); color:white; border-radius:8px; resize:none;"></textarea>
+        </div>
+
+        <button onclick="handleWithdrawSubmit()" id="btnWithdrawFinal" style="width:100%; padding:12px; background:var(--dash-gold); border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Request Withdrawal</button>
+    </div>
+</div>
+
 <script>
 // Wallet UI Functions
 function openDepositModal() {
@@ -409,11 +433,49 @@ function closeDepositModal() {
     document.getElementById('depositModal').style.display = 'none';
 }
 
+function openWithdrawModal() {
+    document.getElementById('withdrawModal').style.display = 'flex';
+}
+
+function closeWithdrawModal() {
+    document.getElementById('withdrawModal').style.display = 'none';
+}
+
 async function handleDepositSubmit() {
     const amount = document.getElementById('depositAmount').value;
     if (window.initiateDeposit) {
         await window.initiateDeposit(amount);
     }
+}
+
+async function handleWithdrawSubmit() {
+    const amount = document.getElementById('withdrawAmount').value;
+    const bankDetails = document.getElementById('bankDetails').value;
+    const btn = document.getElementById('btnWithdrawFinal');
+
+    if (!amount || amount <= 0) {
+        alert('Please enter a valid amount.');
+        return;
+    }
+    if (!bankDetails.trim()) {
+        alert('Please provide your bank details.');
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Processing...';
+
+    if (window.initiateWithdrawal) {
+        const success = await window.initiateWithdrawal(amount, bankDetails);
+        if (success) {
+            closeWithdrawModal();
+            document.getElementById('withdrawAmount').value = '';
+            document.getElementById('bankDetails').value = '';
+        }
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Request Withdrawal';
 }
 
 async function updateWalletUI() {
