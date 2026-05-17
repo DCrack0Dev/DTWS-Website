@@ -37,6 +37,11 @@ let currentOrder = {
     total: 0
 };
 
+let userWallet = {
+    balance: 0,
+    isLoaded: false
+};
+
 function initModal() {
     const modal = document.getElementById('orderModal');
     const orderBtns = document.querySelectorAll('.btn-order');
@@ -60,7 +65,7 @@ function initModal() {
     form.onsubmit = handleOrderSubmit;
 }
 
-function openModal(service, amount, category) {
+async function openModal(service, amount, category) {
     const modal = document.getElementById('orderModal');
     const optionsGrid = document.getElementById('dynamic-options');
     const summaryService = document.getElementById('summary-service');
@@ -96,7 +101,44 @@ function openModal(service, amount, category) {
         optionsGrid.appendChild(item);
     });
 
+    // Check Wallet Balance
+    await checkWalletBalance();
+
     modal.style.display = 'block';
+}
+
+async function checkWalletBalance() {
+    const user = await window.getFirebaseUser();
+    const walletSection = document.getElementById('wallet-payment-section');
+    const walletBalanceEl = document.getElementById('modal-wallet-balance');
+    const payWithWalletBtn = document.getElementById('btn-pay-wallet');
+
+    if (!user || !window.getWallet || !walletSection) return;
+
+    try {
+        const wallet = await window.getWallet(user.uid);
+        userWallet.balance = wallet ? (wallet.balance || 0) : 0;
+        userWallet.isLoaded = true;
+
+        const depositRequired = Math.round(currentOrder.total / 2);
+        
+        if (walletBalanceEl) {
+            walletBalanceEl.textContent = `R${userWallet.balance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+        }
+
+        if (userWallet.balance >= depositRequired) {
+            walletSection.style.display = 'block';
+            if (payWithWalletBtn) payWithWalletBtn.disabled = false;
+        } else {
+            walletSection.style.display = 'block'; // Show it but maybe disabled or with message
+            if (payWithWalletBtn) {
+                payWithWalletBtn.disabled = true;
+                payWithWalletBtn.title = "Insufficient wallet balance for 50% deposit";
+            }
+        }
+    } catch (e) {
+        console.error("Wallet check failed:", e);
+    }
 }
 
 function toggleOption(opt) {
@@ -109,6 +151,8 @@ function toggleOption(opt) {
         currentOrder.total += opt.price;
     }
     updateTotalDisplay();
+    // Re-check wallet whenever total changes
+    checkWalletBalance();
 }
 
 function updateTotalDisplay() {
@@ -145,6 +189,17 @@ function updateTotalDisplay() {
 
 async function handleOrderSubmit(e) {
     e.preventDefault();
+    
+    // Check if submitting via Wallet or PayFast
+    // The submitter property is only supported in modern browsers
+    const submitter = e.submitter || document.activeElement;
+    const submitType = submitter ? submitter.getAttribute('data-type') : 'payfast';
+    
+    if (submitType === 'wallet') {
+        await handleWalletOrderPayment(e);
+        return;
+    }
+
     const user = await window.getFirebaseUser();
     if (!user) {
         alert('Please login to place an order.');
@@ -191,6 +246,80 @@ async function handleOrderSubmit(e) {
         alert('Something went wrong. Please try again.');
         btn.textContent = originalText;
         btn.disabled = false;
+    }
+}
+
+async function handleWalletOrderPayment(e) {
+    const user = await window.getFirebaseUser();
+    if (!user) return;
+
+    const depositAmount = Math.round(currentOrder.total / 2);
+    if (userWallet.balance < depositAmount) {
+        alert('Insufficient wallet balance.');
+        return;
+    }
+
+    if (!confirm(`Pay R${depositAmount.toLocaleString()} deposit using your wallet balance?`)) return;
+
+    const btn = document.getElementById('btn-pay-wallet');
+    btn.disabled = true;
+    btn.textContent = 'Processing...';
+
+    const formData = new FormData(e.target);
+    const orderData = {
+        userId: user.uid,
+        service: currentOrder.serviceName,
+        totalZar: currentOrder.total,
+        paidAmount: depositAmount,
+        milestone: 1,
+        orderStatus: 'active', // Mark as active immediately since paid
+        orderDate: new Date().toISOString(),
+        options: currentOrder.options.map(o => o.name).join(', '),
+        customer_name: formData.get('name'),
+        customer_email: formData.get('email'),
+        business_name: formData.get('business_name'),
+        business_desc: formData.get('business_desc'),
+        paymentMethod: 'wallet'
+    };
+
+    try {
+        const walletRef = window.db.collection('wallets').doc(user.uid);
+        
+        await window.db.runTransaction(async (transaction) => {
+            const walletDoc = await transaction.get(walletRef);
+            if (!walletDoc.exists || walletDoc.data().balance < depositAmount) {
+                throw new Error('Insufficient balance.');
+            }
+
+            // 1. Deduct from wallet
+            transaction.update(walletRef, {
+                balance: walletDoc.data().balance - depositAmount,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            // 2. Create Order
+            const orderRef = window.db.collection('orders').doc();
+            transaction.set(orderRef, orderData);
+
+            // 3. Create Transaction record
+            const txRef = window.db.collection('transactions').doc();
+            transaction.set(txRef, {
+                userId: user.uid,
+                amount: depositAmount,
+                type: 'order_payment',
+                orderId: orderRef.id,
+                date: firebase.firestore.FieldValue.serverTimestamp(),
+                description: `Payment for ${orderData.service}`
+            });
+        });
+
+        alert('Payment successful! Your order has been placed and is now active.');
+        window.location.href = 'dashboard.html';
+    } catch (err) {
+        console.error('Wallet payment failed:', err);
+        alert('Payment failed: ' + err.message);
+        btn.disabled = false;
+        btn.textContent = 'Pay from Wallet';
     }
 }
 
