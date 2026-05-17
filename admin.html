@@ -593,7 +593,7 @@ async function loadWithdrawals() {
                 </td>
                 <td data-label="DATE">${date}</td>
                 <td data-label="ACTIONS">
-                    <button onclick="window.processWithdrawal('${doc.id}', 'completed')" class="action-btn" style="border-color:#00ff64; color:#00ff64; margin-right:5px;">Approve</button>
+                    <button onclick="window.processWithdrawal('${doc.id}', 'completed', ${data.amount}, '${data.userId}', \`${data.bankDetails || ''}\`)" class="action-btn" style="border-color:#00ff64; color:#00ff64; margin-right:5px;">Approve</button>
                     <button onclick="window.processWithdrawal('${doc.id}', 'rejected', ${data.amount}, '${data.userId}')" class="action-btn" style="border-color:#ff4b4b; color:#ff4b4b;">Reject</button>
                 </td>
             `;
@@ -604,19 +604,59 @@ async function loadWithdrawals() {
     }
 }
 
-window.processWithdrawal = async function(id, status, amount = 0, userId = '') {
-    const action = status === 'completed' ? 'approve (mark as paid)' : 'REJECT (refund funds)';
+window.processWithdrawal = async function(id, status, amount = 0, userId = '', bankDetailsStr = '') {
+    const action = status === 'completed' ? 'approve and AUTOMATE payout via PayFast' : 'REJECT (refund funds to wallet)';
     if (!confirm(`Are you sure you want to ${action} this withdrawal?`)) return;
 
     try {
         if (status === 'completed') {
-            await window.db.collection('transactions').doc(id).update({
-                type: 'withdrawal_completed',
-                processedAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            alert("Withdrawal marked as completed.");
+            // 1. Attempt Automated Payout via Vercel API
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Processing Payout...';
+
+            try {
+                // Parse bank details from string if possible or use data
+                // For now, we assume bankDetailsStr is available from the UI
+                const bankLines = bankDetailsStr.split('\n');
+                const bankData = {
+                    account_holder: bankLines[0] || 'Unknown',
+                    account_number: bankLines[1] || '',
+                    bank_name: bankLines[2] || '',
+                    bank_code: bankLines[3] || ''
+                };
+
+                const response = await fetch('/api/payfast-api', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'payout',
+                        amount: amount,
+                        bank_details: bankData
+                    })
+                });
+
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.details || result.error || 'Payout failed');
+
+                // 2. If payout successful, update Firestore
+                await window.db.collection('transactions').doc(id).update({
+                    type: 'withdrawal_completed',
+                    processedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    payfast_payout_id: result.data ? result.data.payout_id : 'automated'
+                });
+                
+                alert("Withdrawal approved and PayFast Payout triggered successfully!");
+            } catch (apiErr) {
+                console.error("PayFast Payout Failed:", apiErr);
+                alert("PayFast Payout Failed: " + apiErr.message + "\n\nFirestore record NOT updated. Please check PayFast settings.");
+                btn.disabled = false;
+                btn.textContent = originalText;
+                return;
+            }
         } else {
-            // Reject and refund
+            // Reject and refund to WALLET (not PayFast)
             const walletRef = window.db.collection('wallets').doc(userId);
             await window.db.runTransaction(async (transaction) => {
                 const walletDoc = await transaction.get(walletRef);
