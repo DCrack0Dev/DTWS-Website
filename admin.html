@@ -313,6 +313,7 @@
       <ul style="list-style:none;">
         <li><a href="#" onclick="showSection('stats')" class="nav-item active" id="nav-stats">📊 Dashboard</a></li>
         <li><a href="#" onclick="showSection('orders')" class="nav-item" id="nav-orders">📁 Order Management</a></li>
+        <li><a href="#" onclick="showSection('withdrawals')" class="nav-item" id="nav-withdrawals">💸 Withdrawals</a></li>
         <li><a href="#" onclick="showSection('inbox')" class="nav-item" id="nav-inbox">📬 Support Inbox</a></li>
         <li><a href="#" onclick="showSection('customers')" class="nav-item" id="nav-customers">👤 Customer List</a></li>
         <li><a href="#" onclick="showSection('tools')" class="nav-item" id="nav-tools">🛠️ System Tools</a></li>
@@ -400,6 +401,32 @@
           </thead>
           <tbody id="admin-orders-body">
             <!-- Loaded via JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- WITHDRAWALS SECTION -->
+    <section id="section-withdrawals" class="view-section">
+      <header class="dash-header">
+        <h2>Withdrawal Requests</h2>
+        <p style="color:var(--text-muted);">Manage and process client fund withdrawals.</p>
+      </header>
+      
+      <div class="dash-card" style="margin-top:2.5rem;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>CLIENT</th>
+              <th>AMOUNT</th>
+              <th>BANK DETAILS</th>
+              <th>DATE</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody id="admin-withdrawals-body">
+            <!-- Loaded via JS -->
+            <tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--text-muted);">Loading requests...</td></tr>
           </tbody>
         </table>
       </div>
@@ -526,6 +553,93 @@ window.showSection = function(sectionId) {
     if (section) section.classList.add('active');
     if (nav) nav.classList.add('active');
 }
+
+async function loadWithdrawals() {
+    try {
+        const snapshot = await window.db.collection('transactions')
+            .where('type', '==', 'withdrawal_pending')
+            .orderBy('date', 'desc')
+            .get();
+
+        const body = document.getElementById('admin-withdrawals-body');
+        if (!body) return;
+        body.innerHTML = '';
+
+        if (snapshot.empty) {
+            body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--text-muted);">No pending withdrawal requests.</td></tr>';
+            return;
+        }
+
+        for (const doc of snapshot.docs) {
+            const data = doc.data();
+            const date = data.date ? (data.date.toDate ? data.date.toDate().toLocaleDateString() : new Date(data.date).toLocaleDateString()) : 'N/A';
+            
+            // Get user profile for name
+            let userName = 'Loading...';
+            try {
+                const profile = await window.db.collection('profiles').doc(data.userId).get();
+                userName = profile.exists ? (profile.data().nickname || profile.data().displayName || 'User') : 'Unknown';
+            } catch (e) { userName = 'Unknown'; }
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td data-label="CLIENT">
+                    <div style="font-weight:600;">${userName}</div>
+                    <div style="font-size:0.7rem; color:var(--text-muted);">${data.userId}</div>
+                </td>
+                <td data-label="AMOUNT" style="color:var(--gold); font-weight:700;">R${data.amount.toLocaleString()}</td>
+                <td data-label="BANK DETAILS">
+                    <div style="font-size:0.8rem; max-width:250px; white-space:pre-wrap;">${data.bankDetails || 'N/A'}</div>
+                </td>
+                <td data-label="DATE">${date}</td>
+                <td data-label="ACTIONS">
+                    <button onclick="window.processWithdrawal('${doc.id}', 'completed')" class="action-btn" style="border-color:#00ff64; color:#00ff64; margin-right:5px;">Approve</button>
+                    <button onclick="window.processWithdrawal('${doc.id}', 'rejected', ${data.amount}, '${data.userId}')" class="action-btn" style="border-color:#ff4b4b; color:#ff4b4b;">Reject</button>
+                </td>
+            `;
+            body.appendChild(tr);
+        }
+    } catch (e) {
+        console.error("Error loading withdrawals:", e);
+    }
+}
+
+window.processWithdrawal = async function(id, status, amount = 0, userId = '') {
+    const action = status === 'completed' ? 'approve (mark as paid)' : 'REJECT (refund funds)';
+    if (!confirm(`Are you sure you want to ${action} this withdrawal?`)) return;
+
+    try {
+        if (status === 'completed') {
+            await window.db.collection('transactions').doc(id).update({
+                type: 'withdrawal_completed',
+                processedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            alert("Withdrawal marked as completed.");
+        } else {
+            // Reject and refund
+            const walletRef = window.db.collection('wallets').doc(userId);
+            await window.db.runTransaction(async (transaction) => {
+                const walletDoc = await transaction.get(walletRef);
+                const currentBalance = walletDoc.exists ? (walletDoc.data().balance || 0) : 0;
+                
+                transaction.set(walletRef, {
+                    balance: currentBalance + amount,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+
+                transaction.update(window.db.collection('transactions').doc(id), {
+                    type: 'withdrawal_rejected',
+                    processedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            });
+            alert("Withdrawal rejected and funds refunded to user wallet.");
+        }
+        loadWithdrawals();
+    } catch (e) {
+        console.error("Error processing withdrawal:", e);
+        alert("Action failed: " + e.message);
+    }
+};
 
 window.openOrderModal = function(id, service, detailsHtml) {
     currentViewingOrderId = id;
@@ -906,6 +1020,9 @@ async function loadAllAdminData() {
             console.warn("Tickets ordered query failed, falling back to unordered:", err);
             ticketsSnapshot = await window.db.collection('support_tickets').limit(20).get();
         }
+        
+        // 3. Fetch Withdrawals
+        await loadWithdrawals();
 
         const inboxList = document.getElementById('inbox-list');
         if (inboxList) {
