@@ -85,6 +85,7 @@ async function handlePaymentResponse() {
         const pendingTxs = await window.db.collection(WALLET_CONFIG.transactions)
             .where('userId', '==', user.uid)
             .where('type', '==', 'deposit_pending')
+            .orderBy('date', 'desc')
             .limit(1)
             .get();
 
