@@ -37,12 +37,12 @@ function redirectToPayFast(itemName, amount, customerData = {}) {
     const params = {
         merchant_id: PAYFAST_CONFIG.merchant_id,
         merchant_key: PAYFAST_CONFIG.merchant_key,
-        return_url: PAYFAST_CONFIG.return_url,
-        cancel_url: PAYFAST_CONFIG.cancel_url,
+        return_url: customerData.return_url || PAYFAST_CONFIG.return_url,
+        cancel_url: customerData.cancel_url || PAYFAST_CONFIG.cancel_url,
         notify_url: PAYFAST_CONFIG.notify_url,
         name_first: customerData.name || 'Customer',
         email_address: customerData.email || 'customer@example.com',
-        m_payment_id: 'DTWS-' + Date.now(),
+        m_payment_id: customerData.m_payment_id || 'DTWS-' + Date.now(),
         amount: parseFloat(amount).toFixed(2),
         item_name: 'DemiTech: ' + itemName,
         item_description: 'Service order for ' + itemName
@@ -64,8 +64,12 @@ function redirectToPayFast(itemName, amount, customerData = {}) {
 function checkPaymentStatus() {
     const urlParams = new URLSearchParams(window.location.search);
     const status = urlParams.get('pay_status');
+    const type = urlParams.get('type');
     
     if (status === 'success') {
+        // If it's a wallet deposit, wallet.js will handle the message
+        if (type === 'wallet') return;
+
         alert('Payment Successful! Thank you for choosing DemiTech Web Services. We will contact you shortly to begin your project.');
         // Clear the URL param
         window.history.replaceState({}, document.title, window.location.pathname);
