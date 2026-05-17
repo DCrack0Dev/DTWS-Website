@@ -497,6 +497,7 @@
         <li><a href="#" onclick="showSection('stats')" class="nav-item active" id="nav-stats">📊 Dashboard</a></li>
         <li><a href="#" onclick="showSection('orders')" class="nav-item" id="nav-orders">📁 Order Management</a></li>
         <li><a href="#" onclick="showSection('withdrawals')" class="nav-item" id="nav-withdrawals">💸 Withdrawals</a></li>
+        <li><a href="#" onclick="showSection('transactions')" class="nav-item" id="nav-transactions">📜 Financial History</a></li>
         <li><a href="#" onclick="showSection('inbox')" class="nav-item" id="nav-inbox">📬 Support Inbox</a></li>
         <li><a href="#" onclick="showSection('customers')" class="nav-item" id="nav-customers">👤 Customer List</a></li>
         <li><a href="#" onclick="showSection('tools')" class="nav-item" id="nav-tools">🛠️ System Tools</a></li>
@@ -610,6 +611,32 @@
           <tbody id="admin-withdrawals-body">
             <!-- Loaded via JS -->
             <tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--text-muted);">Loading requests...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TRANSACTIONS SECTION -->
+    <section id="section-transactions" class="view-section">
+      <header class="dash-header">
+        <h2>Financial History</h2>
+        <p style="color:var(--text-muted);">View all deposits and payments across the platform.</p>
+      </header>
+      
+      <div class="dash-card" style="margin-top:2.5rem;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>CLIENT</th>
+              <th>AMOUNT</th>
+              <th>TYPE</th>
+              <th>DATE</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody id="admin-transactions-body">
+            <!-- Loaded via JS -->
+            <tr><td colspan="5" style="text-align:center; padding:2rem; color:var(--text-muted);">Loading transactions...</td></tr>
           </tbody>
         </table>
       </div>
@@ -747,8 +774,113 @@ window.showSection = function(sectionId) {
     // 2. Heavy Data Loading (Asynchronous/Deferred)
     if (sectionId === 'withdrawals') {
         loadWithdrawals();
+    } else if (sectionId === 'transactions') {
+        loadTransactions();
     }
 }
+
+async function loadTransactions() {
+    const body = document.getElementById('admin-transactions-body');
+    if (!body) return;
+
+    try {
+        if (!window.db) return;
+
+        const snapshot = await window.db.collection('transactions')
+            .orderBy('date', 'desc')
+            .limit(100)
+            .get();
+
+        if (snapshot.empty) {
+            body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:3rem; color:var(--text-muted);">No transactions found.</td></tr>';
+            return;
+        }
+
+        const fragment = document.createDocumentFragment();
+        for (const doc of snapshot.docs) {
+            const data = doc.data();
+            const date = data.date ? (data.date.toDate ? data.date.toDate().toLocaleDateString() : new Date(data.date).toLocaleDateString()) : 'N/A';
+            const profile = profileCache.get(data.userId) || { nickname: 'User' };
+            const userName = profile.nickname || profile.displayName || 'User';
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td data-label="CLIENT">
+                    <div style="font-weight:600;">${userName}</div>
+                    <div style="font-size:0.7rem; color:var(--text-muted);">${data.userId}</div>
+                </td>
+                <td data-label="AMOUNT" style="font-weight:700; color:${data.type.includes('deposit') ? '#00ff64' : '#ff4b4b'};">
+                    ${data.type.includes('deposit') ? '+' : '-'}R${data.amount.toLocaleString()}
+                </td>
+                <td data-label="TYPE">
+                    <span class="status-pill" style="font-size:0.6rem; background:rgba(255,255,255,0.05);">${data.type.replace('_', ' ').toUpperCase()}</span>
+                </td>
+                <td data-label="DATE">${date}</td>
+                <td data-label="ACTIONS">
+                    ${data.type === 'deposit_completed' && data.pf_payment_id ? 
+                        `<button onclick="window.initiatePayFastRefund('${doc.id}', ${data.amount}, '${data.userId}', '${data.pf_payment_id}')" class="action-btn" style="border-color:var(--gold); color:var(--gold);">PayFast Refund</button>` 
+                        : ''}
+                </td>
+            `;
+            fragment.appendChild(tr);
+        }
+
+        body.innerHTML = '';
+        body.appendChild(fragment);
+    } catch (e) {
+        console.error("Error loading transactions:", e);
+    }
+}
+
+window.initiatePayFastRefund = async function(txId, amount, userId, pfPaymentId) {
+    if (!confirm(`Are you sure you want to refund R${amount.toLocaleString()} back to the customer's bank/card via PayFast? This will also deduct the amount from their website wallet.`)) return;
+
+    const btn = event.target;
+    btn.disabled = true;
+    btn.textContent = 'Refunding...';
+
+    try {
+        // 1. Call PayFast API via Vercel
+        const response = await fetch('/api/payfast-api', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'refund',
+                amount: amount,
+                payment_id: pfPaymentId
+            })
+        });
+
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.details || result.error || 'Refund failed');
+
+        // 2. Deduct from User Wallet
+        const walletRef = window.db.collection('wallets').doc(userId);
+        await window.db.runTransaction(async (transaction) => {
+            const walletDoc = await transaction.get(walletRef);
+            const currentBalance = walletDoc.exists ? (walletDoc.data().balance || 0) : 0;
+            
+            transaction.update(walletRef, {
+                balance: currentBalance - amount,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            // 3. Mark transaction as refunded
+            transaction.update(window.db.collection('transactions').doc(txId), {
+                type: 'deposit_refunded',
+                refundedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        });
+
+        alert("Refund successful! The funds have been returned via PayFast and deducted from the user's wallet.");
+        loadTransactions();
+    } catch (e) {
+        console.error("Refund failed:", e);
+        alert("Refund failed: " + e.message);
+        btn.disabled = false;
+        btn.textContent = 'PayFast Refund';
+    }
+};
 
 // Mobile Menu Toggle
 document.addEventListener('DOMContentLoaded', () => {

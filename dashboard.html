@@ -414,68 +414,76 @@
             <input type="number" id="withdrawAmount" placeholder="0.00" style="width:100%; padding:10px; background:var(--dash-bg); border:1px solid var(--dash-border); color:white; border-radius:8px;">
         </div>
 
-        <div style="margin: 1rem 0;">
-            <label style="font-size:0.7rem; color:var(--dash-muted); display:block; margin-bottom:5px;">Bank Details (Account Name, Number, Bank, Branch Code)</label>
-            <textarea id="bankDetails" rows="4" style="width:100%; padding:10px; background:var(--dash-bg); border:1px solid var(--dash-border); color:white; border-radius:8px; resize:none;"></textarea>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin: 1rem 0;">
+            <div>
+                <label style="font-size:0.6rem; color:var(--dash-muted); display:block; margin-bottom:5px;">Account Holder</label>
+                <input type="text" id="accHolder" style="width:100%; padding:8px; background:var(--dash-bg); border:1px solid var(--dash-border); color:white; border-radius:6px;">
+            </div>
+            <div>
+                <label style="font-size:0.6rem; color:var(--dash-muted); display:block; margin-bottom:5px;">Account Number</label>
+                <input type="text" id="accNumber" style="width:100%; padding:8px; background:var(--dash-bg); border:1px solid var(--dash-border); color:white; border-radius:6px;">
+            </div>
         </div>
 
-        <button onclick="handleWithdrawSubmit()" id="btnWithdrawFinal" style="width:100%; padding:12px; background:var(--dash-gold); border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Request Withdrawal</button>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin: 1rem 0;">
+            <div>
+                <label style="font-size:0.6rem; color:var(--dash-muted); display:block; margin-bottom:5px;">Bank Name</label>
+                <input type="text" id="bankName" placeholder="e.g. Capitec" style="width:100%; padding:8px; background:var(--dash-bg); border:1px solid var(--dash-border); color:white; border-radius:6px;">
+            </div>
+            <div>
+                <label style="font-size:0.6rem; color:var(--dash-muted); display:block; margin-bottom:5px;">Branch Code</label>
+                <input type="text" id="branchCode" style="width:100%; padding:8px; background:var(--dash-bg); border:1px solid var(--dash-border); color:white; border-radius:6px;">
+            </div>
+        </div>
+
+        <button onclick="handleWithdrawSubmit()" id="btnWithdrawFinal" style="width:100%; padding:12px; background:var(--dash-gold); border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Confirm Instant Withdrawal</button>
     </div>
 </div>
 
 <script>
-// Wallet UI Functions
-function openDepositModal() {
-    document.getElementById('depositModal').style.display = 'flex';
-}
-
-function closeDepositModal() {
-    document.getElementById('depositModal').style.display = 'none';
-}
-
-function openWithdrawModal() {
-    document.getElementById('withdrawModal').style.display = 'flex';
-}
-
-function closeWithdrawModal() {
-    document.getElementById('withdrawModal').style.display = 'none';
-}
-
-async function handleDepositSubmit() {
-    const amount = document.getElementById('depositAmount').value;
-    if (window.initiateDeposit) {
-        await window.initiateDeposit(amount);
-    }
-}
+// ... (previous UI functions)
 
 async function handleWithdrawSubmit() {
     const amount = document.getElementById('withdrawAmount').value;
-    const bankDetails = document.getElementById('bankDetails').value;
+    const accHolder = document.getElementById('accHolder').value;
+    const accNumber = document.getElementById('accNumber').value;
+    const bankName = document.getElementById('bankName').value;
+    const branchCode = document.getElementById('branchCode').value;
     const btn = document.getElementById('btnWithdrawFinal');
 
     if (!amount || amount <= 0) {
         alert('Please enter a valid amount.');
         return;
     }
-    if (!bankDetails.trim()) {
-        alert('Please provide your bank details.');
+    if (!accHolder || !accNumber || !bankName) {
+        alert('Please fill in all banking details.');
         return;
     }
 
     btn.disabled = true;
-    btn.textContent = 'Processing...';
+    btn.textContent = 'Processing Instant Payout...';
+
+    const bankData = {
+        account_holder: accHolder,
+        account_number: accNumber,
+        bank_name: bankName,
+        bank_code: branchCode || '000000',
+        account_type: '1' // Default to Check/Current
+    };
 
     if (window.initiateWithdrawal) {
-        const success = await window.initiateWithdrawal(amount, bankDetails);
+        const success = await window.initiateWithdrawal(amount, bankData);
         if (success) {
             closeWithdrawModal();
-            document.getElementById('withdrawAmount').value = '';
-            document.getElementById('bankDetails').value = '';
+            // Clear fields
+            ['withdrawAmount', 'accHolder', 'accNumber', 'bankName', 'branchCode'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
         }
     }
 
     btn.disabled = false;
-    btn.textContent = 'Request Withdrawal';
+    btn.textContent = 'Confirm Instant Withdrawal';
 }
 
 async function updateWalletUI() {
