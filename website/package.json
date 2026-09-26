@@ -1,0 +1,6 @@
+{
+  "name": "dtws-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Public DTWS marketing + customer portal (Next.js 14 App Router)."
+}
