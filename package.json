@@ -1,17 +1,29 @@
 {
-  "name": "dtws-website",
+  "name": "dtws-monorepo",
   "version": "1.0.0",
-  "description": "DemiTech Web Services AI Command Center",
   "private": true,
+  "description": "DTWS: separate public website + private Optimus monorepo",
+  "workspaces": [
+    "website",
+    "optimus",
+    "shared"
+  ],
   "scripts": {
-    "dev": "next dev -p 3000",
-    "build": "next build",
-    "start": "next start",
+    "dev:website": "cross-env NEXT_DIR=website next dev website -p 3000",
+    "dev:optimus": "cross-env NEXT_DIR=optimus next dev optimus -p 3001",
+    "build:website": "cross-env NEXT_DIR=website next build website",
+    "build:optimus": "cross-env NEXT_DIR=optimus next build optimus",
+    "build:all": "npm run build:website && npm run build:optimus",
+    "typecheck": "npm run typecheck:website && npm run typecheck:optimus",
+    "typecheck:website": "tsc --noEmit -p website/tsconfig.json",
+    "typecheck:optimus": "tsc --noEmit -p optimus/tsconfig.json",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "start:website": "cross-env PORT=3000 next start website -p 3000",
+    "start:optimus": "cross-env PORT=3001 next start optimus -p 3001",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
-    "postbuild": "node scripts/scan-secrets.mjs"
+    "postbuild": "node scripts/scan-secrets.mjs",
+    "postbuild:all": "node scripts/scan-secrets.mjs website optimus"
   },
   "repository": {
     "type": "git",
@@ -24,6 +36,7 @@
     "appwrite": "^24.2.0",
     "axios": "^1.6.0",
     "clsx": "^2.1.1",
+    "cross-env": "^7.0.3",
     "date-fns": "^3.6.0",
     "firebase": "^12.12.0",
     "firebase-admin": "^12.7.0",
@@ -41,6 +54,7 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.20",
+    "cross-env": "^7.0.3",
     "eslint": "^8.57.1",
     "eslint-config-next": "14.2.15",
     "jest": "^29.7.0",
