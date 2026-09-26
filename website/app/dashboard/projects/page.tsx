@@ -26,7 +26,7 @@ type OrderDocData = {
 type OrderDoc = OrderDocData & { id: string };
 
 export default function ClientDashboardPage() {
-  const { user, profile, initialising, isAdmin } = useFirebaseUser();
+  const { user, profile, initialising } = useFirebaseUser();
   const { signOut } = useFirebase();
   const router = useRouter();
 
