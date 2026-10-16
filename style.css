@@ -1141,6 +1141,11 @@ footer {
   text-decoration: none;
   transition: color 0.2s;
 }
+.footer-detail {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
 .footer-col a:hover { color: var(--gold); }
 .footer-bottom {
   border-top: 1px solid var(--border);
@@ -1304,4 +1309,11 @@ footer {
   .hero-stats { grid-template-columns: 1fr; }
   .why-strip { grid-template-columns: 1fr !important; }
   .section-title { font-size: 1.8rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+@media (max-width: 480px) {
+  .wa-float { width: 50px; height: 50px; right: 1rem; bottom: 1rem; }
 }
