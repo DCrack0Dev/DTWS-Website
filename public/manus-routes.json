@@ -1,0 +1,13 @@
+{
+  "routes": [
+    {"path": "/", "title": "DemiTech Web Services"},
+    {"path": "/pricing.html", "title": "Pricing"},
+    {"path": "/portfolio.html", "title": "Portfolio"},
+    {"path": "/contact.html", "title": "Contact"},
+    {"path": "/login.html", "title": "Login"},
+    {"path": "/register.html", "title": "Register"},
+    {"path": "/dashboard.html", "title": "Dashboard"},
+    {"path": "/admin.html", "title": "Admin"}
+  ]
+}
+***
