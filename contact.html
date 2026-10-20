@@ -377,6 +377,13 @@ try { if (localStorage.getItem('dtws-theme') === 'light') document.documentEleme
         }
     };
 
+    // Open a blank tab immediately from the user's submit gesture. This keeps
+    // the WhatsApp handoff reliable on mobile browsers after async requests.
+    const whatsappWindow = window.open('about:blank', '_blank');
+    if (whatsappWindow) whatsappWindow.opener = null;
+
+    if (window.trackEvent) window.trackEvent('quote_submit', { service, budget });
+
     // Show feedback state
     btn.textContent = '⌛ Sending...';
     btn.disabled = true;
@@ -402,8 +409,9 @@ try { if (localStorage.getItem('dtws-theme') === 'light') document.documentEleme
         btn.style.background = '#2a7a2a';
         document.getElementById('form-feedback').style.display = 'block';
         
-        // Open WhatsApp
-        window.open(waUrl, '_blank');
+        // Complete the already-approved WhatsApp handoff.
+        if (whatsappWindow) whatsappWindow.location.href = waUrl;
+        else window.location.href = waUrl;
         
         setTimeout(() => {
           btn.textContent = '🚀 Send My Request';
@@ -415,7 +423,8 @@ try { if (localStorage.getItem('dtws-theme') === 'light') document.documentEleme
       } else {
         // Fallback to WhatsApp only if Formspree fails
         console.warn('Formspree failed, falling back to WhatsApp');
-        window.open(waUrl, '_blank');
+        if (whatsappWindow) whatsappWindow.location.href = waUrl;
+        else window.location.href = waUrl;
         btn.textContent = '✅ WhatsApp Opened!';
         btn.disabled = false;
       }
@@ -423,7 +432,8 @@ try { if (localStorage.getItem('dtws-theme') === 'light') document.documentEleme
     .catch((error) => {
       // General error fallback
       console.error('Submission error:', error);
-      window.open(waUrl, '_blank');
+      if (whatsappWindow) whatsappWindow.location.href = waUrl;
+      else window.location.href = waUrl;
       btn.textContent = '✅ WhatsApp Opened!';
       btn.disabled = false;
     });

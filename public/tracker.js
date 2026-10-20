@@ -34,5 +34,27 @@ async function trackVisit() {
     }
 }
 
+window.trackEvent = async function(eventName, details = {}) {
+    try {
+        if (typeof firebase === 'undefined') return;
+        await firebase.firestore().collection('site_events').add({
+            event: eventName,
+            page: window.location.pathname,
+            details,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    } catch (error) {
+        console.warn('Event tracking failed:', error);
+    }
+};
+
+document.addEventListener('click', (event) => {
+    const link = event.target.closest('a[href]');
+    if (!link || !window.trackEvent) return;
+    const href = link.getAttribute('href') || '';
+    if (href.includes('contact.html')) window.trackEvent('quote_cta_click', { href });
+    if (href.includes('wa.me')) window.trackEvent('whatsapp_cta_click', { href });
+});
+
 // Run after a short delay to ensure Firebase is initialized
 setTimeout(trackVisit, 2000);
