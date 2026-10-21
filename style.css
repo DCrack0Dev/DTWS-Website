@@ -1160,6 +1160,19 @@ section { position: relative; }
 .form-group select option { background: var(--bg); }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 .form-submit { width: 100%; }
+.form-reassurance {
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  margin: -1.25rem 0 1.75rem;
+}
+.form-footnote {
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.5;
+  text-align: center;
+  margin-top: 0.9rem;
+}
 
 /* ── FOOTER ── */
 footer {

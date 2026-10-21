@@ -130,21 +130,22 @@ try { if (localStorage.getItem('dtws-theme') === 'light') document.documentEleme
     <!-- FORM -->
     <div class="contact-form-wrap">
       <h3>Request a Free Quote</h3>
+      <p class="form-reassurance">Tell us what you want to build — it takes about 60 seconds. No obligation.</p>
       <form id="quote-form" action="https://formspree.io/f/xlgarwyw" method="POST">
         <input type="hidden" name="_subject" value="New DemiTech website quote request"/>
         <div class="form-row">
           <div class="form-group">
             <label for="name">Your Name</label>
-            <input type="text" id="name" name="name" placeholder="e.g. Thabo Nkosi" required/>
+            <input type="text" id="name" name="name" autocomplete="name" placeholder="e.g. Thabo Nkosi" required/>
           </div>
           <div class="form-group">
             <label for="phone">Phone / WhatsApp</label>
-            <input type="tel" id="phone" name="phone" placeholder="+27 82 000 0000" required/>
+            <input type="tel" id="phone" name="phone" autocomplete="tel" placeholder="+27 82 000 0000" required/>
           </div>
         </div>
         <div class="form-group">
           <label for="email">Email Address</label>
-          <input type="email" id="email" name="email" placeholder="you@yourbusiness.co.za" required/>
+          <input type="email" id="email" name="email" autocomplete="email" placeholder="you@yourbusiness.co.za" required/>
         </div>
         <div class="form-group">
           <label for="service">Service Needed</label>
@@ -181,6 +182,7 @@ try { if (localStorage.getItem('dtws-theme') === 'light') document.documentEleme
         <button type="submit" class="btn btn-gold form-submit">🚀 Send My Request</button>
       </form>
       <p id="form-feedback" style="display:none;margin-top:1rem;font-size:.85rem;color:var(--gold);text-align:center;">✅ Request sent! We'll be in touch within 24 hours.</p>
+      <p class="form-footnote">Prefer a quick chat? Your request can also continue in WhatsApp.</p>
     </div>
 
   </div>
