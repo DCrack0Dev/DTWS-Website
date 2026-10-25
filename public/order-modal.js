@@ -202,8 +202,20 @@ async function handleOrderSubmit(e) {
 
     const user = await window.getFirebaseUser();
     if (!user) {
-        alert('Please login to place an order.');
-        window.location.href = 'login.html';
+        const service = currentOrder.serviceName.toLowerCase();
+        const quoteService = service.includes('landing') ? 'Landing Page'
+            : service.includes('e-commerce') || service.includes('store') ? 'E-commerce Store'
+            : service.includes('mobile') || service.includes('app') ? 'Mobile App'
+            : service.includes('seo') ? 'SEO Services'
+            : service.includes('marketing') || service.includes('social') ? 'Digital Marketing'
+            : 'Business Website';
+        const budget = currentOrder.basePrice < 5000 ? 'Under R5,000'
+            : currentOrder.basePrice < 15000 ? 'R5,000 – R15,000'
+            : currentOrder.basePrice < 40000 ? 'R15,000 – R40,000'
+            : currentOrder.basePrice < 100000 ? 'R40,000 – R100,000'
+            : 'Over R100,000';
+        const params = new URLSearchParams({ service: quoteService, budget, source: 'pricing-order' });
+        window.location.href = `contact.html?${params.toString()}`;
         return;
     }
 

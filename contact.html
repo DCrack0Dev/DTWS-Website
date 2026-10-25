@@ -326,6 +326,21 @@ try { if (localStorage.getItem('dtws-theme') === 'light') document.documentEleme
 </script>
 
 <script>
+ (() => {
+   const params = new URLSearchParams(window.location.search);
+   const service = params.get('service');
+   const budget = params.get('budget');
+   const source = params.get('source');
+   const serviceField = document.getElementById('service');
+   const budgetField = document.getElementById('budget');
+   const messageField = document.getElementById('message');
+   if (service && serviceField) serviceField.value = service;
+   if (budget && budgetField) budgetField.value = budget;
+   if (source === 'pricing-order' && messageField) {
+     messageField.value = `I’m interested in a ${service || 'website'} project. Please advise on the best next steps.`;
+   }
+ })();
+
  document.getElementById('quote-form').addEventListener('submit', function(e) {
     e.preventDefault();
     const btn = this.querySelector('button');
