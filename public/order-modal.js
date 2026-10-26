@@ -205,10 +205,14 @@ async function handleOrderSubmit(e) {
         const service = currentOrder.serviceName.toLowerCase();
         const quoteService = service.includes('landing') ? 'Landing Page'
             : service.includes('e-commerce') || service.includes('store') ? 'E-commerce Store'
-            : service.includes('mobile') || service.includes('app') ? 'Mobile App'
+            : service.includes('web app') || service.includes('api') || service.includes('chat bot') ? 'Web Application'
+            : service.includes('mobile app') ? 'Mobile App'
             : service.includes('seo') ? 'SEO Services'
-            : service.includes('marketing') || service.includes('social') ? 'Digital Marketing'
-            : 'Business Website';
+            : service.includes('marketing') || service.includes('social') || service.includes('paid ads') ? 'Digital Marketing'
+            : service.includes('ui') || service.includes('ux') || service.includes('logo') ? 'Logo & Branding'
+            : service.includes('maintenance') || service.includes('support') ? 'Maintenance'
+            : service.includes('website') ? 'Business Website'
+            : 'Consultation';
         const budget = currentOrder.basePrice < 5000 ? 'Under R5,000'
             : currentOrder.basePrice < 15000 ? 'R5,000 – R15,000'
             : currentOrder.basePrice < 40000 ? 'R15,000 – R40,000'
