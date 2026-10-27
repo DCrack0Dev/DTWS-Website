@@ -131,6 +131,7 @@ try { if (localStorage.getItem('dtws-theme') === 'light') document.documentEleme
     <div class="contact-form-wrap">
       <h3>Request a Free Quote</h3>
       <p class="form-reassurance">Tell us what you want to build — it takes about 60 seconds. No obligation.</p>
+      <p id="pricing-handoff-note" style="display:none;margin:-.75rem 0 1.25rem;padding:.7rem .85rem;border:1px solid rgba(212,160,23,.35);color:var(--gold);font-size:.78rem;line-height:1.5;">Your Pricing selection has been carried over below — just add your details.</p>
       <form id="quote-form" action="https://formspree.io/f/xlgarwyw" method="POST">
         <input type="hidden" name="_subject" value="New DemiTech website quote request"/>
         <div class="form-row">
@@ -334,10 +335,12 @@ try { if (localStorage.getItem('dtws-theme') === 'light') document.documentEleme
    const serviceField = document.getElementById('service');
    const budgetField = document.getElementById('budget');
    const messageField = document.getElementById('message');
+   const handoffNote = document.getElementById('pricing-handoff-note');
    if (service && serviceField) serviceField.value = service;
    if (budget && budgetField) budgetField.value = budget;
    if (source === 'pricing-order' && messageField) {
      messageField.value = `I’m interested in a ${service || 'website'} project. Please advise on the best next steps.`;
+     if (handoffNote) handoffNote.style.display = 'block';
    }
  })();
 

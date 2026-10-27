@@ -49,6 +49,14 @@ window.trackEvent = async function(eventName, details = {}) {
 };
 
 document.addEventListener('click', (event) => {
+    const orderButton = event.target.closest('.btn-order');
+    if (orderButton && window.trackEvent) {
+        window.trackEvent('pricing_order_click', {
+            service: orderButton.getAttribute('data-order') || '',
+            amount: orderButton.getAttribute('data-amount') || '',
+            category: orderButton.getAttribute('data-category') || ''
+        });
+    }
     const link = event.target.closest('a[href]');
     if (!link || !window.trackEvent) return;
     const href = link.getAttribute('href') || '';
