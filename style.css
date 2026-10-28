@@ -1209,6 +1209,13 @@ section { position: relative; }
   text-align: center;
   margin-top: 0.9rem;
 }
+.form-whatsapp-link {
+  color: var(--gold);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(212,160,23,.45);
+  padding-bottom: 2px;
+}
+.form-whatsapp-link:hover { color: var(--bright-gold); }
 
 /* ── FOOTER ── */
 footer {

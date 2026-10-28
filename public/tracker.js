@@ -61,7 +61,7 @@ document.addEventListener('click', (event) => {
     if (!link || !window.trackEvent) return;
     const href = link.getAttribute('href') || '';
     if (href.includes('contact.html')) window.trackEvent('quote_cta_click', { href });
-    if (href.includes('wa.me')) window.trackEvent('whatsapp_cta_click', { href });
+    if (href.includes('wa.me')) window.trackEvent('whatsapp_cta_click', { href, context: link.className || 'link' });
 });
 
 // Run after a short delay to ensure Firebase is initialized
