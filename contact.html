@@ -134,6 +134,7 @@ try { if (localStorage.getItem('dtws-theme') === 'light') document.documentEleme
       <p id="pricing-handoff-note" style="display:none;margin:-.75rem 0 1.25rem;padding:.7rem .85rem;border:1px solid rgba(212,160,23,.35);color:var(--gold);font-size:.78rem;line-height:1.5;">Your Pricing selection has been carried over below — just add your details.</p>
       <form id="quote-form" action="https://formspree.io/f/xlgarwyw" method="POST">
         <input type="hidden" name="_subject" value="New DemiTech website quote request"/>
+        <input type="hidden" id="lead-source" name="lead_source" value="direct"/>
         <div class="form-row">
           <div class="form-group">
             <label for="name">Your Name</label>
@@ -332,12 +333,14 @@ try { if (localStorage.getItem('dtws-theme') === 'light') document.documentEleme
    const service = params.get('service');
    const budget = params.get('budget');
    const source = params.get('source');
+   const leadSourceField = document.getElementById('lead-source');
    const serviceField = document.getElementById('service');
    const budgetField = document.getElementById('budget');
    const messageField = document.getElementById('message');
    const handoffNote = document.getElementById('pricing-handoff-note');
    if (service && serviceField) serviceField.value = service;
    if (budget && budgetField) budgetField.value = budget;
+   if (leadSourceField) leadSourceField.value = source || 'direct';
    if (source === 'pricing-order' && messageField) {
      messageField.value = `I’m interested in a ${service || 'website'} project. Please advise on the best next steps.`;
      if (handoffNote) handoffNote.style.display = 'block';
@@ -354,6 +357,7 @@ try { if (localStorage.getItem('dtws-theme') === 'light') document.documentEleme
     const service = formData.get('service');
     const budget = formData.get('budget');
     const message = formData.get('message');
+    const leadSource = formData.get('lead_source') || 'direct';
   
     // Create receipt format for WhatsApp
     const receipt = `*NEW PROJECT REQUEST* 🚀\n` +
@@ -382,6 +386,7 @@ try { if (localStorage.getItem('dtws-theme') === 'light') document.documentEleme
                     service,
                     budget,
                     message,
+                    leadSource,
                     status: 'new',
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
@@ -402,7 +407,7 @@ try { if (localStorage.getItem('dtws-theme') === 'light') document.documentEleme
     const whatsappWindow = window.open('about:blank', '_blank');
     if (whatsappWindow) whatsappWindow.opener = null;
 
-    if (window.trackEvent) window.trackEvent('quote_submit', { service, budget });
+    if (window.trackEvent) window.trackEvent('quote_submit', { service, budget, leadSource });
 
     // Show feedback state
     btn.textContent = '⌛ Sending...';
